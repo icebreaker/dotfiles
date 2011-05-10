@@ -1,0 +1,8 @@
+vbell off # turn off visual bell
+defscrollback 5000
+startup_message off
+defutf8 on
+hardstatus alwayslastline '%{= B} %H  %= %{= k}%{ W}%-w%{+b G}%n*%t%{-b G}%{k}%{ W}%+w %= %{c}%d %D %{M}%c '
+defbce "on"
+term xterm-256color
+nonblock "on"

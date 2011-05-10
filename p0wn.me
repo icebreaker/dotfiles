@@ -1,0 +1,29 @@
+#!/bin/bash
+
+DOTFILES=$HOME/.dotfiles
+
+SYMLINK=".symlink"
+for src in $(find $DOTFILES -name "*$SYMLINK" -print); do
+
+	SRC=$(basename $src $SYMLINK)
+	DIR=$(dirname $src)
+	PARENT=$(dirname $DIR)
+	
+	if test "$PARENT" != "$DOTFILES"; then # second or Nth level dirs
+		TARGET_DIR=$HOME/.${DIR#$DOTFILES/*/}
+		mkdir -p -v $TARGET_DIR
+		
+		TARGET=$TARGET_DIR/$SRC
+	else # first level dirs
+		TARGET=$HOME/.$SRC
+	fi
+	
+	# take extra care for nested symlinked dirs as targets
+	# even though -n should suffice, but sometimes it doesn't
+	if [ ! -d "$TARGET" ]; then
+		ln -v -s -n $src $TARGET
+	fi
+	
+done
+
+# source $HOME/.bashrc

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<style-scheme id="OSX" _name="OSX" version="1.0">
+	<author>www.aprium.net</author>
+	<_description>Well its a colour scheme and its very good</_description>
+	<!-- Colors  -->
+	<color name="gray20" value="#333333"/>
+	<color name="gray70" value="#b3b3b3"/>
+	<color name="white" value="#f2f2f2"/>
+	<color name="black" value="#141413"/>
+	<color name="green" value="#6fa551"/>
+	<color name="aqua" value="#00d8ff"/>
+	<color name="blue" value="#3261b9"/>
+	<color name="lightskyblue" value="#5e93d4"/>
+	<color name="purple" value="#58257d"/>
+	<color name="orange" value="#D49D4C"/>
+	<color name="carbon" value="#232323"/>
+	<color name="salmon" value="#fa8072"/>
+	<color name="steelblue3" value="#4f94cd"/>
+	<color name="palevioletred2" value="#ee799f"/>
+	<color name="brown4" value="#8b2323"/>
+	<color name="red" value="#a43665"/>
+	<!-- Global Settings -->
+	<style name="text" foreground="gray20"/>
+	<style name="cursor" foreground="black"/>
+	<style name="current-line" foreground="gray70" />
+	<style name="line-numbers" foreground="gray70" background="gray70"/>
+	<!-- Bracket Matching -->
+	<style name="bracket-match" foreground="blue3"/>
+	<style name="bracket-mismatch" foreground="red" bold="true"/>
+	<style name="search-match" foreground="brown4" bold="true"/>
+	<!-- Comments -->
+	<style name="def:comment" foreground="green"/>
+	<style name="def:shebang" foreground="green"/>
+	<style name="def:doc-comment-element" foreground="green" bold="true"/>
+	<!-- Constants and Variables-->
+	<style name="def:constant" foreground="blue"/>
+	<style name="def:string" foreground="gray20"/>
+	<style name="def:special-char" foreground="purple"/>
+	<style name="def:special-constant" foreground="purple" bold="true"/>
+	<style name="def:boolean" foreground="purple" bold="true"/>
+	<style name="def:number" foreground="orange"/>
+	<style name="def:floating-point" foreground="white"/>
+	<style name="def:keyword" foreground="blue" italic="true"/>
+	<style name="def:builtin" foreground="lightskyblue"/>
+	<style name="def:variable" foreground="red"/>
+	<!-- Identifiers -->
+	<style name="def:identifier" foreground="red"/>
+	<!-- Statements -->
+	<style name="def:statement" foreground="lightskyblue"/>
+	<!-- Types -->
+	<style name="def:type" foreground="blue"/>
+	<!-- Others -->
+	<style name="def:error" foreground="white" background="red" bold="true"/>
+	<style name="def:note" foreground="black" background="orange" bold="true"/>
+	<style name="def:net-address-in-comment" foreground="blue" italic="true" underline="true"/>
+	<style name="def:preprocessor" foreground="purple" bold="true"/>
+	<!-- Unknown? -->
+	<style name="def:specials" foreground="white" background="purple"/>
+	<!-- C Styles -->
+	<style name="c:preprocessor" foreground="purple" map-to="def:special-char"/>
+	<!-- Diff Styles -->
+	<style name="diff:ignore" foreground="gray70"/>
+	<!-- Ruby Styles -->
+	<style name="ruby:module-handler" foreground="blue"/>
+	<style name="ruby:symbol" foreground="blue"/>
+	<style name="ruby:special-variable" foreground="orange" bold="true"/>
+	<style name="ruby:predefined-variable" foreground="purple"/>
+	<style name="ruby:regex" foreground="green"/>
+	<!-- SH Styles -->
+	<style name="sh:function" foreground="salmon"/>
+	<style name="sh:variable1" foreground="purple"/>
+	<style name="sh:variable2" foreground="purple"/>
+	<style name="sh:others" map-to="text"/>
+	<!-- XML Styles -->
+	<style name="xml:attribute-name" foreground="purple"/>
+	<style name="xml:element-name" foreground="blue"/>
+</style-scheme>
+

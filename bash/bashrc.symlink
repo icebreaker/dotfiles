@@ -1,0 +1,13 @@
+# shortcut to $DOTFILES
+export DOTFILES=$HOME/.dotfiles
+
+# source every .bsh file
+for config_file in $(find $DOTFILES -name "*.bsh" -print);
+do
+	. $config_file
+done
+
+# source private (i.e ECHO_NEST_API_KEY)
+if [ -f ~/.localrc ]; then
+    . ~/.localrc
+fi

@@ -1,0 +1,9 @@
+[Gedit Plugin]
+Loader=python
+Module=autotab
+IAge=2
+Name=Auto Tab
+Description=Automatically detect tab preferences for source files.
+Authors=Kristoffer Lundén <kristoffer.lunden@gmail.com>, Lars Uebernickel (larsuebernickel@gmx.de)
+Copyright=Copyright © 2007 Kristoffer Lundén <kristoffer.lunden@gmail.com>, Lars Uebernickel (larsuebernickel@gmx.de)
+Website=http://gedit-autotab.googlecode.com/

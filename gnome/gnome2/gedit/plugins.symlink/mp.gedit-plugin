@@ -1,0 +1,9 @@
+[Gedit Plugin]
+Loader=python
+Module=mp
+IAge=2
+Name=Markdown Preview
+Description=Show the HTML version of the Markdown text you're editing using WebKit and the GitHub cascading stylesheet.
+Authors=Michele Campeotto <micampe@micampe.it>\nMihail Szabolcs <szaby@szabster.net>
+Copyright=Copyright (c) 2010, Mihail Szabolcs
+Website=http://www.szabster.net/

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<style-scheme id="simons" _name="Simon's Dark" version="1.0">
+
+  <author>Simon Zimmermann</author>
+  <_description>Dark color scheme</_description>
+
+  <!-- Color Palette -->
+  <color name="yellow"      	            value="#fce94f"/>
+  <color name="orange"                      value="#f57900"/>
+  <color name="skyblue"                     value="#729fcf"/>
+  <color name="lightblue"                   value="#5ED3FF"/>
+  <color name="blue"                        value="#3D93E5"/>
+  <color name="darkblue"                    value="#5D8291"/>
+  <color name="red"			                value="#cc0000"/>
+  <color name="lightgrey"                   value="#eeeeec"/>
+  <color name="grey"                  		value="#E8EBE4"/>
+  <color name="darkgrey"	                value="#888a85"/>
+  <color name="verydarkgrey"                value="#555753"/>
+  <color name="veryverydarkgrey"            value="#2e3436"/>
+
+  <!-- Global Settings -->
+  <style name="text"                        foreground="grey" background="veryverydarkgrey"/>
+  <style name="selection"                   foreground="lightgrey" background="darkgrey"/>
+  <style name="cursor"                      foreground="grey"/>
+  <style name="current-line"                background="verydarkgrey"/>
+  <style name="line-numbers"                foreground="darkgrey" background="veryverydarkgrey"/>
+  <style name="search-match"  				background="darkgrey" bold="true" underline="true"/>
+ 
+  <!-- Bracket Matching -->
+  <style name="bracket-match"               foreground="lightgrey" background="darkgrey" bold="true"/>
+  <style name="bracket-mismatch"            foreground="lightgrey" background="red" bold="true"/>
+
+  <!-- Comments -->
+  <style name="def:comment"                 foreground="darkgrey"/>
+  <style name="def:sheband"                 foreground="darkgrey" bold="true"/>
+  <style name="def:doc-comment-element"     italic="true"/>
+
+  <!-- Constants -->
+  <style name="def:constant"                foreground="yellow"/>    
+  <style name="def:string"                  foreground="yellow"/>
+  <style name="def:special-char"            foreground="orange"/>
+  <style name="def:special-constant"        foreground="orange"/>
+  <style name="def:floating-point"          foreground="orange"/>
+
+  <!-- Identifiers -->
+  <style name="def:identifier"              foreground="skyblue"/>
+
+  <!-- Statements -->
+  <style name="def:statement"               foreground="blue"/>
+
+  <!-- Types -->
+  <style name="def:type"                    foreground="lightblue"/> 
+
+  <!-- Others -->
+  <style name="def:preprocessor"            foreground="darkblue"/>
+  <style name="def:error"                   foreground="lightgrey" background="red" bold="true"/>
+  <style name="def:note"                    background="yellow" foreground="darkgrey" bold="true"/>
+  <style name="def:underlined"              italic="true" underline="true"/>
+ 
+</style-scheme>

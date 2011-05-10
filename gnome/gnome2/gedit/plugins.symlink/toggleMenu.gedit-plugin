@@ -1,0 +1,9 @@
+[Gedit Plugin]
+Loader=python
+Module=toggleMenu
+IAge=2
+Name=Toggle Menu
+Description=Show or Hide Menu Bar
+Authors=Intars Students <the.mobix@gmail.com>
+Copyright=Copyright © 2010 Intars Students <the.mobix@gmail.com>
+Website=http://www.gedit.org

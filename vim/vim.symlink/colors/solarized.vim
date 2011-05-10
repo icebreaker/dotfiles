@@ -1,0 +1,1 @@
+/home/icebreaker/Projects/solarized/vim-colors-solarized/colors/solarized.vim

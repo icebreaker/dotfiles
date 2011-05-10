@@ -1,0 +1,10 @@
+[Gedit Plugin]
+Loader=python
+Module=ViGedit
+IAge=2
+Name=vigedit
+Description=ViGedit (We Get It) makes it possible to use vi-style key bindings in Gedit.
+Icon=gedit-plugin
+Authors=Trond Danielsen <trond.danielsen@gmail.com>, Stephen Moore <delfick755@gmail.com>, Joseph Method <tristil@gmail.com>
+Copyright=Copyright © 2006 Trond Danielsen, © 2008, 2009 Stephen Moore, © 2008 Joseph Method 
+Website=http://launchpad.net/vigedit

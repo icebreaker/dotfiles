@@ -1,0 +1,120 @@
+" Custom make wrapper which can search for a valid Makefile.
+set makeprg=make.sh
+" Bind Ctrl+B to make
+map <c-b> <ESC>:make -f .project build<CR>
+" Bind Ctrl+R to execute
+map <c-r> <ESC>:make -f .project execute<CR>
+" Bind Ctrl+Q to clean
+map <c-k> <ESC>:make -f .project clean<CR>
+" Bind Ctrl+P to run premake and re-generate the Makefile
+map <c-p> <ESC>:! premake.sh gmake<CR>
+" Window Manager
+map <F9> <ESC>:WMToggle<CR>
+
+" BufExplorer Settings
+let g:bufExplorerSplitVertSize = 30
+let g:bufExplorerOpenMode = 1
+
+set encoding=utf8
+set fileencoding=utf8
+set selectmode=key
+set nowrap
+set complete-=i
+set wildmenu
+set fileformats=unix,mac,dos
+set nocp
+set keymodel=startsel
+set laststatus=2
+set novisualbell
+set number
+set report=0
+set lazyredraw
+set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$ 
+set autoindent
+set cindent
+set noexpandtab
+set smartindent
+set smartcase
+set tabstop=4
+set shiftwidth=4
+set softtabstop=4
+set cursorline
+set smarttab
+set showmatch
+set nohlsearch
+set incsearch
+set nocompatible
+set backspace=indent,eol,start
+set diffopt+=iwhite
+set hidden
+set nostartofline
+set shortmess=as
+set showcmd
+set ttyfast
+set ignorecase
+"set mouse=a
+set columns=80
+set ruler
+
+syntax on
+syntax sync fromstart
+filetype plugin on
+filetype plugin indent on
+filetype indent on
+filetype on
+
+set t_AB=^[[48;5;%dm
+set t_AF=^[[38;5;%dm
+set t_Co=256
+set term=gnome-256color
+set bg=light
+
+if has("gui_running")
+	set guifont=Monaco\ 14
+	set bg=dark
+endif
+
+let g:solarized_italic=0
+let g:solarized_termcolors=256
+colorscheme solarized
+
+" Word Completion
+function! Tab_Or_Complete()
+	if col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^\w'
+		return "\<C-N>"
+	else
+		return "\<Tab>"
+	endif
+endfunction
+inoremap <Tab> <C-R>=Tab_Or_Complete()<CR>
+
+" File Types
+au! BufRead,BufNewFile *.json set filetype=json
+au! BufRead,BufNewFile *.as set filetype=actionscript
+au! BufRead,BufNewFile *.ru set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2
+au! BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2
+au! BufRead,BufNewFile Rakefile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2
+au! BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
+au! BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc call SetFileTypeSH("bash")
+
+" Templating
+" Basic templating functionality I built for new *buffers*, not very
+" flexible but it does the job for simple templates, now I've replaced
+" it my new and shiny Templatizer data-driven generator project, I mainly
+" keep these here for further reference for those who might want this
+" kind of simple templating functionality.
+function! GetBaseName()
+	return expand('%:p:t:r')
+endfunction
+
+function! GetBaseNameNoPrefix()
+	let f = GetBaseName()
+	return strpart(f,2,strlen(f))
+endfunction
+
+"function! MyTemplate()
+"	0r $HOME/template.tpl
+"	execute(':%s/Template/' . GetBaseName() . '/g')
+"	execute(':%s/TEMPLATE/' . toupper(GetBaseName()) . '/g')
+"endfunction
+"autocmd BufNewFile *.myext silent! call MyTemplate()

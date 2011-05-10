@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<style-scheme version="1.0" name="Oblivion">
+  <style name="AddedLine" foreground="#e07000"/>
+  <style name="Comment" foreground="#888a85"/>
+  <style name="CurrentLine" background="#555753"/>
+  <style name="CurrentLineNumber" foreground="#808080" bold="true"/>
+  <style name="DiffFile" foreground="#8ae234" bold="true"/>
+  <style name="DiffLocation" foreground="#8ae234"/>
+  <style name="DisabledCode" foreground="#888a85"/>
+  <style name="Doxygen.Comment" foreground="#888a85" italic="true"/>
+  <style name="Doxygen.Tag" foreground="#888a85" bold="true"/>
+  <style name="Field" foreground="#d3d7cf"/>
+  <style name="Keyword" foreground="#729fcf"/>
+  <style name="Label" foreground="#cc0000"/>
+  <style name="LineNumber" foreground="#808080" background="#000000"/>
+  <style name="Link" foreground="#ffffff"/>
+  <style name="Local" foreground="#d3d7cf"/>
+  <style name="Number" foreground="#edd400"/>
+  <style name="Occurrences" foreground="#000000" background="#dcdcdc"/>
+  <style name="Occurrences.Rename" foreground="#000000" background="#ffc8c8"/>
+  <style name="Occurrences.Unused" foreground="#808000"/>
+  <style name="Operator" foreground="#d3d7cf"/>
+  <style name="Parentheses" foreground="#d3d7cf" background="#555753"/>
+  <style name="Preprocessor" foreground="#ad7fa8"/>
+  <style name="RemovedLine" foreground="#729fcf"/>
+  <style name="SearchResult" foreground="#eeeeec" background="#4e9a06"/>
+  <style name="SearchScope" foreground="#d3d7cf" background="#4e9a06"/>
+  <style name="Selection" foreground="#eeeeec" background="#888a85"/>
+  <style name="Static" foreground="#d3d7cf"/>
+  <style name="String" foreground="#edd400"/>
+  <style name="Text" foreground="#d3d7cf" background="#2e3436"/>
+  <style name="Type" foreground="#8ae234" bold="true"/>
+  <style name="VirtualMethod" foreground="#e07000"/>
+  <style name="VisualWhitespace" foreground="#c0c0c0"/>
+</style-scheme>
