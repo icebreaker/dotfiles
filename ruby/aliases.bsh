@@ -1,0 +1,6 @@
+alias s='rails server'
+alias c='rails console'
+alias r='rake'
+alias u='rake test:units'
+alias f='rake test:functionals'
+alias i='rake test:integration'
