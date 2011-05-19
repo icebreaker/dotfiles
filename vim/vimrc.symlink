@@ -58,10 +58,10 @@ set ruler
 
 syntax on
 syntax sync fromstart
+filetype on
 filetype plugin on
 filetype plugin indent on
 filetype indent on
-filetype on
 
 set t_AB=^[[48;5;%dm
 set t_AF=^[[38;5;%dm
@@ -96,6 +96,7 @@ au! BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop
 au! BufRead,BufNewFile Rakefile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2
 au! BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
 au! BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc call SetFileTypeSH("bash")
+au! BufRead,BufNewFile *.md,*.markdown,*.mdown set filetype=markdown
 
 " Templating
 " Basic templating functionality I built for new *buffers*, not very
