@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+	echo "usage: `basename $0` hda.img [cdrom.iso]"
+	exit 65
+fi
+
+if test -z "$2"; then
+	kvm -hda $1 -m 1024 -enable-kvm -sdl
+else
+	kvm -hda $1 -cdrom $2 -boot d -m 1024 -enable-kvm -sdl
+fi

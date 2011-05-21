@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+	echo "usage: `basename $0` hda.img [sizeG/M/K=10G]"
+	exit 65
+fi
+
+if test -z "$2"; then
+	qemu-img create -f qcow2 $1 10G
+else
+	qemu-img create -f qcow2 $1 $2
+fi
+
