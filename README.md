@@ -12,10 +12,10 @@ Getting Started
 ---------------
 * `git clone git://github.com/icebreaker/dotfiles ~/.dotfiles`
 * `cd ~/.dotfiles`
-* `./p0wn` (*installs symlinks to $HOME - files and directories alike*)
+* `make install` (or if you don't have `make`, then `./install`)
 
 If you `clone` to a non-standard location a.k.a not `$HOME/.dotfiles` be sure
-to edit `p0wn` and `bash/bashrc.symlink` then update the `$DOTFILES` variable
+to edit `bash/bashrc.symlink` and update the `DOTFILES` variable
 accordingly, but this rather Non-Orthodox practice is highly discouraged by the 
 high-priests of `The Dotfile Temple`. Earthlings, you have been **WARNED**.
 
@@ -27,7 +27,7 @@ break down your `EXPORTS`, `ENV` at your hearts content without stuffing everyth
 in a single file by just *simply* dropping in a *new file* somewhere within `.dotfiles`
 and `presto` you don't even need to edit anything. Neat isn't it?
 
-Secondly, whenever you execute `./p0wn` your `.dotfiles` directory is scanned for 
+Secondly, whenever you execute `make install` your `.dotfiles` directory is scanned for 
 files ending with `.symlink`; this support two types of symlinks:
 
 * $HOME/.yoursymlink
@@ -41,6 +41,15 @@ Now let's see with some real life examples how this works (source => target):
 
 That's all folks. Simple huh? A small price to pay for well a organized `.dotfiles`
 collection which makes updating a joy and breeze.
+
+Others
+------
+In the `$DOTFILES/bin` directory (which is automatically added to the PATH) there are
+a couple of `helper` or `wrapper` scripts which make my life easier in the first place
+and they might do the same for yours.
+
+I would like to highlight the `aliases` script which will list all your registered aliases
+sorted by topic inside your `.dotfiles` directory. You can even filter by topic using `aliases mytopic`.
 
 Contribute
 ----------
