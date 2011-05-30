@@ -1,5 +1,5 @@
-.DotFiles
-=========
+My Dotfiles
+===========
 I've been sharing my `.dotfiles` for quite some time now, but it was more of a
 chaotic mess than something really useful for another earthling.
 
