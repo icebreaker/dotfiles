@@ -1,3 +1,9 @@
+if [ "$OS" == "fedora" ]; then
+alias qs='sudo yum search'
+alias qi='sudo yum install'
+alias qr='sudo yum remove'
+alias qu='sudo yum update'
+else
 alias qs='sudo apt-cache search'
 alias qa='sudo apt-get autoremove'
 alias qf='sudo apt-get install -f'
@@ -7,3 +13,4 @@ alias qp='sudo dpkg -i'
 alias qu='sudo apt-get update'
 alias qg='sudo apt-get upgrade'
 alias qd='sudo apt-get dist-upgrade'
+fi

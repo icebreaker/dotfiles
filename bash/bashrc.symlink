@@ -1,5 +1,17 @@
+# OS
+if [ -f /etc/fedora-release ]; then
+	export OS="fedora"
+else
+	export OS="ubuntu"
+fi
+
 # shortcut to $DOTFILES
 export DOTFILES=$HOME/.dotfiles
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
 
 # source every .bsh file
 for config_file in $(find $DOTFILES -name "*.bsh" -print);
