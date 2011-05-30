@@ -5,10 +5,10 @@ else
 	export OS="ubuntu"
 fi
 
-# shortcut to $DOTFILES
+# atomic location of the dotfiles
 export DOTFILES=$HOME/.dotfiles
 
-# Source global definitions
+# source global definitions
 if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
 fi
