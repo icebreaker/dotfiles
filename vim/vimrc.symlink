@@ -76,7 +76,8 @@ endif
 
 let g:solarized_italic=0
 let g:solarized_termcolors=256
-colorscheme solarized
+"colorscheme solarized
+colorscheme sorcerer
 
 " Word Completion
 function! Tab_Or_Complete()

@@ -2,7 +2,6 @@ all:
 	@echo "Please run 'make install'."
 
 install:
-	@echo "Installing ..."
 	`pwd`/install
 
 uninstall:

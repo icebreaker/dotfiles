@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # pre-load the .bashrc
-. `pwd`/bash/bashrc.symlink
+. `pwd`/bash/bashrc.symlink &> /dev/null
 
 SYMLINK=".symlink"
 for src in $(find $DOTFILES -name "*$SYMLINK" -print); do
@@ -26,6 +26,3 @@ for src in $(find $DOTFILES -name "*$SYMLINK" -print); do
 	fi
 	
 done
-
-# reload the .bashrc once more
-. $HOME/.bashrc
