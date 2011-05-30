@@ -18,7 +18,7 @@ for SRC in $(find $DOTFILES -name "aliases.bsh" -print | sort); do
 
 	echo $DIR:
 	echo -e "\tname\tcommand"
-	echo -e "\t------------------------------------"
+	echo -e "\t----\t-------------------------------"
 	cat $SRC | grep "alias " | sort | awk '{split($0,r,"=");split(r[1],n," ");printf("\t%s\t%s\n",n[2],r[2]);}'
 done
 
