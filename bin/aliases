@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# look for all the available aliases and make a nice list
+for SRC in $(find $DOTFILES -name "aliases.bsh" -print); do
+	DIR=$(basename $(dirname $SRC))
+	echo $DIR:
+	cat $SRC | grep "alias " | sort | awk '{split($0,r,"=");split(r[1],n," ");printf("\t%s\t%s\n",n[2],r[2]);}'
+done
+
