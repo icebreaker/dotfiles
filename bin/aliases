@@ -1,8 +1,21 @@
 #!/bin/bash
 
+# optional topic argument used to filter aliases by topic
+if test -e "$1"; then
+	TOPIC=$1
+fi
+
 # look for all the available aliases and make a nice list
 for SRC in $(find $DOTFILES -name "aliases.bsh" -print); do
 	DIR=$(basename $(dirname $SRC))
+
+	# filter by topic
+	if test -e "$TOPIC"; then
+		if [ "$TOPIC" != "$DIR" ]; then
+			continue
+		fi
+	fi
+
 	echo $DIR:
 	cat $SRC | grep "alias " | sort | awk '{split($0,r,"=");split(r[1],n," ");printf("\t%s\t%s\n",n[2],r[2]);}'
 done
