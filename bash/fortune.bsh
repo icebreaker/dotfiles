@@ -1,1 +1,5 @@
-fortune | cowsay -n -f $(ls /usr/share/cowsay/cows/ | shuf -n1) 
+if [ -d /usr/share/cowsay/cows/ ]; then
+	fortune | cowsay -n -f $(ls /usr/share/cowsay/cows/ | shuf -n1) 
+else
+	fortune
+fi
