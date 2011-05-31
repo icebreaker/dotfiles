@@ -1,5 +1,5 @@
 all:
-	@echo "Please run 'make install'."
+	@echo "Please run 'make install' to 'install' or 'make update' to 'update'."
 
 update:
 	`pwd`/update
