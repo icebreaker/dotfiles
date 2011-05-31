@@ -22,7 +22,9 @@ for src in $(find $DOTFILES -name "*$SYMLINK" -print); do
 	# take extra care for nested symlinked dirs as targets
 	# even though -n should suffice, but sometimes it doesn't
 	if [ ! -d "$TARGET" ]; then
-		ln -v -s -n $src $TARGET
+		if [ ! -f "$TARGET" ]; then
+			ln -v -s -n $src $TARGET
+		fi
 	fi
 	
 done
