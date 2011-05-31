@@ -8,6 +8,24 @@ a number of reasons which I'm not going to tackle in this very README.
 
 **In six words**: My `.dotfiles` never been so **happy**!
 
+Back after the break
+--------------------
+                   ,
+                  / \,,_  .'|
+               ,{{| /}}}}/_.'
+              }}}}` '{{'  '.
+            {{{{{    _   ;, \
+         ,}}}}}}    /o`\  ` ;)
+        {{{{{{   /           (
+        }}}}}}   |            \
+       {{{{{{{{   \            \          ,-------------------------------.
+       }}}}}}}}}   '.__      _  |        /       HI                        \
+       {{{{{{{{       /`._  (_\ /       /      /   \                        |
+        }}}}}}'      |    //___/   --= <   VVVI     HI-HI-HI                |
+    jgs `{{{{`       |     '--'         \                   \               |
+         }}}`                            \                  HIM-HIM-HIM!!!  /
+                                          '--------------------------------'
+
 Getting Started
 ---------------
 * `git clone git://github.com/icebreaker/dotfiles ~/.dotfiles`

@@ -11,10 +11,6 @@ map <c-p> <ESC>:! premake.sh gmake<CR>
 " Window Manager
 map <F9> <ESC>:WMToggle<CR>
 
-" BufExplorer Settings
-let g:bufExplorerSplitVertSize = 30
-let g:bufExplorerOpenMode = 1
-
 set encoding=utf8
 set fileencoding=utf8
 set selectmode=key
@@ -128,4 +124,4 @@ endfunction
 "	execute(':%s/Template/' . GetBaseName() . '/g')
 "	execute(':%s/TEMPLATE/' . toupper(GetBaseName()) . '/g')
 "endfunction
-"autocmd BufNewFile *.myext silent! call MyTemplate()
+"au! BufNewFile *.myext silent! call MyTemplate()
