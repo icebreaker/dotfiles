@@ -1,6 +1,9 @@
 all:
 	@echo "Please run 'make install'."
 
+update:
+	`pwd`/update
+
 install:
 	`pwd`/install
 
@@ -11,5 +14,5 @@ clean: uninstall
 distclean: clean
 realclean: clean
 
-.PHONY: all install uninstall clean distclean realclean
+.PHONY: all update install uninstall clean distclean realclean
 
