@@ -31,9 +31,7 @@ Getting Started
 * `make install` (or if you don't have `make`, then `./install`)
 
 If you `clone` to a non-standard location a.k.a not `$HOME/.dotfiles` be sure
-to edit `bash/bashrc.symlink` and update the `DOTFILES` variable
-accordingly, but this rather Non-Orthodox practice is highly discouraged by the 
-high-priests of `The Dotfile Temple`. Earthlings, you have been **WARNED**.
+to edit `bash/bashrc.symlink` and update the `DOTFILES` variable.
 
 Behind the scenes magic
 -----------------------
@@ -44,22 +42,20 @@ in a single file by just *simply* dropping in a *new file* somewhere within `.do
 and `presto` you don't even need to edit anything. Neat isn't it?
 
 Secondly, whenever you execute `make install` your `.dotfiles` directory is scanned for 
-files ending with `.symlink`; this support two types of symlinks:
+files ending with `.symlink`.
 
-* $HOME/.yoursymlink
-* $HOME/.yourconfig/yoursymlink (the target directory is created if doesn't exist)
+Some real life examples in order to illustrate how this works:
 
-Now let's see with some real life examples how this works (source => target):
+* `$DOTFILES`/vim/vimrc.symlink => `$HOME`/.vimrc
+* `$DOTFILES`/vim/vim.symlink => `$HOME`/.vim
+* `$DOTFILES`/gnome/gnome2/gedit/themes.symlink => `$HOME`/.gnome2/gedit/themes
 
-* $DOTFILES/vim/vimrc.symlink => $HOME/.vimrc
-* $DOTFILES/vim/vim.symlink => $HOME/.vim
-* $DOTFILES/gnome/gnome2/gedit/themes.symlink => $HOME/.gnome2/gedit/themes
+That's all folks. Simple huh? 
 
-That's all folks. Simple huh? A small price to pay for well a organized `.dotfiles`
-collection which makes updating a joy and breeze.
+A small price to pay for well a organized `.dotfiles` collection which makes updating a joy and breeze.
 
-Others
-------
+Scripts
+-------
 In the `$DOTFILES/bin` directory (which is automatically added to the PATH) there are
 a couple of `helper` or `wrapper` scripts which make my life easier in the first place
 and they might do the same for yours.
