@@ -6,8 +6,6 @@ chaotic mess than something really useful for another earthling.
 Going on the `thematic` organization route with `symlinks` is a lot better for
 a number of reasons which I'm not going to tackle in this very README.
 
-**In six words**: My `.dotfiles` never been so **happy**!
-
 Back after the break
 --------------------
                    ,
@@ -68,6 +66,13 @@ and they might do the same for yours.
 
 I would like to highlight the `aliases` script which will list all your registered aliases
 sorted by topic inside your `.dotfiles` directory. You can even filter by topic using `aliases mytopic`.
+
+TODO
+----
+- use [pathogen](git://github.com/tpope/vim-pathogen.git) and git submodules for Vim
+	- CSApprox as submodule
+	- Solarized as submodule
+	- ScrollColor as submodule
 
 Contribute
 ----------
