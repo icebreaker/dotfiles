@@ -6,8 +6,8 @@ chaotic mess than something really useful for another earthling.
 Going on the `thematic` organization route with `symlinks` is a lot better for
 a number of reasons which I'm not going to tackle in this very README.
 
-Back after the break
---------------------
+Be Back After The Break
+-----------------------
                    ,
                   / \,,_  .'|
                ,{{| /}}}}/_.'
