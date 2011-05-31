@@ -60,8 +60,11 @@ In the `$DOTFILES/bin` directory (which is automatically added to the PATH) ther
 a couple of `helper` or `wrapper` scripts which make my life easier in the first place
 and they might do the same for yours.
 
-I would like to highlight the `aliases` script which will list all your registered aliases
-sorted by topic inside your `.dotfiles` directory. You can even filter by topic using `aliases mytopic`.
+I would like to highlight the `dot-aliases` script which will list all your registered aliases
+sorted by topic inside your `.dotfiles` directory. You can even filter by topic using `dot-aliases mytopic`.
+
+Also the `dot-update` will update your `.dotfiles` regardless of your current directory and it will also
+automatically reload your `.bashrc`.
 
 TODO
 ----
