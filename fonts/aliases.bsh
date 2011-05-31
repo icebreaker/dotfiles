@@ -1,1 +1,9 @@
+if [ "$OS" == "fedora" ]; then
+
+alias fu='fc-cache -f -v'
+
+else
+
 alias fu='sudo fc-cache -f -v'
+
+fi
