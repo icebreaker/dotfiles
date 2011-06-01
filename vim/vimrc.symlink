@@ -8,9 +8,14 @@ map <c-r> <ESC>:make -f .project execute<CR>
 map <c-k> <ESC>:make -f .project clean<CR>
 " Bind Ctrl+P to run premake and re-generate the Makefile
 map <c-p> <ESC>:! premake.sh gmake<CR>
-" Window Manager
-map <F9> <ESC>:WMToggle<CR>
+" Toggle Spell checking
+map <F4> :set spell! spelllang=en_us<CR>
+" Toggle compile errors window
+map <F3> :clist!<CR>
+" Toggle Line Numbers
+map <F2> :set nonumber!<CR>
 
+set nospell
 set encoding=utf8
 set fileencoding=utf8
 set selectmode=key
@@ -51,6 +56,10 @@ set ignorecase
 "set mouse=a
 set columns=80
 set ruler
+set undolevels=500
+set history=1000
+set nofsync
+set clipboard+=unnamed
 
 syntax on
 syntax sync fromstart
@@ -93,7 +102,7 @@ au! BufRead,BufNewFile Rakefile set filetype=ruby tabstop=2 shiftwidth=2 softtab
 au! BufRead,BufNewFile *.ru set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.erb set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.haml set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile *.haml set filetype=haml tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.sass set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.yml set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.rake set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
@@ -103,6 +112,7 @@ au! BufRead,BufNewFile *.php set filetype=php
 au! BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
 au! BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc call SetFileTypeSH("bash")
 au! BufRead,BufNewFile *.md,*.markdown,*.mdown set filetype=markdown
+au! BufRead,BufNewFile *.py set filetype=python
 
 " Templating
 " Basic templating functionality I built for new *buffers*, not very
