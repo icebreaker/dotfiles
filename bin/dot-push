@@ -1,0 +1,6 @@
+#!/bin/bash
+
+cd $DOTFILES
+git add .
+git commit -m "$@"
+git push origin master
