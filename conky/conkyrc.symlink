@@ -1,0 +1,70 @@
+lua_load ~/.dotfiles/conky/rings-v1.2.lua
+lua_draw_hook_pre ring_stats
+
+own_window yes
+own_window_hints undecorated,below,skip_taskbar
+#own_window_type desktop
+own_window_colour brown
+own_window_transparent yes
+background no
+
+double_buffer yes
+
+use_spacer left
+use_xft yes
+
+# Update interval in seconds
+update_interval 1.0
+
+draw_outline no
+draw_borders no
+
+uppercase no
+
+stippled_borders 8
+
+default_color 2d3e4e
+default_shade_color 98c4f5
+default_outline_color 98c4f5
+
+alignment top_left
+
+minimum_size 1366 80
+
+border_inner_margin 0 0
+
+gap_x 0
+gap_y 0
+
+override_utf8_locale no
+xftfont Monaco:bold:size=12
+xftalpha 0.8
+
+TEXT
+${offset 60}${voffset 100}${font Santana:bold:size=28}${color white}${time %A,} ${color white}${time %B %e %G}$font
+
+${offset 1030}${voffset -140}${color}${font openlogos:size=60}U${font Monaco:bold:size=20}${color white}GNU${color }LINUX${color}${font openlogos:size=60}t
+
+${offset 1000}${voffset -170}${font Monaco:bold:size=13}${color}SYSTEM ${color}${hr 2}
+${offset 1000}$font${color}$kernel${color} $alignr $machine
+${offset 1000}$font${color}$nodename ${color} $alignr $uptime
+
+${offset 1000}${font Monaco:bold:size=13}${color}CPU ${color}${hr 2}
+${offset 1000}$font${color}CPU1  ${color}${cpu cpu1}% ${cpubar cpu1}
+${offset 1000}$font${color}CPU2  ${color}${cpu cpu2}% ${cpubar cpu2}
+
+${offset 1000}${font Monaco:bold:size=13}${color}MEMORY ${color}${hr 2}
+${offset 1000}$font${color}MEM  ${color}$alignr $mem / $memmax
+${offset 1000}$membar
+
+${offset 1000}${font Monaco:bold:size=13}${color}HDD ${color}${hr 2}
+${offset 1000}$font${color}ROOT  ${color}$alignr ${fs_free /}/${fs_size /}
+${offset 1000}$fs_bar
+${offset 1000}$font${color}HOME  ${color}$alignr ${fs_free /home}/${fs_size /home}
+${offset 1000}$fs_bar
+${offset 1000}$font${color}OPT  ${color}$alignr ${fs_free /opt}/${fs_size /opt}
+${offset 1000}$fs_bar
+
+${offset 1000}${font Monaco:bold:size=13}${color}NET ${color}${hr 2}
+${offset 1000}$font${color}Uploaded  ${color} $alignr ${totalup wlan0}
+${offset 1000}$font${color}Downloaded  ${color} $alignr ${totaldown wlan0}
