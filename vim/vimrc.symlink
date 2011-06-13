@@ -107,7 +107,7 @@ au! BufRead,BufNewFile *.erb set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.haml set filetype=haml tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.sass set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.yml,*.yaml set filetype=yaml tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.rake set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile *.rake,*.gemspec set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.install set filetype=php
 au! BufRead,BufNewFile *.inc set filetype=php
 au! BufRead,BufNewFile *.php set filetype=php
