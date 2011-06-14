@@ -18,3 +18,5 @@ alias qg='sudo apt-get upgrade'
 alias qd='sudo apt-get dist-upgrade'
 
 fi
+
+alias jsmin='java -jar /opt/bin/yuicompressor-2.4.6.jar --nomunge'
