@@ -49,7 +49,7 @@ color1 C22F2F
 color2 white
 
 TEXT
-${font Droid Sans:style=Bold:size=8}SYSTEM $stippled_hr${font}
+${font Droid Sans:style=Bold:size=8}SYSTEM ${hr 2}${font}
 ##############
 # - SYSTEM - #
 ##############
@@ -67,32 +67,23 @@ ${voffset 4}${offset 1}${color0}${swapbar 4,18}${color}${voffset -4}${goto 32}F:
 #############
 # - CLOCK - #
 #############
-${voffset 4}${font Droid Sans:style=Bold:size=8}DATE $stippled_hr${font}
+${voffset 4}${font Droid Sans:style=Bold:size=8}DATE ${hr 2}${font}
 ${voffset -10}${alignc 46}${color2}${font Arial Black:size=30}${time %H:%M}${font}${color}
 ${alignc}${time %d %B %Y}
 ####################
 # - MEDIA PLAYER - #
 ####################
-${voffset 4}${font Droid Sans:style=Bold:size=8}MEDIA PLAYER $stippled_hr${font}
+${voffset 4}${font Droid Sans:style=Bold:size=8}MEDIA PLAYER ${hr 2}${font}
 ${execi 6 /home/coderguy/.conkycolors/bin/conkyCover}${execpi 2 /usr/share/conkycolors/bin/conkyRhythmbox -t /home/coderguy/.conkycolors/templates/conkyPlayer.template}
 ##########
 # - HD - #
 ##########
-${voffset 4}${font Droid Sans:style=Bold:size=8}HD $stippled_hr${font}
+${voffset 4}${font Droid Sans:style=Bold:size=8}HD ${hr 2}${font}
 ${execpi 30 /usr/share/conkycolors/bin/conkyHD1}
 ###############
 # - WEATHER - #
 ###############
 # For a working weather script you NEED to define, in a user specific config file, a partner id and registration code for the weather.com xoap service. For this purpose copy .conkyForecast.config in /usr/share/conkycolors folder to your home and setup as required.
 # http://www.weather.com/services/xmloap.html
-${voffset 4}${font Droid Sans:style=Bold:size=8}WEATHER $stippled_hr${font}
-# |--WLAN0
-${if_up wlan0}
-${execpi 10800 /usr/share/conkycolors/bin/conkyForecast --location=hROXX0043 -t /home/coderguy/.conkycolors/templates/conkyForecast.template}
-# |--ETH0
-${else}${if_up eth0}
-${execpi 10800 /usr/share/conkycolors/bin/conkyForecast --location=hROXX0043 -t /home/coderguy/.conkycolors/templates/conkyForecast.template}
-# |--PPP0
-${else}${if_up ppp0}
-${execpi 10800 /usr/share/conkycolors/bin/conkyForecast --location=hROXX0043 -t /home/coderguy/.conkycolors/templates/conkyForecast.template}
-${else}${voffset 4}${color0}${font PizzaDude Bullets:size=12}4${font}${color}${goto 32}Weather Unavailable${voffset 14}${endif}${endif}${endif}
+${voffset 4}${font Droid Sans:style=Bold:size=8}WEATHER ${hr 2}{font}
+${voffset 4}${execpi 10800 /usr/share/conkycolors/bin/conkyForecast -t /home/coderguy/.conkycolors/templates/conkyForecast.template}
