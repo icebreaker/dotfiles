@@ -1,2 +1,2 @@
-export BIN_PATH=$DOTFILES/bin
-export PATH=$BIN_PATH:$PATH
+export DOT_BIN=$DOTFILES/bin
+export PATH=$DOT_BIN:$PATH

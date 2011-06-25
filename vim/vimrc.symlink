@@ -75,7 +75,7 @@ set term=gnome-256color
 set bg=light
 
 if has("gui_running")
-	set guifont=Monaco\ 14
+	set guifont=Monaco\ 13
 	set bg=dark
 endif
 

@@ -1,0 +1,2 @@
+sudo update-alternatives --install /usr/bin/x-www-browser x-www-browser $DOT_BIN/google-chrome2 999
+sudo update-alternatives --set x-www-browser $DOT_BIN/google-chrome2

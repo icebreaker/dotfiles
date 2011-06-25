@@ -1,8 +1,12 @@
 # OS
 if [ -f /etc/fedora-release ]; then
-	export OS="fedora"
+	export DOT_OS="fedora"
 else
-	export OS="ubuntu"
+	if [ -x /usr/bin/lsb_release ]; then
+		export DOT_OS=$(lsb_release -d | awk '{ print tolower($2) }')
+	else
+		export DOT_OS="linux"
+	fi
 fi
 
 # atomic location of the dotfiles

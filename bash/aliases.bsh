@@ -1,4 +1,4 @@
-if [ "$OS" == "fedora" ]; then
+if [ "$DOT_OS" == "fedora" ]; then
 
 alias qs='sudo yum search'
 alias qi='sudo yum install'

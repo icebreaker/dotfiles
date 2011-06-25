@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec -a "$0" "google-chrome" --ignore-gpu-blacklist "$@"

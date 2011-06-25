@@ -28,3 +28,11 @@ for src in $(find $DOTFILES -name "*$SYMLINK" -print); do
 	fi
 	
 done
+
+INSTALL=".install"
+for src in $(find $DOTFILES -name "*$INSTALL" -print); do
+	. $src
+done
+
+# reload the installed / updated .bashrc
+. ~/.bashrc &> /dev/null
