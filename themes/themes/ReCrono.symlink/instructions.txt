@@ -1,0 +1,38 @@
+### HOW TO START ###
+
+As you can see in my preview image I've added a custom panel. 
+Gnome-panel unfortunately can't handle real transpareny without making it all look like a frellwit. 
+We can work around this by embedding some graphics on our wallpaper, making it look like real transparency.
+
+For this to work you need to have GIMP installed.
+Ubuntu users - Open a terminal and type: sudo apt-get install gimp
+Then you also need some plugins for gimp.
+You also need a GIMP plugin call Liquid Rescale: sudo apt-get install gimp-plugin-registry
+
+### THE IMAGE ###
+
+1. Locate the panel.png file in this theme's directory.
+
+2. Open the PNG-file in GIMP.
+
+3. Go to Layer > Liquid Rescale.
+
+4. Enter your screen resolution in the Width area and then resize the image. 
+(The "chain" icon next to the values needs to be "open". If it's locked, just click on it. It should be open by default though.)
+
+5. Press CTRL+A (or Select > All.) Copy the image and paste it on your wallpaper of choice. 
+Important: Your wallpaper must have the same width and height as your desktop resolution.
+
+6. Move the pasted layer to the top and then save your new wallpaper as whatever.png.
+
+### THE PANEL ###
+
+1. Go to the directory where you installed the theme. Open the panel.rc file.
+
+2. Put a # in front of bg_pixmap[NORMAL] so it will look like this:
+#bg_pixmap[NORMAL] = "/Panel/panel-bg.png" # Disable for normal panel backgrounds.
+Then save the document.
+
+3. Rightclick on your panel and select properties. Go to the Background tab and select Solid color. Move the Style slider all the way to the left.
+
+4. And you're done! Enjoy your "faked transparent panel."
