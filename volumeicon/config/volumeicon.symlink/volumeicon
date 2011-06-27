@@ -1,0 +1,19 @@
+
+[StatusIcon]
+stepsize=4
+lmb_slider=true
+mmb_mute=false
+onclick=xfce4-mixer
+theme=White Gnome
+
+[Hotkeys]
+up_enabled=true
+down_enabled=true
+mute_enabled=true
+up=XF86AudioRaiseVolume
+down=XF86AudioLowerVolume
+mute=XF86AudioMute
+
+[Alsa]
+card=hw:1
+channel=Master Front

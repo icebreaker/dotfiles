@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openbox_menu xmlns="http://openbox.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://openbox.org/                 file:///usr/share/openbox/menu.xsd">
+	<menu id="root-menu" label="Openbox 3">
+		<item label="Run Program">
+			<action name="Execute">
+				<execute>
+					gmrun
+				</execute>
+			</action>
+		</item>
+		<separator/>
+		<item label="Terminal">
+			<action name="Execute">
+				<execute>
+					terminator
+				</execute>
+			</action>
+		</item>
+		<item label="Web Browser">
+			<action name="Execute">
+				<execute>
+					x-www-browser
+				</execute>
+			</action>
+		</item>
+		<item label="Skype">
+			<action name="Execute">
+				<execute>
+					~/.dotfiles/bin/skype2
+				</execute>
+			</action>
+		</item>
+		<item label="Emphathy">
+			<action name="Execute">
+				<execute>
+					empathy
+				</execute>
+			</action>
+		</item>
+		<item label="File Manager">
+			<action name="Execute">
+				<execute>
+					thunar
+				</execute>
+			</action>
+		</item>
+		<item label="Text Editor">
+			<action name="Execute">
+				<execute>
+					gedit
+				</execute>
+			</action>
+		</item>
+		<item label="Media Player">
+			<action name="Execute">
+				<execute>
+					rhythmbox
+				</execute>
+			</action>
+		</item>
+		<separator/>
+		<menu id="multimedia" label="Multimedia">
+			<item label="Volume Control">
+				<action name="Execute">
+					<execute>
+						xfce4-mixer
+					</execute>
+				</action>
+			</item>
+			<item label="DVD/CD Burner">
+				<action name="Execute">
+					<execute>
+						xfburn
+					</execute>
+				</action>
+			</item>
+		</menu>
+		<menu id="network" label="Network">
+			<item label="Filezilla">
+				<action name="Execute">
+					<execute>
+						filezilla
+					</execute>
+				</action>
+			</item>
+			<item label="Transmission">
+				<action name="Execute">
+					<execute>
+						transmission
+					</execute>
+				</action>
+			</item>
+			<item label="XChat">
+				<action name="Execute">
+					<execute>
+						xchat
+					</execute>
+				</action>
+			</item>
+		</menu>
+		<separator/>
+		<menu execute="cb-dropbox-pipemenu" id="dropbox" label="Dropbox"/>
+		<separator/>
+		<menu id="settings" label="Settings">
+			<menu execute="cb-compmgr" id="CompositingPipeMenu" label="Compositing"/>
+			<menu id="conkyconfig" label="Conky Config">
+				<item label="Edit .conkyrc">
+					<action name="Execute">
+						<execute>
+							gedit ~/.conkyrc
+						</execute>
+					</action>
+				</item>
+				<item label="Restart Conky">
+					<action name="Execute">
+						<execute>
+							conkywonky
+						</execute>
+					</action>
+				</item>
+				<separator label="Help?"/>
+				<item label="man page">
+					<action name="Execute">
+						<execute>
+							terminator --command="man conky"
+						</execute>
+					</action>
+				</item>
+				<item label="Wiki Page">
+					<action name="Execute">
+						<execute>
+							x-www-browser http://crunchbanglinux.org/wiki/conky
+						</execute>
+					</action>
+				</item>
+			</menu>
+			<menu id="dmenuconfig" label="dmenu Config">
+				<item label="Edit start-up script">
+					<action name="Execute">
+						<execute>
+							gedit ~/.config/dmenu/dmenu-bind.sh
+						</execute>
+					</action>
+				</item>
+				<separator label="Help?"/>
+				<item label="man page">
+					<action name="Execute">
+						<execute>
+							terminator --command="man dmenu"
+						</execute>
+					</action>
+				</item>
+			</menu>
+			<menu id="gmrunconfig" label="gmrun Config">
+				<item label="Edit config file">
+					<action name="Execute">
+						<execute>
+							gedit ~/.gmrunrc
+						</execute>
+					</action>
+				</item>
+				<separator label="Help?"/>
+				<item label="man page">
+					<action name="Execute">
+						<execute>
+							terminator --command="man gmrun"
+						</execute>
+					</action>
+				</item>
+			</menu>
+			<menu id="obConfig" label="Openbox Config">
+				<item label="Edit menu.xml">
+					<action name="Execute">
+						<execute>
+							gedit ~/.config/openbox/menu.xml
+						</execute>
+					</action>
+				</item>
+				<item label="Edit rc.xml">
+					<action name="Execute">
+						<execute>
+							gedit ~/.config/openbox/rc.xml
+						</execute>
+					</action>
+				</item>
+				<item label="Edit autostart.sh">
+					<action name="Execute">
+						<execute>
+							gedit ~/.config/openbox/autostart.sh
+						</execute>
+					</action>
+				</item>
+				<item label="GUI Menu Editor">
+					<action name="Execute">
+						<execute>
+							obmenu
+						</execute>
+					</action>
+				</item>
+				<item label="GUI Config Tool">
+					<action name="Execute">
+						<execute>
+							obconf
+						</execute>
+					</action>
+				</item>
+				<item label="Reconfigure">
+					<action name="Reconfigure"/>
+				</item>
+				<item label="Restart">
+					<action name="Restart"/>
+				</item>
+			</menu>
+			<menu id="terminatorconfig" label="Terminator Config">
+				<item label="Edit config file">
+					<action name="Execute">
+						<execute>
+							gedit ~/.config/terminator/config
+						</execute>
+					</action>
+				</item>
+				<separator label="Help?"/>
+				<item label="man page">
+					<action name="Execute">
+						<execute>
+							terminator --command="man terminator_config"
+						</execute>
+					</action>
+				</item>
+			</menu>
+			<menu id="tint2config" label="tint2 Panel Config">
+				<item label="Edit config file">
+					<action name="Execute">
+						<execute>
+							gedit ~/.config/tint2/tint2rc
+						</execute>
+					</action>
+				</item>
+				<item label="GUI Config Tool">
+					<action name="Execute">
+						<execute>
+							tint2conf
+						</execute>
+					</action>
+				</item>
+				<separator label="Help?"/>
+				<item label="man page">
+					<action name="Execute">
+						<execute>
+							terminator --command="man tint2"
+						</execute>
+					</action>
+				</item>
+				<item label="Online Help">
+					<action name="Execute">
+						<execute>
+							x-www-browser http://code.google.com/p/tint2/wiki/Welcome
+						</execute>
+					</action>
+				</item>
+			</menu>
+			<menu id="DisplaySettings" label="Display Settings">
+			    <item label="Adjust with grandr">
+				    <action name="Execute">
+					    <execute>
+						    grandr
+					    </execute>
+				    </action>
+			    </item>
+			    <separator label="Help?"/>
+			    <item label="man xrandr">
+				    <action name="Execute">
+					    <execute>
+						    terminator --command="man xrandr"
+					    </execute>
+				    </action>
+			    </item>
+			</menu>
+			<menu id="NotificationsSettings" label="Notifications">
+			    <item label="Edit config file">
+				    <action name="Execute">
+					    <execute>
+						    gedit ~/.notify-osd
+					    </execute>
+				    </action>
+			    </item>
+			    <item label="Send test notification">
+				    <action name="Execute">
+					    <execute>
+						    cb-fortune
+					    </execute>
+				    </action>
+			    </item>
+			</menu>
+			<item label="Edit Default Applications">
+				<action name="Execute">
+					<execute>
+						terminator --command="sudo update-alternatives --all"
+					</execute>
+				</action>
+			</item>
+			<item label="User Interface Settings">
+				<action name="Execute">
+					<execute>
+						lxappearance
+					</execute>
+				</action>
+			</item>
+			<item label="Power Management">
+				<action name="Execute">
+					<execute>
+						xfce4-power-manager-settings
+					</execute>
+				</action>
+			</item>
+			<item label="Screensaver">
+				<action name="Execute">
+					<execute>
+						xscreensaver-demo
+					</execute>
+				</action>
+			</item>
+			<item label="Choose Wallpaper">
+				<action name="Execute">
+					<execute>
+						nitrogen ~/images/wallpapers/
+					</execute>
+				</action>
+			</item>
+		</menu>
+		<menu id="system" label="System">
+		    <menu execute="cb-printing-pipemenu" id="PrintingPipeMenu" label="Printers"/>
+		    <item label="GParted">
+				<action name="Execute">
+					<execute>
+						gksudo gparted
+					</execute>
+				</action>
+			</item>
+			<item label="GDM Login Set-up">
+				<action name="Execute">
+					<execute>
+						gksudo gdmsetup
+					</execute>
+				</action>
+			</item>
+			<item label="Synaptic Package Manager">
+				<action name="Execute">
+					<execute>
+						gksudo synaptic
+					</execute>
+				</action>
+			</item>
+		</menu>
+		<menu id="help" label="Help" execute="cb-help-pipemenu" />
+		<separator/>
+		<item label="Lock Screen">
+			<action name="Execute">
+				<execute>
+					cb-lock
+				</execute>
+			</action>
+		</item>
+		<item label="Exit">
+			<action name="Execute">
+				<execute>
+					openbox-logout
+				</execute>
+			</action>
+		</item>
+	</menu>
+</openbox_menu>

@@ -1,0 +1,31 @@
+# notify-osd settings
+# -------------------
+# Edit the variables in this file to change the appearance of your
+# system notifications.
+#
+# For more information about this file, see:
+# http://leolik.blogspot.com/2009/12/notify-osd.html [Russian]
+#
+# Once you have made your changes, you can test them by entering
+# the command 'cb-fortune' in your terminal. Enjoy!
+#
+slot-allocation = fixed
+bubble-expire-timeout = 10sec
+bubble-vertical-gap = 5px
+bubble-horizontal-gap = 5px
+bubble-corner-radius = 36,36%
+bubble-icon-size = 30px
+bubble-gauge-size = 6px
+bubble-width = 240px
+bubble-background-color = 3c3c3c
+bubble-background-opacity = 98%
+text-margin-size = 10px
+text-title-size = 100%
+text-title-weight = bold
+text-title-color = d8d8d8
+text-title-opacity = 100%
+text-body-size = 90%
+text-body-weight = normal
+text-body-color = d8d8d8
+text-body-opacity = 100%
+text-shadow-opacity = 0%

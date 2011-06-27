@@ -1,0 +1,4 @@
+ShowDotFiles = 1
+TabTimeout = 0
+Terminal = terminator
+TermExec = terminator --command
