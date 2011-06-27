@@ -76,6 +76,13 @@
 			</item>
 		</menu>
 		<menu id="network" label="Network">
+			<item label="Firefox">
+				<action name="Execute">
+					<execute>
+						/opt/firefox/firefox
+					</execute>
+				</action>
+			</item>
 			<item label="Filezilla">
 				<action name="Execute">
 					<execute>
