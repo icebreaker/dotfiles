@@ -11,11 +11,12 @@
     scrollback_lines = 5000
     background_type = transparent
     use_system_font = False
-    cursor_color = "#d8d8d8"
+    cursor_color = "#8d8b8b"
     foreground_color = "#d8d8d8"
     show_titlebar = False
     color_scheme = custom
-    font = Monaco 14
+    font = Droid Sans Mono 14
+    cursor_blink = False
 [layouts]
   [[default]]
     [[[child1]]]

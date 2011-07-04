@@ -61,6 +61,8 @@ set history=1000
 set nofsync
 set clipboard+=unnamed
 
+let python_highlight_all=1
+
 syntax on
 syntax sync fromstart
 filetype on
@@ -85,6 +87,7 @@ colorscheme railscasts
 "colorscheme solarized
 "colorscheme sorcerer
 "colorscheme obsidian
+"colorscheme github
 
 " Word Completion
 function! Tab_Or_Complete()
