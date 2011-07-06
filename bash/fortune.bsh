@@ -1,4 +1,4 @@
-if [ -x /usr/games/fortune ]; then
+if [ -x /usr/games/fortune -o -x /usr/bin/fortune ]; then
 	if [ -d /usr/share/cowsay/cows/ ]; then
 		fortune | cowsay -n -f $(ls /usr/share/cowsay/cows/ | shuf -n1) 
 	else
