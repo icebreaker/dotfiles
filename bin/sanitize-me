@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'sanitize'
+
+if ARGV.size < 2
+	puts "usage: sanitize-me input.csv output.csv"
+	exit -1
+end
+
+open(ARGV[1],'w') { |f| f.write(Sanitize.clean(File.read(ARGV[0]))) }
