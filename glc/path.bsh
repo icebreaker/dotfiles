@@ -1,0 +1,2 @@
+export LD_LIBRARY_PATH=/opt/glc/lib64:/opt/glc/lib32:$LD_LIBRARY_PATH
+export PATH=/opt/glc/bin:$PATH
