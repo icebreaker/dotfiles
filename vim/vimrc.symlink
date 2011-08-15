@@ -8,6 +8,8 @@ map <c-r> <ESC>:make -f .project execute<CR>
 map <c-k> <ESC>:make -f .project clean<CR>
 " Bind Ctrl+P to run premake and re-generate the Makefile
 map <c-p> <ESC>:! premake.sh gmake<CR>
+" Toggle NerdTree
+map <c-n> :NERDTreeToggle<CR>
 " Toggle Spell checking
 map <F4> :set spell! spelllang=en_us<CR>
 " Toggle compile errors window
