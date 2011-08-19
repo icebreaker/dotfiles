@@ -1,0 +1,9 @@
+[Gedit Plugin]
+Loader=python
+Module=reindent
+IAge=2
+Name=Reindent Python
+Description=Python Reindentation plugin for gedit
+Authors=Fernando San Martín Woerner <fsmw@gnome.org>
+Copyright=Copyright © 2006 Fernando San Martín Woerner <fsmw@gnome.org>
+Website=http://www.gedit.org
