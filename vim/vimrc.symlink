@@ -102,7 +102,6 @@ endfunction
 inoremap <Tab> <C-R>=Tab_Or_Complete()<CR>
 
 " File Types
-au! BufRead,BufNewFile *.md,*.markdown,*.mdown set filetype=markdown
 au! BufRead,BufNewFile *.json set filetype=json
 au! BufRead,BufNewFile *.as set filetype=actionscript
 au! BufRead,BufNewFile Rakefile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
@@ -119,7 +118,6 @@ au! BufRead,BufNewFile *.inc set filetype=php
 au! BufRead,BufNewFile *.php set filetype=php
 au! BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
 au! BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc call SetFileTypeSH("bash")
-au! BufRead,BufNewFile *.md,*.markdown,*.mdown set filetype=markdown
 au! BufRead,BufNewFile *.py set filetype=python
 
 " Templating
