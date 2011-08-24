@@ -88,8 +88,9 @@ let g:solarized_termcolors=256
 "colorscheme railscasts
 "colorscheme solarized
 "colorscheme sorcerer
-colorscheme obsidian
+"colorscheme obsidian
 "colorscheme github
+colorscheme Tomorrow
 
 " Word Completion
 function! Tab_Or_Complete()
