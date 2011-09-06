@@ -85,12 +85,12 @@ endif
 
 let g:solarized_italic=0
 let g:solarized_termcolors=256
-"colorscheme railscasts
+colorscheme railscasts
 "colorscheme solarized
 "colorscheme sorcerer
 "colorscheme obsidian
 "colorscheme github
-colorscheme Tomorrow
+"colorscheme Tomorrow
 
 " Word Completion
 function! Tab_Or_Complete()
