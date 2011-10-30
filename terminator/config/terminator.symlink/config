@@ -13,9 +13,10 @@
     use_system_font = False
     cursor_color = "#8d8b8b"
     foreground_color = "#d8d8d8"
+    icon_bell = False
     show_titlebar = False
     color_scheme = custom
-    font = Droid Sans Mono 15
+    font = Monaco 15
     cursor_blink = False
 [layouts]
   [[default]]

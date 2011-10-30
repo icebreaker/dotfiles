@@ -1,0 +1,25 @@
+## CRUNCHBANG
+## Compatible with Debian Squeeze, but use at your own risk.
+deb http://packages.crunchbanglinux.org/statler statler main
+
+## DEBIAN
+deb http://ftp.de.debian.org/debian/ squeeze main contrib non-free
+deb-src http://ftp.de.debian.org/debian/ squeeze main contrib non-free
+
+## DEBIAN SECURITY
+deb http://security.debian.org/ squeeze/updates main
+deb-src http://security.debian.org/ squeeze/updates main
+
+## DEBIAN BACKPORTS
+#deb http://backports.debian.org/debian-backports squeeze-backports main contrib non-free
+
+## TEMPORARY
+#deb http://mirror.cse.iitk.ac.in/debian/ testing main contrib
+
+## MULTIMEDIA
+deb http://www.debian-multimedia.org squeeze main non-free
+deb-src http://www.debian-multimedia.org squeeze main non-free
+
+# VLC
+# deb http://download.videolan.org/pub/videolan/debian squeeze main
+# deb-src http://download.videolan.org/pub/videolan/debian squeeze main

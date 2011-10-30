@@ -8,4 +8,4 @@ else
 	fi
 fi
 	
-exec -a "$0" "google-chrome" --ignore-gpu-blacklist "$@"
+exec -a "$0" "google-chrome" --ignore-gpu-blacklist --enable-nacl "$@"

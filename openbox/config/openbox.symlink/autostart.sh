@@ -74,7 +74,7 @@ cb-setxkbmap-live &
 (sleep 10s && ~/.dropbox-dist/dropboxd) &
 
 ## Autostart Check GMail
-(sleep 10s && checkgmail) &
+# (sleep 10s && checkgmail) &
 
 ## Start Conky after a slight delay
 # (sleep 20s && conky -q) &

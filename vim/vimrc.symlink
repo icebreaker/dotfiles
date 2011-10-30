@@ -79,18 +79,23 @@ set term=gnome-256color
 set bg=light
 
 if has("gui_running")
-	set guifont=Monaco\ 13
+	set guifont=Monaco\ 14
 	set bg=dark
 endif
 
 let g:solarized_italic=0
 let g:solarized_termcolors=256
-colorscheme railscasts
+"colorscheme railscasts
+"colorscheme 256-jungle
 "colorscheme solarized
 "colorscheme sorcerer
 "colorscheme obsidian
 "colorscheme github
 "colorscheme Tomorrow
+"colorscheme jellybeans
+colorscheme neverland2
+"colorscheme desertEx
+"colorscheme molokai
 
 " Word Completion
 function! Tab_Or_Complete()
@@ -105,7 +110,7 @@ inoremap <Tab> <C-R>=Tab_Or_Complete()<CR>
 " File Types
 au! BufRead,BufNewFile *.json set filetype=json
 au! BufRead,BufNewFile *.as set filetype=actionscript
-au! BufRead,BufNewFile Rakefile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile Rakefile,Gemfile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.ru set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile .irbrc set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab

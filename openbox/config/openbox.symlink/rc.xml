@@ -353,6 +353,24 @@
         <command>empathy</command>
       </action>
     </keybind>
+    <keybind key="W-g">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Gimp</name>
+        </startupnotify>
+        <command>gimp</command>
+      </action>
+    </keybind>
+        <keybind key="W-i">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Inkscape</name>
+        </startupnotify>
+        <command>inkscape</command>
+      </action>
+    </keybind>
     <keybind key="W-v">
       <action name="Execute">
         <startupnotify>

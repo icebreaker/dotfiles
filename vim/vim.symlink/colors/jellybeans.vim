@@ -287,7 +287,7 @@ fun! s:X(group, fg, bg, attr, lcfg, lcbg)
 endfun
 " }}}
 
-call s:X("Normal","e8e8d3","151515","","White","")
+call s:X("Normal","b8b8b8","151515","","White","")
 set background=dark
 
 if version >= 700
