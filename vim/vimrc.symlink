@@ -87,6 +87,8 @@ let g:solarized_italic=0
 let g:solarized_termcolors=256
 "colorscheme railscasts
 "colorscheme 256-jungle
+"colorscheme wombat
+"colorscheme railscasts
 "colorscheme solarized
 "colorscheme sorcerer
 "colorscheme obsidian
