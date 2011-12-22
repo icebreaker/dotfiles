@@ -1,10 +1,14 @@
 #!/bin/bash
 
-if [ -f "/usr/lib32/libv4l/v4l1compat.so" ]; then
-	export LD_PRELOAD=/usr/lib32/libv4l/v4l1compat.so
+if [ -f "/usr/libv4l/v4l1compat.so" ]; then
+	export LD_PRELOAD=/usr/libv4l/v4l1compat.so
 else
-	if [ -f "/usr/libv4l/v4l1compat.so" ]; then
-		export LD_PRELOAD=/usr/libv4l/v4l1compat.so
+	if [ -f "/usr/lib64/libv4l/v4l1compat.so" ]; then
+		export LD_PRELOAD=/usr/lib32/libv4l/v4l1compat.so
+	else
+		if [ -f "/usr/lib32/libv4l/v4l1compat.so" ]; then
+			export LD_PRELOAD=/usr/lib32/libv4l/v4l1compat.so
+		fi
 	fi
 fi
 	
