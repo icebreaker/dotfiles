@@ -1,0 +1,7 @@
+[user]
+	name = icebreaker
+	email = theicebreaker007@gmail.com
+[push]
+	default = current
+[alias]
+	hub = !hub
