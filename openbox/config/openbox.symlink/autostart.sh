@@ -50,7 +50,7 @@ xscreensaver -no-splash &
 echo 10 > /proc/acpi/video/VGA1/LCDD/brightness
 
 ## Start volumeicon after a slight delay
-(sleep 3s && volumeicon) &
+# (sleep 3s && volumeicon) &
 
 ## Start Clipboard manager
 # (sleep 3s && parcellite) &

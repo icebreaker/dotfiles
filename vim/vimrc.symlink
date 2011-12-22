@@ -80,22 +80,23 @@ set bg=light
 
 if has("gui_running")
 	set guifont=Monaco\ 14
-	set bg=dark
+	"set bg=dark
 endif
 
 let g:solarized_italic=0
 let g:solarized_termcolors=256
-"colorscheme railscasts
+colorscheme railscasts
 "colorscheme 256-jungle
 "colorscheme wombat
 "colorscheme railscasts
+"set bg=light
 "colorscheme solarized
 "colorscheme sorcerer
 "colorscheme obsidian
 "colorscheme github
 "colorscheme Tomorrow
 "colorscheme jellybeans
-colorscheme neverland2
+"colorscheme neverland2
 "colorscheme desertEx
 "colorscheme molokai
 
@@ -127,6 +128,9 @@ au! BufRead,BufNewFile *.php set filetype=php
 au! BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
 au! BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc call SetFileTypeSH("bash")
 au! BufRead,BufNewFile *.py set filetype=python
+au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile *.coffee set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile *.lua set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
 " Templating
 " Basic templating functionality I built for new *buffers*, not very

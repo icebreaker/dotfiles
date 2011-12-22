@@ -23,12 +23,12 @@
        mouse into it, also raise the window -->
   </focus>
   <placement>
-    <policy>Smart</policy>
+    <policy>UnderMouse</policy>
     <!-- 'Smart' or 'UnderMouse' -->
     <center>yes</center>
     <!-- whether to place windows in the center of the free area found or
        the top left corner -->
-    <monitor>Any</monitor>
+    <monitor>Mouse</monitor>
   </placement>
   <theme>
     <name>Onyx-black</name>
@@ -128,7 +128,7 @@
      Many programs reserve space automatically, but you can use this in other
      cases. -->
   <margins>
-    <top>1</top>
+    <top>0</top>
     <bottom>0</bottom>
     <left>0</left>
     <right>0</right>
@@ -344,7 +344,7 @@
         <command>~/.dotfiles/bin/skype2</command>
       </action>
     </keybind>
-        <keybind key="W-p">
+    <keybind key="W-p">
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
@@ -362,7 +362,7 @@
         <command>gimp</command>
       </action>
     </keybind>
-        <keybind key="W-i">
+    <keybind key="W-i">
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>

@@ -11,12 +11,13 @@
     scrollback_lines = 5000
     background_type = transparent
     use_system_font = False
-    cursor_color = "#8d8b8b"
+    cursor_color = "#8f8f8f"
     foreground_color = "#d8d8d8"
+    scroll_on_output = False
     icon_bell = False
     show_titlebar = False
     color_scheme = custom
-    font = Monaco 15
+    font = Monaco 13
     cursor_blink = False
 [layouts]
   [[default]]
