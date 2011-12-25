@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ -z "$DOTFILES" ]; then
+	echo "Not installed."
+else
+	LOG=`git shortlog -n -s`
+	COMMITS=`echo $LOG | awk '{split($0, a," "); print a[1]}'`
+	AUTHOR=`echo $LOG | awk '{split($0, a," "); print a[2]}'`
+	COMMIT=`git log -1 --pretty=%B`
+	REMOTE=`git remote show -n origin | grep "Fetch URL:" | awk '{split($0, a," "); print a[3]}'`
+	echo -e "os\t: $DOT_OS"
+	echo -e "bin\t: $DOT_BIN"
+	echo -e "source\t: $DOTFILES"
+	echo -e "remote\t: $REMOTE"
+	echo -e "author\t: $AUTHOR"
+	echo -e "commits\t: $COMMITS"
+	echo -e "message\t: $COMMIT"
+fi
