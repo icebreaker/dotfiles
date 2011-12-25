@@ -19,7 +19,7 @@ alias qd='sudo apt-get dist-upgrade'
 
 fi
 
-alias jsmin='java -jar /opt/bin/yuic.jar --nomunge'
+alias jsmin='java -jar $DOT_BIN/yuic.jar --nomunge'
 alias cpuinfo='cat /proc/cpuinfo | head -n 8'
 alias meminfo='free -t -m'
 alias iotest='dd if=/dev/zero of=iotest bs=64k count=4k conv=fdatasync 2>&1 | tail -n 1 && rm ./iotest'
