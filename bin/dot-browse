@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd $DOTFILES
+git hub browse
