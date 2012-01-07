@@ -131,6 +131,7 @@ au! BufRead,BufNewFile *.py set filetype=python
 au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.coffee set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.lua set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile *.md,*.markdown,*.mkd colorscheme solarized | set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
 " Templating
 " Basic templating functionality I built for new *buffers*, not very
