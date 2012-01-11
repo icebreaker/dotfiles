@@ -17,6 +17,12 @@ map <F3> :clist!<CR>
 " Toggle Line Numbers
 map <F2> :set nonumber!<CR>
 
+let g:ctrlp_map = '<c-m>'
+"let g:ctrlp_cmd = 'CtrlPBuffer'
+let g:ctrlp_working_path_mode = 1
+let g:ctrlp_dotfiles = 0
+let g:ctrlp_custom_ignore = '\/data\/\|\/docs\/\|\/extern\/\|\/build\/\|Makefile\|\.make$'
+
 set nospell
 set encoding=utf8
 set fileencoding=utf8
