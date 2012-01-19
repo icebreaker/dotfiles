@@ -1,2 +1,2 @@
 export DOT_BIN=$DOTFILES/bin
-export PATH=$DOT_BIN:$PATH
+export PATH=$DOT_BIN:$DOT_BIN/depot_tools:$PATH
