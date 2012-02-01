@@ -1,0 +1,10 @@
+if [ -z "$RUBY_VER" ]; then
+	export RUBY_VER="192"
+fi
+
+export RUBY_RC=$HOME/.rubyrc
+export RUBY_HOME=$HOME/.ruby
+export RUBY=$RUBY_HOME/$RUBY_VER
+export GEM_HOME=$RUBY/gems
+
+export PATH=$GEM_HOME/bin:$RUBY/bin:$PATH
