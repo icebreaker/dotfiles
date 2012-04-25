@@ -31,11 +31,6 @@ if [ -f ~/.localrc ]; then
     . ~/.localrc
 fi
 
-# source rubyrc
-if [ -f ~/.rubyrc ]; then
-	. ~/.rubyrc
-fi
-
 # rvm wizardry ... 
 if [ -s "$HOME/.rvm/scripts/rvm" ]; then
 	if [ -f "$HOME/.rvm/scripts/Rvm" ]; then

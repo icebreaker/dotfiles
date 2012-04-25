@@ -17,7 +17,7 @@
     icon_bell = False
     show_titlebar = False
     color_scheme = custom
-    font = Droid Sans Mono 14
+    font = Droid Sans Mono 13
     cursor_blink = False
 [layouts]
   [[default]]
