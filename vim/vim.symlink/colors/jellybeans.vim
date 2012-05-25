@@ -287,11 +287,11 @@ fun! s:X(group, fg, bg, attr, lcfg, lcbg)
 endfun
 " }}}
 
-call s:X("Normal","b8b8b8","151515","","White","")
+call s:X("Normal","b8b8b8","","","White","")
 set background=dark
 
 if version >= 700
-  call s:X("CursorLine","","1c1c1c","","","Black")
+  call s:X("CursorLine","","4f4f4f","","","Black")
   call s:X("CursorColumn","","1c1c1c","","","Black")
   call s:X("MatchParen","ffffff","80a090","bold","","DarkCyan")
 
@@ -311,7 +311,7 @@ call s:X("LineNr","605958","151515","none","Black","")
 call s:X("Comment","888888","","italic","Grey","")
 call s:X("Todo","808080","","bold","White","Black")
 
-call s:X("StatusLine","000000","dddddd","italic","Black","White")
+call s:X("StatusLine","b8b8b8","","italic","Black","White")
 call s:X("StatusLineNC","ffffff","403c41","italic","White","Black")
 call s:X("VertSplit","777777","403c41","italic","Black","Black")
 call s:X("WildMenu","f0a0c0","302028","","Magenta","")
