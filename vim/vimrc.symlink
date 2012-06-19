@@ -96,12 +96,12 @@ let g:solarized_termcolors=256
 "colorscheme wombat
 "colorscheme railscasts
 "set bg=light
-"colorscheme solarized
+colorscheme solarized
 "colorscheme sorcerer
 "colorscheme obsidian
 "colorscheme github
 "colorscheme Tomorrow
-colorscheme jellybeans
+"colorscheme jellybeans
 "colorscheme neverland2
 "colorscheme desertEx
 "colorscheme molokai
