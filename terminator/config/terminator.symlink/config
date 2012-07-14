@@ -7,17 +7,45 @@
 [profiles]
   [[default]]
     palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
-    background_darkness = 0.86
+    background_darkness = 0.94
     scrollback_lines = 5000
     background_type = transparent
     use_system_font = False
-    cursor_color = "#8f8f8f"
+    cursor_color = "#b6acac"
     foreground_color = "#d8d8d8"
     scroll_on_output = False
     icon_bell = False
     show_titlebar = False
     color_scheme = custom
-    font = Droid Sans Mono 13
+    font = Inconsolata Medium 17
+    cursor_blink = False
+  [[solarized-light]]
+    palette = "#073642:#d30102:#859900:#b58900:#6c71c4:#d33682:#2aa198:#839496:#586e75:#cb4b16:#859900:#b58900:#268bd2:#dc322f:#2aa198:#93a1a1"
+    background_darkness = 0.94
+    scrollback_lines = 5000
+    background_type = transparent
+    use_system_font = False
+    cursor_color = "#002b36"
+    foreground_color = "#002b36"
+    scroll_on_output = False
+    icon_bell = False
+    show_titlebar = False
+    font = Inconsolata Medium 15
+    background_color = "#eee8d5"
+    cursor_blink = False
+  [[solarized-dark]]
+    palette = "#073642:#d30102:#859900:#b58900:#6c71c4:#d33682:#2aa198:#839496:#586e75:#cb4b16:#859900:#b58900:#268bd2:#dc322f:#2aa198:#93a1a1"
+    background_darkness = 0.94
+    scrollback_lines = 5000
+    background_type = transparent
+    use_system_font = False
+    cursor_color = "#eee8d5"
+    foreground_color = "#eee8d5"
+    scroll_on_output = False
+    icon_bell = False
+    show_titlebar = False
+    font = Inconsolata Medium 15
+    background_color = "#002b36"
     cursor_blink = False
 [layouts]
   [[default]]

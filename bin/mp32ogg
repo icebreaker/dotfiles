@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]; then
+	echo "usage: `basename $0` input.mp3 output.ogg"
+	exit 65
+fi
+
+mpg321 $1 -w - | oggenc -o $2 -

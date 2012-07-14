@@ -308,6 +308,24 @@
         <command>x-www-browser</command>
       </action>
     </keybind>
+     <keybind key="W-q">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Qt Creator</name>
+        </startupnotify>
+        <command>/opt/qt/QtCreator/bin/qtcreator</command>
+      </action>
+    </keybind>
+     <keybind key="W-F12">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Wine Screenshot</name>
+        </startupnotify>
+        <command>/home/coderguy/.dotfiles/bin/winescreenshot</command>
+      </action>
+    </keybind>
     <keybind key="W-l">
       <action name="Execute">
         <startupnotify>

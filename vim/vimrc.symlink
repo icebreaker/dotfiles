@@ -8,20 +8,12 @@ map <c-r> <ESC>:make -f .project execute<CR>
 map <c-k> <ESC>:make -f .project clean<CR>
 " Bind Ctrl+P to run premake and re-generate the Makefile
 map <c-p> <ESC>:! premake.sh gmake<CR>
-" Toggle NerdTree
-map <c-n> :NERDTreeToggle<CR>
 " Toggle Spell checking
 map <F4> :set spell! spelllang=en_us<CR>
 " Toggle compile errors window
 map <F3> :clist!<CR>
 " Toggle Line Numbers
 map <F2> :set nonumber!<CR>
-
-let g:ctrlp_map = '<c-m>'
-"let g:ctrlp_cmd = 'CtrlPBuffer'
-let g:ctrlp_working_path_mode = 1
-let g:ctrlp_dotfiles = 0
-let g:ctrlp_custom_ignore = '\/data\/\|\/docs\/\|\/extern\/\|\/build\/\|Makefile\|\.make$'
 
 set nospell
 set encoding=utf8
@@ -81,23 +73,26 @@ filetype indent on
 set t_AB=^[[48;5;%dm
 set t_AF=^[[38;5;%dm
 set t_Co=256
-set term=gnome-256color
-set bg=light
+"set term=gnome-256color
+set term=xterm-256color
 
 if has("gui_running")
-	set guifont=Monaco\ 14
-	"set bg=dark
+	"set guifont=Monaco\ 14
 endif
 
 let g:solarized_italic=0
 let g:solarized_termcolors=256
+"let g:solarized_termtrans = 1
 "colorscheme railscasts
 "colorscheme 256-jungle
 "colorscheme wombat
 "colorscheme railscasts
 "set bg=light
 "colorscheme solarized
-colorscheme sorcerer
+"set bg=light
+"set bg=dark
+"colorscheme solarized
+"colorscheme sorcerer
 "colorscheme obsidian
 "colorscheme github
 "colorscheme Tomorrow
@@ -105,6 +100,10 @@ colorscheme sorcerer
 "colorscheme neverland2
 "colorscheme desertEx
 "colorscheme molokai
+"colorscheme mars
+"colorscheme hemisu
+"colorscheme sahara
+colorscheme gummybears
 
 " Word Completion
 function! Tab_Or_Complete()

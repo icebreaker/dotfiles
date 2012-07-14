@@ -11,13 +11,13 @@
 "
 " File:         jellybeans.vim
 " Maintainer:   NanoTech <http://nanotech.nanotechcorp.net/>
-" Version:      1.4
-" Last Change:  April 11th, 2011
+" Version:      1.3
+" Last Change:  October 25th, 2010
 " Contributors: Daniel Herbert <http://pocket-ninja.com>,
 "               Henry So, Jr. <henryso@panix.com>,
 "               David Liang <bmdavll at gmail dot com>
 "
-" Copyright (c) 2009-2011 NanoTech
+" Copyright (c) 2009-2010 NanoTech
 "
 " Permission is hereby granted, free of charge, to any person obtaining a copy
 " of this software and associated documentation files (the "Software"), to deal
@@ -269,58 +269,55 @@ fun! s:X(group, fg, bg, attr, lcfg, lcbg)
     if !l:fge && !l:bge
       exec "hi ".a:group." guifg=#".a:fg." guibg=#".a:bg." ctermfg=".s:rgb(a:fg)." ctermbg=".s:rgb(a:bg)
     elseif !l:fge && l:bge
-      exec "hi ".a:group." guifg=#".a:fg." guibg=NONE ctermfg=".s:rgb(a:fg)." ctermbg=NONE"
+      exec "hi ".a:group." guifg=#".a:fg." guibg=NONE ctermfg=".s:rgb(a:fg)
     elseif l:fge && !l:bge
-      exec "hi ".a:group." guifg=NONE guibg=#".a:bg." ctermfg=NONE ctermbg=".s:rgb(a:bg)
+      exec "hi ".a:group." guifg=NONE guibg=#".a:bg." ctermbg=".s:rgb(a:bg)
     endif
   endif
 
   if a:attr == ""
     exec "hi ".a:group." gui=none cterm=none"
   else
-    let noitalic = join(filter(split(a:attr, ","), "v:val !=? 'italic'"), ",")
-    if empty(noitalic)
-      let noitalic = "none"
+    if a:attr == 'italic'
+      exec "hi ".a:group." gui=".a:attr." cterm=none"
+    else
+      exec "hi ".a:group." gui=".a:attr." cterm=".a:attr
     endif
-    exec "hi ".a:group." gui=".a:attr." cterm=".noitalic
   endif
 endfun
 " }}}
 
-call s:X("Normal","b8b8b8","151515","","White","")
-set background=dark
-
 if version >= 700
-  call s:X("CursorLine","","1c1c1c","","","Black")
-  call s:X("CursorColumn","","1c1c1c","","","Black")
-  call s:X("MatchParen","ffffff","80a090","bold","","DarkCyan")
+  call s:X("CursorLine","","1c1c1c","","","")
+  call s:X("CursorColumn","","1c1c1c","","","")
+  call s:X("MatchParen","ffffff","80a090","bold","","")
 
   call s:X("TabLine","000000","b0b8c0","italic","","Black")
-  call s:X("TabLineFill","9098a0","","","","Black")
-  call s:X("TabLineSel","000000","f0f0f0","italic,bold","Black","White")
+  call s:X("TabLineFill","9098a0","","","","")
+  call s:X("TabLineSel","000000","f0f0f0","italic,bold","","")
 
   " Auto-completion
-  call s:X("Pmenu","ffffff","606060","","White","Black")
-  call s:X("PmenuSel","101010","eeeeee","","Black","White")
+  call s:X("Pmenu","ffffff","000000","","","")
+  call s:X("PmenuSel","101010","eeeeee","","","")
 endif
 
-call s:X("Visual","","404040","","","Black")
+call s:X("Visual","","404040","","","")
 call s:X("Cursor","","b0d0f0","","","")
 
+call s:X("Normal","e8e8d3","151515","","White","")
 call s:X("LineNr","605958","151515","none","Black","")
 call s:X("Comment","888888","","italic","Grey","")
-call s:X("Todo","808080","","bold","White","Black")
+call s:X("Todo","808080","","bold","","")
 
 call s:X("StatusLine","000000","dddddd","italic","Black","White")
 call s:X("StatusLineNC","ffffff","403c41","italic","White","Black")
 call s:X("VertSplit","777777","403c41","italic","Black","Black")
-call s:X("WildMenu","f0a0c0","302028","","Magenta","")
 
-call s:X("Folded","a0a8b0","384048","italic","Black","")
-call s:X("FoldColumn","a0a8b0","384048","","","Black")
-hi! link SignColumn FoldColumn
+call s:X("Folded","a0a8b0","384048","italic","black","")
+call s:X("FoldColumn","a0a8b0","384048","","","")
+call s:X("SignColumn","a0a8b0","384048","","","")
 
-call s:X("Title","70b950","","bold","Green","")
+call s:X("Title","70b950","","bold","","")
 
 call s:X("Constant","cf6a4c","","","Red","")
 call s:X("Special","799d6a","","","Green","")
@@ -335,33 +332,23 @@ call s:X("Function","fad07a","","","Yellow","")
 call s:X("Statement","8197bf","","","DarkBlue","")
 call s:X("PreProc","8fbfdc","","","LightBlue","")
 
-hi! link Operator Normal
+hi link Operator Normal
 
 call s:X("Type","ffb964","","","Yellow","")
-call s:X("NonText","606060","151515","","Black","")
+call s:X("NonText","606060","151515","","","")
 
-call s:X("SpecialKey","444444","1c1c1c","","Black","")
+call s:X("SpecialKey","444444","1c1c1c","","","")
 
 call s:X("Search","f0a0c0","302028","underline","Magenta","")
 
-call s:X("Directory","dad085","","","Yellow","")
-call s:X("ErrorMsg","","902020","","","DarkRed")
-hi! link Error ErrorMsg
-hi! link MoreMsg Special
-call s:X("Question","65C254","","","Green","")
-
-
-" Spell Checking
-
-call s:X("SpellBad","","902020","underline","","DarkRed")
-call s:X("SpellCap","","0000df","underline","","Blue")
-call s:X("SpellRare","","540063","underline","","DarkMagenta")
-call s:X("SpellLocal","","2D7067","underline","","Green")
+call s:X("Directory","dad085","","","","")
+call s:X("ErrorMsg","","902020","","","")
+hi link Error ErrorMsg
 
 " Diff
 
-hi! link diffRemoved Constant
-hi! link diffAdded String
+hi link diffRemoved Constant
+hi link diffAdded String
 
 " VimDiff
 
@@ -372,32 +359,30 @@ call s:X("DiffText","","000940","","","DarkRed")
 
 " PHP
 
-hi! link phpFunctions Function
+hi link phpFunctions Function
 call s:X("StorageClass","c59f6f","","","Red","")
-hi! link phpSuperglobal Identifier
-hi! link phpQuoteSingle StringDelimiter
-hi! link phpQuoteDouble StringDelimiter
-hi! link phpBoolean Constant
-hi! link phpNull Constant
-hi! link phpArrayPair Operator
+hi link phpSuperglobal Identifier
+hi link phpQuoteSingle StringDelimiter
+hi link phpQuoteDouble StringDelimiter
+hi link phpBoolean Constant
+hi link phpNull Constant
+hi link phpArrayPair Operator
 
 " Ruby
 
-hi! link rubySharpBang Comment
+hi link rubySharpBang Comment
 call s:X("rubyClass","447799","","","DarkBlue","")
-call s:X("rubyIdentifier","c6b6fe","","","Cyan","")
-hi! link rubyConstant Type
-hi! link rubyFunction Function
+call s:X("rubyIdentifier","c6b6fe","","","","")
 
 call s:X("rubyInstanceVariable","c6b6fe","","","Cyan","")
 call s:X("rubySymbol","7697d6","","","Blue","")
-hi! link rubyGlobalVariable rubyInstanceVariable
-hi! link rubyModule rubyClass
-call s:X("rubyControl","7597c6","","","Blue","")
+hi link rubyGlobalVariable rubyInstanceVariable
+hi link rubyModule rubyClass
+call s:X("rubyControl","7597c6","","","","")
 
-hi! link rubyString String
-hi! link rubyStringDelimiter StringDelimiter
-hi! link rubyInterpolationDelimiter Identifier
+hi link rubyString String
+hi link rubyStringDelimiter StringDelimiter
+hi link rubyInterpolationDelimiter Identifier
 
 call s:X("rubyRegexpDelimiter","540063","","","Magenta","")
 call s:X("rubyRegexp","dd0093","","","DarkMagenta","")
@@ -406,44 +391,26 @@ call s:X("rubyRegexpSpecial","a40073","","","Magenta","")
 call s:X("rubyPredefinedIdentifier","de5577","","","Red","")
 
 " JavaScript
-hi! link javaScriptValue Constant
-hi! link javaScriptRegexpString rubyRegexp
-
-" CoffeeScript
-
-hi! link coffeeRegExp javaScriptRegexpString
+hi link javaScriptValue Constant
+hi link javaScriptRegexpString rubyRegexp
 
 " C
 
-hi! link cOperator Constant
+hi link cOperator Constant
 
 " Objective-C/Cocoa
-hi! link objcClass Type
-hi! link cocoaClass objcClass
-hi! link objcSubclass objcClass
-hi! link objcSuperclass objcClass
-hi! link objcDirective rubyClass
-hi! link cocoaFunction Function
-hi! link objcMethodName Identifier
-hi! link objcMethodArg Normal
-hi! link objcMessageName Identifier
+hi link objcClass Type
+hi link cocoaClass objcClass
+hi link objcSubclass objcClass
+hi link objcSuperclass objcClass
+hi link objcDirective rubyClass
+hi link cocoaFunction Function
+hi link objcMethodName Identifier
+hi link objcMethodArg Normal
+hi link objcMessageName Identifier
 
-" Plugins, etc.
-
-hi! link TagListFileName Directory
-call s:X("PreciseJumpTarget","B9ED67","405026","","White","Green")
-
-" Manual overrides for 256-color terminals. Dark colors auto-map badly.
-if !s:low_color
-  hi StatusLineNC ctermbg=234
-  hi Folded ctermbg=236
-  hi FoldColumn ctermbg=236
-  hi SignColumn ctermbg=236
-  hi DiffAdd ctermbg=22
-  hi DiffDelete ctermbg=52
-  hi DiffChange ctermbg=17
-  hi DiffText ctermbg=19
-endif
+" Tag list
+hi link TagListFileName Directory
 
 " delete functions {{{
 delf s:X
