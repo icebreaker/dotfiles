@@ -14,6 +14,8 @@ map <F4> :set spell! spelllang=en_us<CR>
 map <F3> :clist!<CR>
 " Toggle Line Numbers
 map <F2> :set nonumber!<CR>
+" Send to Twitter (will prompt)
+map <F12> :PosttoTwitter<CR>
 
 set nospell
 set encoding=utf8
@@ -83,6 +85,7 @@ endif
 let g:solarized_italic=0
 let g:solarized_termcolors=256
 "let g:solarized_termtrans = 1
+
 "colorscheme railscasts
 "colorscheme 256-jungle
 "colorscheme wombat
@@ -136,7 +139,7 @@ au! BufRead,BufNewFile *.py set filetype=python
 au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.coffee set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.lua set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.md,*.markdown,*.mkd colorscheme solarized | set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile *.md,*.markdown,*.mkd set tw=79 tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
 " Templating
 " Basic templating functionality I built for new *buffers*, not very

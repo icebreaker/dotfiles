@@ -6,8 +6,8 @@ DIR=`pwd`
 while test "$DIR" != "/"; do
 	for m in .project; do
 		if [ -f "${DIR}/${m}" ]; then
-			cd "${DIR}"
-			make $@
+			#cd "${DIR}"
+			make -C $DIR $@
 			exit
 		fi
 	done
