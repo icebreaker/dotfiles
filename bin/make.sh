@@ -7,7 +7,7 @@ while test "$DIR" != "/"; do
 	for m in .project; do
 		if [ -f "${DIR}/${m}" ]; then
 			#cd "${DIR}"
-			make -C $DIR $@
+			make -C "$DIR" $@
 			exit
 		fi
 	done
