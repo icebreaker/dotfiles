@@ -1,17 +1,15 @@
 " Custom make wrapper which can search for a valid Makefile.
 set makeprg=make.sh
 " Bind Ctrl+B to make
-map <c-b> <ESC>:make -f .project build<CR>
+map <c-b> <ESC>:make! -f .project build<CR>
 " Bind Ctrl+R to execute
-map <c-r> <ESC>:make -f .project execute<CR>
+map <c-r> <ESC>:make! -f .project execute<CR>
 " Bind Ctrl+Q to clean
-map <c-k> <ESC>:make -f .project clean<CR>
+map <c-k> <ESC>:make! -f .project clean<CR>
 " Bind Ctrl+P to run premake and re-generate the Makefile
 map <c-p> <ESC>:! premake.sh gmake<CR>
 " Toggle Spell checking
 map <F4> :set spell! spelllang=en_us<CR>
-" Toggle compile errors window
-map <F3> :clist!<CR>
 " Toggle Line Numbers
 map <F2> :set nonumber!<CR>
 " Send to Twitter (will prompt)
