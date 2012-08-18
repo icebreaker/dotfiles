@@ -5,4 +5,4 @@ if [ $# -lt 2 ]; then
 	exit 65
 fi
 
-ffmpeg -i $1 -s 400x240 -vcodec mpeg4 -b 350000 -acodec libfaac -ac 1 -ar 16000 -r 14 -ab 32000 -aspect 16:9 $2
+ffmpeg -i "$1" -s 400x240 -vcodec mpeg4 -b 350000 -acodec libfaac -ac 1 -ar 16000 -r 14 -ab 32000 -aspect 16:9 "$2"
