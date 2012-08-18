@@ -35,9 +35,9 @@ set lazyredraw
 set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$ 
 set autoindent
 set cindent
-set noexpandtab
 set smartindent
 set smartcase
+set noexpandtab
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
@@ -62,6 +62,7 @@ set undolevels=500
 set history=1000
 set nofsync
 set clipboard+=unnamed
+set cinoptions+=g0
 
 let python_highlight_all=1
 
@@ -140,25 +141,4 @@ au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandt
 au! BufRead,BufNewFile *.coffee set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.lua set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.md,*.markdown,*.mkd set tw=79 tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-
-" Templating
-" Basic templating functionality I built for new *buffers*, not very
-" flexible but it does the job for simple templates, now I've replaced
-" it my new and shiny Templatizer data-driven generator project, I mainly
-" keep these here for further reference for those who might want this
-" kind of simple templating functionality.
-function! GetBaseName()
-	return expand('%:p:t:r')
-endfunction
-
-function! GetBaseNameNoPrefix()
-	let f = GetBaseName()
-	return strpart(f,2,strlen(f))
-endfunction
-
-"function! MyTemplate()
-"	0r $HOME/template.tpl
-"	execute(':%s/Template/' . GetBaseName() . '/g')
-"	execute(':%s/TEMPLATE/' . toupper(GetBaseName()) . '/g')
-"endfunction
-"au! BufNewFile *.myext silent! call MyTemplate()
+au! BufRead,BufNewFile * set formatoptions=tcq
