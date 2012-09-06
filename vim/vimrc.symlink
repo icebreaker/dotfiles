@@ -29,7 +29,8 @@ set laststatus=2
 set novisualbell
 set number
 set report=0
-set lazyredraw
+set nolazyredraw
+set ttyfast
 set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$ 
 set autoindent
 set cindent
@@ -51,7 +52,6 @@ set hidden
 set nostartofline
 set shortmess=as
 set showcmd
-set ttyfast
 set ignorecase
 "set mouse=a
 set columns=80
@@ -144,20 +144,17 @@ au! BufRead,BufNewFile *.md,*.markdown,*.mkd call DistractionFreeWriting()
 au! BufRead,BufNewFile * set formatoptions=tcq
 
 function! DistractionFreeWriting()
-	set tw=79 
-	set tabstop=2 
-	set shiftwidth=2 
-	set softtabstop=2 
-	set expandtab
-	set lines=40 columns=100
-	set guioptions-=r
+	set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+	set columns=100
 	set laststatus=0
 	set noruler
 	set linebreak
 	set nonumber
 	set foldcolumn=12
+	set tw=79
+
+	colorscheme Tomorrow
 	hi FoldColumn ctermbg=none
 	hi LineNr ctermfg=0 ctermbg=none
 	hi NonText ctermfg=0
-	colorscheme Tomorrow
 endfunction
