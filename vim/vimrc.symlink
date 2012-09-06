@@ -1,11 +1,11 @@
 " Custom make wrapper which can search for a valid Makefile.
 set makeprg=make.sh
 " Bind Ctrl+B to make
-map <c-b> <ESC>:make! -f .project build<CR>
+map <c-b> <ESC>:make -f .project build<CR>
 " Bind Ctrl+R to execute
-map <c-r> <ESC>:make! -f .project execute<CR>
+map <c-r> <ESC>:make -f .project execute<CR>
 " Bind Ctrl+Q to clean
-map <c-k> <ESC>:make! -f .project clean<CR>
+map <c-k> <ESC>:make -f .project clean<CR>
 " Bind Ctrl+P to run premake and re-generate the Makefile
 map <c-p> <ESC>:! premake.sh gmake<CR>
 " Toggle Spell checking
@@ -78,8 +78,10 @@ set t_Co=256
 set term=xterm-256color
 
 if has("gui_running")
-	"set guifont=Monaco\ 14
+	set guifont=Inconsolata\ Medium\ 18
 endif
+
+let g:Powerline_symbols = 'fancy'
 
 let g:solarized_italic=0
 let g:solarized_termcolors=256
@@ -138,5 +140,24 @@ au! BufRead,BufNewFile *.py set filetype=python
 au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.coffee set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.lua set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.md,*.markdown,*.mkd set tw=79 tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile *.md,*.markdown,*.mkd call DistractionFreeWriting()
 au! BufRead,BufNewFile * set formatoptions=tcq
+
+function! DistractionFreeWriting()
+	set tw=79 
+	set tabstop=2 
+	set shiftwidth=2 
+	set softtabstop=2 
+	set expandtab
+	set lines=40 columns=100
+	set guioptions-=r
+	set laststatus=0
+	set noruler
+	set linebreak
+	set nonumber
+	set foldcolumn=12
+	hi FoldColumn ctermbg=none
+	hi LineNr ctermfg=0 ctermbg=none
+	hi NonText ctermfg=0
+	colorscheme Tomorrow
+endfunction
