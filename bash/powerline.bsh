@@ -1,0 +1,6 @@
+function _powerline()
+{
+	export PS1="$($DOTFILES/bash/bin/powerline.py $?)"
+}
+
+export PROMPT_COMMAND="_powerline"
