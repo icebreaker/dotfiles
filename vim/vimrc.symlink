@@ -50,7 +50,7 @@ set backspace=indent,eol,start
 set diffopt+=iwhite
 set hidden
 set nostartofline
-set shortmess=as
+set shortmess=asI
 set showcmd
 set ignorecase
 "set mouse=a
