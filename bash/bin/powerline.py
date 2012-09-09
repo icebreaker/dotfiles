@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# TODO: rewrite this in Bash script
+
 import os
 import subprocess
 import sys
@@ -86,13 +88,17 @@ def add_cwd_segment(powerline):
 		cwd = cwd[1:]
 
 	names = cwd.split('/')
-	for n in names[:-1]:
-		powerline.append(' ' + n + ' ', 250, 237, Powerline.separator_thin, 244)
-	powerline.append(' ' + names[-1] + ' ', 254, 237)
+	for n in names[:-2]:
+		powerline.append(' ' + n + ' ', 247, 236, Powerline.separator_thin, 247)
+
+	if len(names) > 1:
+		powerline.append(' ' + names[-2] + ' ', 247, 236)
+
+	powerline.append(' ' + names[-1] + ' ', 231, 240)
 
 def add_root_indicator(powerline, error):
 	bg = 236
-	fg = 15
+	fg = 247
 	if int(error) != 0:
 		fg = 15
 		bg = 161
