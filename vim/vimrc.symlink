@@ -167,3 +167,6 @@ function! DistractionFreeWriting()
 	hi LineNr ctermfg=0 ctermbg=none
 	hi NonText ctermfg=0
 endfunction
+
+" Swap Directory
+set directory=~/.vim/swap
