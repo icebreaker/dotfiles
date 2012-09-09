@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "up" $(uptime | grep -PZo "(?<=up )[^,]*")
+exit 0
