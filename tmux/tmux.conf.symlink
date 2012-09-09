@@ -9,11 +9,11 @@ set -g status-justify "centre"
 set -g status-left "#[fg=colour236,bg=colour252] #($DOTFILES/tmux/powerline/uptime) #[fg=colour252,bg=colour236]⮀"
 set -g status-right "#[fg=colour136,bg=colour236]⮃ #($DOTFILES/tmux/powerline/date_day) ⮃ #($DOTFILES/tmux/powerline/date_full) ⮃ #($DOTFILES/tmux/powerline/time) "
 
-set -g window-status-format "#[fg=default,bg=colour236] #I #W "
+set -g window-status-format "#[fg=default,bg=colour236] #I #W"
 set -g window-status-current-format "#[fg=colour236,bg=colour148]⮀#[fg=colour22,bg=colour148,noreverse] #I ⮁ #W #[fg=colour148,bg=colour236,nobold]⮀"
 
 set -g set-titles on
-#set -g set-titles-string '[#I] #W'
+set -g set-titles-string '#I #W'
 setw -g automatic-rename on
 
 unbind C-b
