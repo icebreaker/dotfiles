@@ -11,6 +11,16 @@ set -g status-right "#[fg=colour136,bg=colour236]⮃ #($DOTFILES/tmux/powerline/
 
 set -g window-status-format "#[fg=default,bg=colour236] #I #W"
 set -g window-status-current-format "#[fg=colour236,bg=colour148]⮀#[fg=colour22,bg=colour148,noreverse] #I ⮁ #W #[fg=colour148,bg=colour236,nobold]⮀"
+set -g window-status-activity-attr bold
+
+set -g pane-border-fg colour236
+set -g pane-active-border-fg colour236
+
+set -g message-fg colour117
+set -g message-bg colour24
+set -g message-attr bold
+
+set -g display-time 2000
 
 set -g set-titles on
 set -g set-titles-string '#I #W'
@@ -19,6 +29,14 @@ setw -g automatic-rename on
 unbind C-b
 set -g prefix C-a
 
+bind -n M-Left select-pane -L
+bind -n M-Right select-pane -R
+bind -n M-Up select-pane -U
+bind -n M-Down select-pane -D
+
 unbind %
-bind | split-window -h
-bind _ split-window -v
+bind \ split-window -h
+bind - split-window -v
+
+set -g history-limit 100000
+set -s escape-time 0
