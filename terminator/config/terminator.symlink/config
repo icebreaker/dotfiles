@@ -3,16 +3,17 @@
   title_transmit_bg_color = "#000000"
   title_inactive_bg_color = "#000000"
 [keybindings]
-  go_left = <Shift><Alt>Left
-  go_down = <Shift><Alt>Down
-  hide_window = <Shift><Control>a
-  go_right = <Shift><Alt>Right
   go_up = <Shift><Alt>Up
+  go_down = <Shift><Alt>Down
+  go_right = <Shift><Alt>Right
+  new_tab = <Shift><Control><Alt>t
+  go_left = <Shift><Alt>Left
+  hide_window = <Shift><Control>a
 [profiles]
   [[default]]
     palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
     background_darkness = 1.03
-    scrollback_lines = 5000
+    scrollback_lines = 2048
     use_system_font = False
     cursor_color = "#b6acac"
     foreground_color = "#c6c6c6"
@@ -20,7 +21,7 @@
     icon_bell = False
     show_titlebar = False
     color_scheme = custom
-    font = Inconsolata for Powerline Medium 18
+    font = Inconsolata for Powerline Medium 16
     background_color = "#121212"
     cursor_blink = False
 [layouts]

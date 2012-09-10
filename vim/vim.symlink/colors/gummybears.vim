@@ -80,7 +80,7 @@ endif
 "}}}
 " General colors"{{{
 hi  Normal       guifg=#c6c6c6 guibg=#121212 gui=NONE      ctermfg=251   ctermbg=233  cterm=NONE
-hi  NonText      guifg=#ff00ff guibg=#000000 gui=NONE      ctermfg=13    ctermbg=0    cterm=NONE
+hi  NonText      guifg=#c6c6c6 guibg=#121212 gui=NONE      ctermfg=251	 ctermbg=233  cterm=NONE
 
 hi  Cursor       guifg=#000000 guibg=#ffff00 gui=NONE      ctermfg=0     ctermbg=11   cterm=reverse
 hi  LineNr       guifg=#3a3a3a guibg=#000000 gui=NONE      ctermfg=237   ctermbg=0    cterm=NONE

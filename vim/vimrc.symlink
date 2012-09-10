@@ -96,14 +96,9 @@ let g:solarized_italic=0
 let g:solarized_termcolors=256
 "let g:solarized_termtrans = 1
 
-"colorscheme railscasts
 "colorscheme 256-jungle
 "colorscheme wombat
 "colorscheme railscasts
-"set bg=light
-"colorscheme solarized
-"set bg=light
-"set bg=dark
 "colorscheme solarized
 "colorscheme sorcerer
 "colorscheme obsidian
@@ -161,11 +156,7 @@ function! DistractionFreeWriting()
 	set nonumber
 	set foldcolumn=12
 	set tw=79
-
-	colorscheme Tomorrow
 	hi FoldColumn ctermbg=none
-	hi LineNr ctermfg=0 ctermbg=none
-	hi NonText ctermfg=0
 endfunction
 
 " Swap Directory
