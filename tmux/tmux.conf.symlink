@@ -5,6 +5,7 @@ set -g status-bg colour236
 set -g status-fg default
 set -g status-interval 2
 set -g status-utf8 on
+set -g status-left-length 15
 set -g status-justify "centre"
 set -g status-left "#[fg=colour236,bg=colour252] #($DOTFILES/tmux/powerline/uptime) #[fg=colour252,bg=colour236]⮀"
 set -g status-right "#[fg=colour136,bg=colour236]⮃ #($DOTFILES/tmux/powerline/date_day) ⮃ #($DOTFILES/tmux/powerline/date_full) ⮃ #($DOTFILES/tmux/powerline/time) "
