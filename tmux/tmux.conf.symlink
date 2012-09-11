@@ -43,7 +43,7 @@ unbind %
 bind \ split-window -h
 bind - split-window -v
 
-set -g history-limit 2048
+set -g history-limit 5000
 set -s escape-time 0
 
 #set -g mode-mouse on
