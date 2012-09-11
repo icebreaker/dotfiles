@@ -3,7 +3,7 @@ set -g default-terminal "xterm-256color"
 set -g status on
 set -g status-bg colour236
 set -g status-fg default
-set -g status-interval 2
+set -g status-interval 4
 set -g status-utf8 on
 set -g status-left-length 15
 set -g status-justify "centre"
@@ -43,10 +43,10 @@ unbind %
 bind \ split-window -h
 bind - split-window -v
 
-set -g history-limit 100000
+set -g history-limit 2048
 set -s escape-time 0
 
-set -g mode-mouse on
-set -g mouse-resize-pane on
-set -g mouse-select-pane on
-set -g mouse-select-window on
+#set -g mode-mouse on
+#set -g mouse-resize-pane on
+#set -g mouse-select-pane on
+#set -g mouse-select-window on
