@@ -145,7 +145,19 @@ au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandt
 au! BufRead,BufNewFile *.coffee set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.lua set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.md,*.markdown,*.mkd call DistractionFreeWriting()
+au! BufRead,BufNewFile *.c,*.h,*.cpp,*.hpp,*.cxx,*.hxx,*.cc,*.hh call FoldLicense()
 au! BufRead,BufNewFile * set formatoptions=tcq
+
+" Credit: http://gslsrc.net/l02_license_folding.html
+function! FoldLicense()
+	let s:line = getline(1)
+	if s:line == "/*"
+		let s:savepos = getpos(".")
+		call cursor(1, 1)
+		execute "normal" "zf]*"
+		call setpos(".", s:savepos)
+	endif
+endfunction
 
 function! DistractionFreeWriting()
 	set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
