@@ -21,7 +21,7 @@
     icon_bell = False
     show_titlebar = False
     color_scheme = custom
-    font = Inconsolata for Powerline Medium 16
+    font = PT Mono for Powerline 14
     background_color = "#121212"
     cursor_blink = False
 [layouts]
