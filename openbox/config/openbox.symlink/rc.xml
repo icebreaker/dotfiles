@@ -31,7 +31,7 @@
     <monitor>Mouse</monitor>
   </placement>
   <theme>
-    <name>Onyx-black</name>
+    <name>ObBear2</name>
     <titleLayout>DSLIMC</titleLayout>
     <!--
       avaible characters are NDSLIMC, each can occur at most once.
@@ -89,6 +89,18 @@
       <!-- 'bold' or 'normal' -->
       <slant>Normal</slant>
       <!-- 'italic' or 'normal' -->
+    </font>
+    <font place="ActiveOnScreenDisplay">
+      <name>Droid Sans</name>
+      <size>8</size>
+      <weight>Normal</weight>
+      <slant>Normal</slant>
+    </font>
+    <font place="InactiveOnScreenDisplay">
+      <name>Droid Sans</name>
+      <size>8</size>
+      <weight>Normal</weight>
+      <slant>Normal</slant>
     </font>
   </theme>
   <desktops>
@@ -308,7 +320,7 @@
         <command>x-www-browser</command>
       </action>
     </keybind>
-     <keybind key="W-q">
+    <keybind key="W-q">
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
@@ -317,7 +329,7 @@
         <command>/opt/qt/QtCreator/bin/qtcreator</command>
       </action>
     </keybind>
-     <keybind key="W-F12">
+    <keybind key="W-F12">
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
@@ -366,9 +378,9 @@
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
-          <name>Emphathy</name>
+          <name>Pidgin</name>
         </startupnotify>
-        <command>empathy</command>
+        <command>pidgin</command>
       </action>
     </keybind>
     <keybind key="W-g">

@@ -1,18 +1,18 @@
 if [ "$DOT_OS" != "fedora" ]; then
 	if [ -x /usr/sbin/update-alternatives ]; then
 		CHROME=$DOT_BIN/google-chrome2
-		MATCH=$(update-alternatives --list x-www-browser | grep $CHROME)
+		MATCH=$(/usr/sbin/update-alternatives --list x-www-browser | grep $CHROME)
 
 		if [ "$MATCH" != "$CHROME" ]; then
-			sudo update-alternatives --install /usr/bin/x-www-browser x-www-browser $DOT_BIN/google-chrome2 999
-			sudo update-alternatives --set x-www-browser $DOT_BIN/google-chrome2
+			sudo /usr/sbin/update-alternatives --install /usr/bin/x-www-browser x-www-browser $DOT_BIN/google-chrome2 999
+			sudo /usr/sbin/update-alternatives --set x-www-browser $DOT_BIN/google-chrome2
 		fi
 
-		MATCH=$(update-alternatives --list gnome-www-browser | grep $CHROME)
+		MATCH=$(/usr/sbin/update-alternatives --list gnome-www-browser | grep $CHROME)
 
 		if [ "$MATCH" != "$CHROME" ]; then
-			sudo update-alternatives --install /usr/bin/gnome-www-browser gnome-www-browser $DOT_BIN/google-chrome2 999
-			sudo update-alternatives --set gnome-www-browser $DOT_BIN/google-chrome2
+			sudo /usr/sbin/update-alternatives --install /usr/bin/gnome-www-browser gnome-www-browser $DOT_BIN/google-chrome2 999
+			sudo /usr/sbin/update-alternatives --set gnome-www-browser $DOT_BIN/google-chrome2
 		fi
 	fi
 fi

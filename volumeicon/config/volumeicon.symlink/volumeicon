@@ -1,10 +1,12 @@
-
 [StatusIcon]
 stepsize=4
 lmb_slider=true
 mmb_mute=false
+use_horizontal_slider=false
+show_sound_level=false
+use_transparent_background=false
 onclick=xfce4-mixer
-theme=White Gnome
+theme=Default
 
 [Hotkeys]
 up_enabled=true
@@ -15,5 +17,5 @@ down=XF86AudioLowerVolume
 mute=XF86AudioMute
 
 [Alsa]
-card=hw:1
-channel=Master Front
+card=hw:0
+channel=Master

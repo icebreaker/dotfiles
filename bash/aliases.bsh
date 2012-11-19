@@ -5,6 +5,14 @@ alias qi='sudo yum install'
 alias qr='sudo yum remove'
 alias qu='sudo yum update'
 
+elif [ "$DOT_OS" == "opensuse" ]; then
+
+alias qs='sudo zypper search'
+alias qr='sudo zypper remove --clean-deps'
+alias qi='sudo zypper install'
+alias qu='sudo zypper refresh'
+alias qd='sudo zypper dist-upgrade'
+
 else
 
 alias qs='sudo apt-cache search'

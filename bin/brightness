@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -f /sys/class/backlight/acpi_video0/brightness ]; then
+chown icebreaker /sys/class/backlight/acpi_video0/brightness
+elif [ -f /proc/acpi/video/VGA1/LCDD/brightness ]; then
+chown icebreaker /proc/acpi/video/VGA1/LCDD/brightness 
+fi

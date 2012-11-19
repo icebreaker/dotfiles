@@ -1,0 +1,51 @@
+## Set brightness (we own the `device` because of /init.d/brightness)
+if [ -f /sys/class/backlight/acpi_video0/brightness ]; then
+	echo 10 > /sys/class/backlight/acpi_video0/brightness
+elif [ -f /proc/acpi/video/VGA1/LCDD/brightness ]; then
+	echo 10 > /proc/acpi/video/VGA1/LCDD/brightness
+fi
+
+## Start session manager
+#lxsession &
+
+## Enable power management
+xfce4-power-manager &
+
+## Start Thunar Daemon
+thunar --daemon &
+
+## Set desktop wallpaper
+nitrogen --restore &
+
+## Launch panel
+tint2 &
+
+## Start Composite Manager
+xcompmgr -n -I 0 -O 0 -D 0 -C &
+
+## Launch network manager applet
+(sleep 4s && nm-applet) &
+
+## Detect and configure touchpad. See 'man synclient' for more info.
+if egrep -iq 'touchpad' /proc/bus/input/devices; then
+    synclient VertEdgeScroll=1 &
+    synclient TapButton1=1 &
+fi
+
+## Start xscreensaver
+xscreensaver -no-splash &
+
+## Start Volumeicon
+(sleep 3s && volumeicon) &
+
+## Start Clipboard manager
+# (sleep 3s && parcellite) &
+
+## Start Dropbox Daemon
+(sleep 10s && ~/.dropbox-dist/dropboxd) &
+
+## Start Check GMail
+# (sleep 10s && checkgmail) &
+
+## Start Conky
+# (sleep 20s && conky -q) &

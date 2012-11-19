@@ -16,13 +16,6 @@
 				</execute>
 			</action>
 		</item>
-		<item label="Qt Creator">
-			<action name="Execute">
-				<execute>
-					/opt/qt/QtCreator/bin/qtcreator
-				</execute>
-			</action>
-		</item>
 		<item label="Web Browser">
 			<action name="Execute">
 				<execute>
@@ -37,10 +30,10 @@
 				</execute>
 			</action>
 		</item>
-		<item label="Emphathy">
+		<item label="Pidgin">
 			<action name="Execute">
 				<execute>
-					empathy
+					pidgin
 				</execute>
 			</action>
 		</item>
@@ -86,7 +79,7 @@
 			<item label="Firefox">
 				<action name="Execute">
 					<execute>
-						/opt/firefox/firefox
+						firefox
 					</execute>
 				</action>
 			</item>
@@ -113,10 +106,7 @@
 			</item>
 		</menu>
 		<separator/>
-		<menu execute="cb-dropbox-pipemenu" id="dropbox" label="Dropbox"/>
-		<separator/>
 		<menu id="settings" label="Settings">
-			<menu execute="cb-compmgr" id="CompositingPipeMenu" label="Compositing"/>
 			<menu id="conkyconfig" label="Conky Config">
 				<item label="Edit .conkyrc">
 					<action name="Execute">
@@ -197,10 +187,10 @@
 						</execute>
 					</action>
 				</item>
-				<item label="Edit autostart.sh">
+				<item label="Edit autostart">
 					<action name="Execute">
 						<execute>
-							gedit ~/.config/openbox/autostart.sh
+							gedit ~/.config/openbox/autostart
 						</execute>
 					</action>
 				</item>
@@ -301,7 +291,7 @@
 			    <item label="Send test notification">
 				    <action name="Execute">
 					    <execute>
-						    cb-fortune
+							notify-send "Test Notification"
 					    </execute>
 				    </action>
 			    </item>
@@ -337,48 +327,63 @@
 			<item label="Choose Wallpaper">
 				<action name="Execute">
 					<execute>
-						nitrogen ~/images/wallpapers/
+						nitrogen
 					</execute>
 				</action>
 			</item>
 		</menu>
 		<menu id="system" label="System">
-		    <menu execute="cb-printing-pipemenu" id="PrintingPipeMenu" label="Printers"/>
 		    <item label="GParted">
 				<action name="Execute">
 					<execute>
-						gksudo gparted
+						xdg-su -c gparted
 					</execute>
 				</action>
 			</item>
-			<item label="GDM Login Set-up">
+			<item label="Login Set-up">
 				<action name="Execute">
 					<execute>
-						gksudo gdmsetup
+						xdg-su -c lxdm-config
 					</execute>
 				</action>
 			</item>
-			<item label="Synaptic Package Manager">
+			<item label="Yast 2">
 				<action name="Execute">
 					<execute>
-						gksudo synaptic
+						xdg-su -c yast2
 					</execute>
 				</action>
 			</item>
 		</menu>
-		<menu id="help" label="Help" execute="cb-help-pipemenu" />
 		<separator/>
 		<item label="Lock Screen">
 			<action name="Execute">
 				<execute>
-					cb-lock
+					xscreensaver-command -lock
 				</execute>
 			</action>
 		</item>
-		<item label="Exit">
+		
+		<item label="Logout">
 			<action name="Execute">
 				<execute>
-					openbox-logout
+					sudo /sbin/logout
+				</execute>
+			</action>
+		</item>
+		
+		<item label="Restart">
+			<action name="Execute">
+				<execute>
+					sudo /sbin/reboot
+				</execute>
+			</action>
+		</item>
+		
+		<item label="Shutdown">
+			<action name="Execute">
+				<execute>
+					sudo /sbin/halt
 				</execute>
 			</action>
 		</item>
