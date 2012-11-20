@@ -39,3 +39,5 @@ if [ -s "$HOME/.rvm/scripts/rvm" ]; then
 fi
 
 alias dot-reload='. ~/.bashrc &> /dev/null'
+
+PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting

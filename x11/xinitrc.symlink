@@ -1,4 +1,2 @@
-export BROWSER=google-chrome2
-
 xrdb ~/.Xresources &
 exec dbus-launch openbox-session

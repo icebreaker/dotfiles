@@ -29,6 +29,7 @@
     <!-- whether to place windows in the center of the free area found or
        the top left corner -->
     <monitor>Mouse</monitor>
+    <primaryMonitor/>
   </placement>
   <theme>
     <name>ObBear2</name>
@@ -115,10 +116,10 @@
     <number>2</number>
     <firstdesk>1</firstdesk>
     <names>
-      <name>1</name>
-      <name>2</name>
-      <name>3</name>
-      <name>4</name>
+      <name>I</name>
+      <name>II</name>
+      <name>III</name>
+      <name>IV</name>
     </names>
     <popupTime>875</popupTime>
     <!-- The number of milliseconds to show the popup for when switching
