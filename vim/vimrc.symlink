@@ -1,11 +1,11 @@
 " Custom make wrapper which can search for a valid Makefile.
 set makeprg=make.sh
 " Bind Ctrl+B to make
-map <c-b> <ESC>:make -f .project build<CR>
+map <c-b> <ESC>:make build<CR>
 " Bind Ctrl+R to execute
-map <c-r> <ESC>:make -f .project execute<CR>
+map <c-r> <ESC>:make execute<CR>
 " Bind Ctrl+Q to clean
-map <c-k> <ESC>:make -f .project clean<CR>
+map <c-k> <ESC>:make clean<CR>
 " Bind Ctrl+P to run premake and re-generate the Makefile
 map <c-p> <ESC>:! premake.sh gmake<CR>
 " Toggle Spell checking
@@ -78,7 +78,7 @@ set t_Co=256
 set term=xterm-256color
 
 if has("gui_running")
-	set guifont=Inconsolata\ Medium\ 18
+	set guifont=PT\ Mono\ for\ Powerline\ 14
 endif
 
 let g:Powerline_symbols = 'fancy'
@@ -115,7 +115,7 @@ colorscheme gummybears
 
 " Word Completion
 function! Tab_Or_Complete()
-	if col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^\w'
+	if col('.')>1 && strpart(getline('.'), col('.')-2, 3) =~ '^\w'
 		return "\<C-N>"
 	else
 		return "\<Tab>"

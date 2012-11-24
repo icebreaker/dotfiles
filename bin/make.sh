@@ -5,7 +5,7 @@ PROJECT='.project'
 
 while test "${DIR}" != "/"; do
 	if [ -f "${DIR}/${PROJECT}" ]; then
-		make -C "${DIR}" $@
+		make -C "${DIR}" -f "${PROJECT}" $@
 		exit
 	fi
 	DIR=`dirname "${DIR}"`
