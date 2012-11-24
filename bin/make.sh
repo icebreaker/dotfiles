@@ -1,17 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 
-EHOME=`echo $HOME | sed "s/#/\#/"`
 DIR=`pwd`
+PROJECT='.project'
 
-while test "$DIR" != "/"; do
-	for m in .project; do
-		if [ -f "${DIR}/${m}" ]; then
-			#cd "${DIR}"
-			make -C "$DIR" $@
-			exit
-		fi
-	done
+while test "${DIR}" != "/"; do
+	if [ -f "${DIR}/${PROJECT}" ]; then
+		make -C "${DIR}" $@
+		exit
+	fi
 	DIR=`dirname "${DIR}"`
 done
 
-echo "No project found!" > /dev/stderr
+echo "No ${PROJECT} found!" > /dev/stderr
