@@ -1,5 +1,6 @@
 " Custom make wrapper which can search for a valid Makefile.
 set makeprg=make.sh
+set errorformat^=%-GIn\ file\ included\ %.%#
 " Bind Ctrl+B to make
 map <c-b> <ESC>:make build<CR>
 " Bind Ctrl+R to execute
