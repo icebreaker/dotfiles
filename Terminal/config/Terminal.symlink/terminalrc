@@ -16,8 +16,9 @@ MiscTabCloseMiddleClick=TRUE
 MiscTabPosition=GTK_POS_TOP
 MiscHighlightUrls=TRUE
 ScrollingBar=TERMINAL_SCROLLBAR_NONE
-FontName=Monospace 9
+FontName=Inconsolata for Powerline Medium 16
 BackgroundMode=TERMINAL_BACKGROUND_TRANSPARENT
 BackgroundDarkness=0.800000
 ColorCursor=#ffffffffffff
+Term=xterm-256color
 
