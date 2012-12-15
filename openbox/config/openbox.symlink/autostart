@@ -24,7 +24,7 @@ tint2 &
 xcompmgr -n -I 0 -O 0 -D 0 -C &
 
 ## Launch network manager applet
-(sleep 4s && nm-applet) &
+# (sleep 5s && nm-applet) &
 
 ## Detect and configure touchpad. See 'man synclient' for more info.
 if egrep -iq 'touchpad' /proc/bus/input/devices; then
