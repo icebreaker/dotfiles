@@ -145,6 +145,7 @@ au! BufRead,BufNewFile *.py set filetype=python
 au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.coffee set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.lua set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile *.hx set filetype=haxe tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.md,*.markdown,*.mkd call DistractionFreeWriting()
 au! BufRead,BufNewFile *.c,*.h,*.cpp,*.hpp,*.cxx,*.hxx,*.cc,*.hh call FoldLicense()
 au! BufRead,BufNewFile * set formatoptions=tcq
@@ -170,6 +171,14 @@ function! DistractionFreeWriting()
 	set foldcolumn=12
 	set tw=79
 	hi FoldColumn ctermbg=none
+	hi clear SpellBad
+	hi SpellBad term=standout ctermfg=1 term=none cterm=none
+	hi clear SpellCap
+	hi SpellCap term=standout ctermfg=2 term=none cterm=none
+	hi clear SpellLocal
+	hi SpellLocal term=standout ctermfg=3 term=none cterm=none
+	hi clear SpellRare
+	hi SpellRare term=standout ctermfg=4 term=none cterm=none
 endfunction
 
 " Swap Directory
