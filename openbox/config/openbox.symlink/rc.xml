@@ -259,7 +259,7 @@
     </keybind>
     <keybind key="A-Print">
       <action name="Execute">
-        <execute>scrot -d 10 '%Y-%m-%d--%s_$wx$h_scrot.png' -e 'mv $f ~/screenshots/ &amp; viewnior ~/screenshots/$f'</execute>
+        <execute>scrot -b -s '%Y-%m-%d--%s_$wx$h_scrot.png' -e 'mv $f ~/screenshots/ &amp; viewnior ~/screenshots/$f'</execute>
       </action>
     </keybind>
     <!-- Keybindings for window switching -->
