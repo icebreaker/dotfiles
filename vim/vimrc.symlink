@@ -7,14 +7,19 @@ map <c-b> <ESC>:make build<CR>
 map <c-r> <ESC>:make execute<CR>
 " Bind Ctrl+Q to clean
 map <c-k> <ESC>:make clean<CR>
-" Bind Ctrl+P to run premake and re-generate the Makefile
-map <c-p> <ESC>:! premake.sh gmake<CR>
+" Bind Ctrl+G to run premake and re-generate the Makefile
+map <c-g> <ESC>:! premake.sh gmake<CR>
 " Toggle Spell checking
 map <F4> :set spell! spelllang=en_us<CR>
 " Toggle Line Numbers
 map <F2> :set nonumber!<CR>
 " Send to Twitter (will prompt)
 map <F12> :PosttoTwitter<CR>
+
+" Copy Paste with Ctrl+C and Ctrl+V
+vmap <c-c> :w! ~/.vim/swap/.buffer<CR>
+nmap <c-c> :.w! ~/.vim/swap/.buffer<CR>
+nmap <c-p> :r ~/.vim/swap/.buffer<CR>
 
 set nospell
 set encoding=utf8
