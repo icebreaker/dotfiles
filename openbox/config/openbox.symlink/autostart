@@ -21,7 +21,7 @@ nitrogen --restore &
 tint2 &
 
 ## Start Composite Manager
-xcompmgr -n -I 0 -O 0 -D 0 -C &
+# xcompmgr -n -I 0 -O 0 -D 0 -C &
 
 ## Launch network manager applet
 # (sleep 5s && nm-applet) &
