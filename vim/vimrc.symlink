@@ -18,7 +18,6 @@ map <F12> :PosttoTwitter<CR>
 
 " Copy Paste with Ctrl+C and Ctrl+V
 vmap <c-c> :w! ~/.vim/swap/.buffer<CR>
-nmap <c-c> :.w! ~/.vim/swap/.buffer<CR>
 nmap <c-p> :r ~/.vim/swap/.buffer<CR>
 
 set nospell
