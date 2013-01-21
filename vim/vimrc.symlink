@@ -118,6 +118,8 @@ let g:solarized_termcolors=256
 "colorscheme sahara
 colorscheme gummybears
 
+hi Normal ctermbg=none
+
 " Word Completion
 function! Tab_Or_Complete()
 	if col('.')>1 && strpart(getline('.'), col('.')-2, 3) =~ '^\w'
