@@ -1,0 +1,2 @@
+alias sk='openssl req -new -x509 -nodes -out ~/.ssh/server.crt -keyout ~/.ssh/server.key'
+alias ts='thin start --ssl --ssl-verify --ssl-key-file ~/.ssh/server.key --ssl-cert-file ~/.ssh/server.crt'
