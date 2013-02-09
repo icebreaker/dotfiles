@@ -1,0 +1,68 @@
+border.color: #303030
+border.width: 0
+menu.items.active.bg: Gradient Vertical Flat Border
+menu.items.active.bg.color: #505050
+menu.items.active.bg.colorTo: #505050
+menu.items.active.bg.border.color: #383838
+menu.items.active.text.color: #FFFFFF
+menu.items.bg: Solid Flat
+menu.items.bg.color: #3A3A3A
+menu.items.disabled.text.color: #808080
+menu.items.font: shadow=y:shadowtint=25:shadowoffset=1
+menu.items.text.color: #C1C1C1
+menu.overlap: 2
+menu.separator.color: #333333
+menu.separator.width: 1
+menu.title.bg: Solid Flat
+menu.title.bg.color: #333333
+menu.title.text.color: #FFFFFF
+menu.title.text.justify: center
+padding.width: 3
+window.active.button.disabled.bg: parentrelative
+window.active.button.disabled.image.color: #CACACA
+window.active.button.hover.bg: Solid Flat Border
+window.active.button.hover.bg.color: #333333
+window.active.button.hover.bg.border.color: #333333
+window.active.button.pressed.bg: Solid Flat Border
+window.active.button.pressed.bg.color: #303030
+window.active.button.pressed.bg.border.color: #333333
+window.active.button.toggled.bg: parentrelative
+window.active.button.toggled.hover.bg: Solid Flat Border
+window.active.button.toggled.hover.bg.color: #333333
+window.active.button.toggled.hover.bg.border.color: #333333
+window.active.button.toggled.unpressed.bg: ParentRelative Flat
+window.active.button.unpressed.bg: parentrelative
+window.active.button.unpressed.image.color: #CACACA
+window.active.client.color: #333333
+window.active.grip.bg: Solid Flat
+window.active.grip.bg.color: #303030
+window.active.handle.bg: Solid Flat
+window.active.handle.bg.color: #303030
+window.active.label.bg: parentrelative
+window.active.label.text.color: #CACACA
+window.active.title.bg: Solid Flat
+window.active.title.bg.color: #333333
+window.active.title.separator.color: #333333
+window.client.padding.width: 1
+window.handle.width: 1
+window.inactive.button.disabled.bg: parentrelative
+window.inactive.button.disabled.image.color: #696967
+window.inactive.button.hover.bg: Solid Flat Border
+window.inactive.button.hover.bg.color: #333333
+window.inactive.button.hover.bg.border.color: #333333
+window.inactive.button.pressed.bg: parentrelative
+window.inactive.button.toggled.image.color: #696967
+window.inactive.button.unpressed.bg: parentrelative
+window.inactive.button.unpressed.image.color: #696967
+window.inactive.client.color: #333333
+window.inactive.grip.bg: Solid Flat
+window.inactive.grip.bg.color: #303030
+window.inactive.handle.bg: Solid Flat
+window.inactive.handle.bg.color: #303030
+window.inactive.label.bg: parentrelative
+window.inactive.label.text.color: #696967
+window.inactive.label.text.font: shadow=n
+window.inactive.title.bg: Solid Flat
+window.inactive.title.bg.color: #474747
+window.inactive.title.separator.color: #333333
+window.label.text.justify: center
