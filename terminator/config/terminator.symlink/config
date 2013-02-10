@@ -15,10 +15,10 @@
   [[default]]
     foreground_color = "#c6c6c6"
     palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
-    background_image = /home/szaby/Pictures/wallpapers/AkaDH_StencilGasha.jpg
-    background_darkness = 0.78
+    background_image = /home/szaby/Pictures/wallpapers/opensuse.jpg
+    background_darkness = 0.89
     scrollback_lines = 2048
-    background_type = image
+    background_type = transparent
     use_system_font = False
     cursor_color = "#b6acac"
     scroll_background = False
@@ -27,7 +27,7 @@
     scrollbar_position = hidden
     show_titlebar = False
     color_scheme = custom
-    font = Droid Sans Mono for Powerline 13
+    font = Inconsolata for Powerline Medium 14
     background_color = "#121212"
     cursor_blink = False
 [layouts]
