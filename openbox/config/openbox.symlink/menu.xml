@@ -360,7 +360,7 @@
 		<item label="Logout">
 			<action name="Execute">
 				<execute>
-					sudo /sbin/logout
+					xdg-su -c /sbin/logout
 				</execute>
 			</action>
 		</item>
@@ -368,7 +368,7 @@
 		<item label="Restart">
 			<action name="Execute">
 				<execute>
-					sudo /sbin/reboot
+					xdg-su -c /sbin/reboot
 				</execute>
 			</action>
 		</item>
@@ -376,7 +376,7 @@
 		<item label="Shutdown">
 			<action name="Execute">
 				<execute>
-					sudo /sbin/shutdown -h now
+					xdg-su -c '/sbin/shutdown -h now'
 				</execute>
 			</action>
 		</item>
