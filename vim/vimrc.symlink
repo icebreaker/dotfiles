@@ -86,6 +86,13 @@ if has("gui_running")
 	set guifont=PT\ Mono\ for\ Powerline\ 14
 endif
 
+set completeopt=menu,menuone
+set pumheight=10
+
+let g:clang_use_library=1
+let g:clang_library_path='/usr/lib64/'
+"let g:clang_snippets=1
+
 let g:Powerline_symbols = 'fancy'
 let g:Powerline_mode_v	= 'V'
 let g:Powerline_mode_V	= 'V⋅L'
