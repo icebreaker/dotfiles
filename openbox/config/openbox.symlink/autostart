@@ -5,6 +5,9 @@ elif [ -f /proc/acpi/video/VGA1/LCDD/brightness ]; then
 	echo 10 > /proc/acpi/video/VGA1/LCDD/brightness
 fi
 
+## Set desktop wallpaper
+nitrogen --restore &
+
 ## Start session manager
 #lxsession &
 
@@ -13,9 +16,6 @@ xfce4-power-manager &
 
 ## Start Thunar Daemon
 thunar --daemon &
-
-## Set desktop wallpaper
-nitrogen --restore &
 
 ## Launch panel
 tint2 &
