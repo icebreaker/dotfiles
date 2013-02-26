@@ -126,6 +126,8 @@ let g:solarized_termcolors=256
 colorscheme gummybears
 
 hi Normal ctermbg=none
+hi Search cterm=none ctermfg=1 ctermbg=172
+hi Todo ctermbg=none ctermfg=107
 
 " Word Completion
 function! Tab_Or_Complete()
