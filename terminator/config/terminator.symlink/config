@@ -28,7 +28,7 @@
     scrollbar_position = hidden
     show_titlebar = False
     color_scheme = custom
-    font = Inconsolata for Powerline Medium 15
+    font = PT Mono for Powerline 14
     background_color = "#121212"
     cursor_blink = False
 [layouts]
