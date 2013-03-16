@@ -20,6 +20,8 @@ map <F12> :PosttoTwitter<CR>
 vmap <c-c> :w! ~/.vim/swap/.buffer<CR>
 nmap <c-p> :r ~/.vim/swap/.buffer<CR>
 
+:noremap <space> :set hlsearch!<CR>
+
 set nospell
 set encoding=utf8
 set fileencoding=utf8
