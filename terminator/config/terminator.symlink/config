@@ -28,7 +28,7 @@
     scrollbar_position = hidden
     show_titlebar = False
     color_scheme = custom
-    font = PT Mono for Powerline 14
+    font = Meslo LG M for Powerline 13
     background_color = "#121212"
     cursor_blink = False
 [layouts]
