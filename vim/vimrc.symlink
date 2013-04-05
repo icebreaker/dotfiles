@@ -128,6 +128,7 @@ let g:solarized_termcolors=256
 colorscheme gummybears
 
 hi Normal ctermbg=none
+hi NonText ctermbg=none
 hi Search cterm=none ctermfg=1 ctermbg=172
 hi Todo ctermbg=none ctermfg=107
 
