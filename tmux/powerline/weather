@@ -1,0 +1,42 @@
+#!/bin/bash
+
+WEATHER_CACHE='/tmp/tmux-accuweather-cache'
+
+if [ -z $WEATHER_CACHE_EXPIRE ]; then
+	WEATHER_CACHE_EXPIRE=10800 # 3 hours
+fi
+
+if [ -z $WEATHER_URL ]; then
+	WEATHER_URL='http://www.accuweather.com/en/ro/targu-mures/289415/weather-forecast/289415'
+fi
+
+function fetch 
+{
+	wget -q $WEATHER_URL -O $WEATHER_CACHE
+}
+
+function is_cache_expired
+{
+	diff=$(($(date +%s) - $(date -r $WEATHER_CACHE +%s)))
+
+	if [ $diff -gt $WEATHER_CACHE_EXPIRE ]; then
+		return 1
+	else
+		return 0
+	fi
+}
+
+function extract_temp
+{
+	return $(cat $WEATHER_CACHE | grep '<strong class="temp">' | head -n 1 | grep -PZo '[0-9]+')
+}
+
+is_cache_expired
+if [ $? -eq 1 ]; then
+	fetch
+fi
+
+extract_temp
+echo $?
+
+exit 0
