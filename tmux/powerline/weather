@@ -17,6 +17,10 @@ function fetch
 
 function is_cache_expired
 {
+	if [ ! -f $WEATHER_CACHE ]; then
+		return 1
+	fi
+
 	diff=$(($(date +%s) - $(date -r $WEATHER_CACHE +%s)))
 
 	if [ $diff -gt $WEATHER_CACHE_EXPIRE ]; then
