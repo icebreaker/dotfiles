@@ -12,4 +12,4 @@ else
 	fi
 fi
 	
-exec -a "$0" "google-chrome" --ignore-gpu-blacklist --enable-nacl "$@"
+exec -a "$0" "google-chrome" --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=4096 "$@"
