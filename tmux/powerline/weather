@@ -3,7 +3,7 @@
 WEATHER_CACHE='/tmp/tmux-accuweather-cache'
 
 if [ -z $WEATHER_CACHE_EXPIRE ]; then
-	WEATHER_CACHE_EXPIRE=10800 # 3 hours
+	WEATHER_CACHE_EXPIRE=3600 # 1 hour
 fi
 
 if [ -z $WEATHER_URL ]; then
