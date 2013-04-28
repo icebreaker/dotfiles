@@ -7,8 +7,8 @@ map <c-b> <ESC>:make build<CR>
 map <c-r> <ESC>:make execute<CR>
 " Bind Ctrl+Q to clean
 map <c-k> <ESC>:make clean<CR>
-" Bind Ctrl+G to run premake and re-generate the Makefile
-map <c-g> <ESC>:! premake.sh gmake<CR>
+" Bind Ctrl+G to generate
+map <c-g> <ESC>:make generate<CR>
 " Toggle Spell checking
 map <F4> :set spell! spelllang=en_us<CR>
 " Toggle Line Numbers
