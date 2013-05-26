@@ -18,4 +18,4 @@ mute=XF86AudioMute
 
 [Alsa]
 card=hw:0
-channel=Master
+channel=Headset
