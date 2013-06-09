@@ -1,10 +1,14 @@
 ## Set initial brightness
 if [ -f /sys/class/backlight/acpi_video0/brightness ]; then
 	echo 10 > /sys/class/backlight/acpi_video0/brightness
-elif [ -f /proc/acpi/video/VGA1/LCDD/brightness ]; then
+fi
+
+if [ -f /proc/acpi/video/VGA1/LCDD/brightness ]; then
 	echo 10 > /proc/acpi/video/VGA1/LCDD/brightness
-elif [ -f /sys/class/backlight/intel_backlight/brightness ]; then
-	echo 3000 > /sys/class/backlight/intel_backlight/brightness
+fi
+
+if [ -f /sys/class/backlight/intel_backlight/brightness ]; then
+	echo 3300 > /sys/class/backlight/intel_backlight/brightness
 fi
 
 ## Set desktop wallpaper
