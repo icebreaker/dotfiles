@@ -20,6 +20,11 @@ map <F12> :PosttoTwitter<CR>
 vmap <c-c> :w! ~/.vim/swap/.buffer<CR>
 nmap <c-p> :r ~/.vim/swap/.buffer<CR>
 
+" Next / Prev File (as in :args)
+:noremap <s-n> :n<CR>
+:noremap <s-p> :prev<CR>
+
+" Highlight Last Searched Term
 :noremap <space> :set hlsearch!<CR>
 
 set nospell
@@ -85,7 +90,7 @@ set t_Co=256
 set term=xterm-256color
 
 if has("gui_running")
-	set guifont=PT\ Mono\ for\ Powerline\ 14
+	set guifont=Meslo\ LG\ M\ for\ Powerline\ 11
 endif
 
 set completeopt=menu,menuone
@@ -201,3 +206,8 @@ endfunction
 
 " Swap Directory
 set directory=~/.vim/swap
+
+" Restore / Jump to last position
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
