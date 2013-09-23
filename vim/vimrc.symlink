@@ -21,8 +21,8 @@ vmap <c-c> :w! ~/.vim/swap/.buffer<CR>
 nmap <c-p> :r ~/.vim/swap/.buffer<CR>
 
 " Next / Prev File (as in :args)
-:noremap <s-n> :n<CR>
-:noremap <s-p> :prev<CR>
+:noremap <c-n> :n<CR>
+:noremap <c-m> :prev<CR>
 
 " Highlight Last Searched Term
 :noremap <space> :set hlsearch!<CR>
