@@ -1,1 +1,5 @@
-export HISTSIZE=5000
+HISTSIZE=10000
+HISTFILESIZE=1000
+# HISTTIMEFORMAT="%F %T "
+HISTCONTROL=ignoredups:ignorespace
+shopt -s histappend
