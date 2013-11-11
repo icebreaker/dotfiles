@@ -24,3 +24,7 @@
 	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --
 	export = "!f() { git checkout-index -f -a --prefix=$1/;  }; f"
 	export-gz = "!f() { git archive HEAD | gzip > $1;  }; f"
+[web]
+	browser = webrowser
+[browser "webrowser"]
+	cmd = xdg-open
