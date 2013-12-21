@@ -11,5 +11,13 @@ else
 		fi
 	fi
 fi
+
+# added temporary workaround for the recent "libudev" issues
+# that stop the Google Talk Plugin from working properly :)
+if [ "$DOT_OS" == "opensuse" ]; then
+	if [ -f "/usr/lib64/libudev.so.0" ]; then
+		export LD_PRELOAD=/usr/lib64/libudev.so.0:$LD_PRELOAD
+	fi
+fi
 	
 exec -a "$0" "google-chrome" --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=4096 "$@"
