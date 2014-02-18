@@ -67,6 +67,7 @@ set showcmd
 set ignorecase
 "set mouse=a
 set columns=120
+"set colorcolumn=120
 set tw=119
 set ruler
 set undolevels=500
@@ -141,7 +142,10 @@ if exists("g:colors_name") && g:colors_name == "gummybears"
 	hi NonText ctermbg=none
 	hi Search cterm=none ctermfg=1 ctermbg=172
 	hi Todo ctermbg=none ctermfg=107
+	hi ColorColumn ctermbg=107 ctermfg=1
 endif
+
+call matchadd('ColorColumn', '\%121v', 99)
 
 " Word Completion
 function! Tab_Or_Complete()
@@ -192,13 +196,15 @@ endfunction
 
 function! DistractionFreeWriting()
 	set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-	set columns=100
 	set laststatus=0
 	set noruler
 	set linebreak
 	set nonumber
 	set foldcolumn=12
+	set columns=80
 	set tw=79
+	set noshowmode 
+	
 	hi FoldColumn ctermbg=none
 	hi clear SpellBad
 	hi SpellBad term=standout ctermfg=1 term=none cterm=none
@@ -208,6 +214,8 @@ function! DistractionFreeWriting()
 	hi SpellLocal term=standout ctermfg=3 term=none cterm=none
 	hi clear SpellRare
 	hi SpellRare term=standout ctermfg=4 term=none cterm=none
+	
+	call matchadd('ColorColumn', '\%81v', 99)
 endfunction
 
 " Swap Directory
@@ -217,3 +225,9 @@ set directory=~/.vim/swap
 if has("autocmd")
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
+
+" VisualBlock plugin
+vmap  <expr>  <C-LEFT>   DVB_Drag('left')
+vmap  <expr>  <C-RIGHT>  DVB_Drag('right')
+vmap  <expr>  <C-DOWN>   DVB_Drag('down')
+vmap  <expr>  <C-UP>     DVB_Drag('up') 
