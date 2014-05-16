@@ -12,13 +12,13 @@
   go_right = <Shift><Alt>Right
   new_tab = <Shift><Control><Alt>t
   go_left = <Shift><Alt>Left
-  hide_window = <Super>grave
+  hide_window = <Alt>grave
 [profiles]
   [[default]]
     foreground_color = "#c6c6c6"
     palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
-    background_image = /home/szaby/Pictures/wallpapers/girl-bread.jpg
-    background_darkness = 1.05
+    background_image = /home/szaby/Pictures/wallpapers/opensuse.jpg
+    background_darkness = 0.86
     scrollback_lines = 2048
     use_system_font = False
     cursor_color = "#b6acac"
@@ -28,7 +28,7 @@
     scrollbar_position = hidden
     show_titlebar = False
     color_scheme = custom
-    font = Meslo LG M 12
+    font = Meslo LG M for Powerline 13
     background_color = "#121212"
     cursor_blink = False
 [layouts]
