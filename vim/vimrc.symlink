@@ -92,7 +92,7 @@ set t_Co=256
 set term=xterm-256color
 
 if has("gui_running")
-	set guifont=Meslo\ LG\ M\ for\ Powerline\ 11
+	set guifont=Meslo\ LG\ M\ for\ Powerline\ 12
 endif
 
 set completeopt=menu,menuone
@@ -117,34 +117,18 @@ let g:solarized_italic=0
 let g:solarized_termcolors=256
 "let g:solarized_termtrans = 1
 
-"colorscheme 256-jungle
-"colorscheme wombat
-"colorscheme railscasts
-"colorscheme solarized
-"colorscheme sorcerer
-"colorscheme obsidian
-"colorscheme github
-"colorscheme Tomorrow
-"colorscheme jellybeans
-"colorscheme neverland2
-"colorscheme desertEx
-"colorscheme molokai
-"colorscheme mars
-"colorscheme hemisu
-"colorscheme sahara
+"set background=dark
 "colorscheme gummybears
-colorscheme hybrid
-"colorscheme hornet
-"colorscheme lucius
-"colorscheme kolor
 
-if exists("g:colors_name") && (g:colors_name == "gummybears" || g:colors_name == "hybrid")
-	hi Normal ctermbg=none ctermfg=251
-	hi NonText ctermbg=none
-	hi Search cterm=none ctermfg=1 ctermbg=172
-	hi Todo ctermbg=none ctermfg=107
-	hi ColorColumn ctermbg=107 ctermfg=1
-endif
+"let g:hybrid_use_Xresources = 1
+colorscheme hybrid
+
+hi Normal ctermbg=none
+hi Normal ctermfg=251
+hi NonText ctermbg=none
+hi Search cterm=none ctermfg=1 ctermbg=172
+hi Todo ctermbg=none ctermfg=107
+hi ColorColumn ctermbg=107 ctermfg=1
 
 call matchadd('ColorColumn', '\%121v', 99)
 

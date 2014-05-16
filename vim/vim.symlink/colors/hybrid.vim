@@ -145,7 +145,7 @@ else
     let s:comment    = "243"
     let s:red        = "167"
     let s:orange     = "173"
-    let s:yellow     = "221"
+    let s:yellow     = "214"
     let s:green      = "143"
     let s:aqua       = "109"
     let s:blue       = "110"
@@ -291,7 +291,7 @@ exe "hi! DiffAdd"       .s:fg_addfg       .s:bg_addbg       .s:fmt_none
 exe "hi! DiffChange"    .s:fg_changefg    .s:bg_changebg    .s:fmt_none
 exe "hi! DiffDelete"    .s:fg_background  .s:bg_red         .s:fmt_none
 exe "hi! DiffText"      .s:fg_background  .s:bg_blue        .s:fmt_none
-exe "hi! ErrorMsg"      .s:fg_background  .s:bg_red         .s:fmt_stnd
+exe "hi! ErrorMsg"      .s:fg_red		  .s:bg_none        .s:fmt_none
 exe "hi! VertSplit"     .s:fg_window      .s:bg_none        .s:fmt_none
 exe "hi! Folded"        .s:fg_comment     .s:bg_darkcolumn  .s:fmt_none
 exe "hi! FoldColumn"    .s:fg_none        .s:bg_darkcolumn  .s:fmt_none
