@@ -31,13 +31,4 @@ if [ -f ~/.localrc ]; then
     . ~/.localrc
 fi
 
-# rvm wizardry ... 
-if [ -s "$HOME/.rvm/scripts/rvm" ]; then
-	if [ -f "$HOME/.rvm/scripts/Rvm" ]; then
-		. "$HOME/.rvm/scripts/Rvm"
-	fi
-fi
-
-alias dot-reload='. ~/.bashrc &> /dev/null'
-
-PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
