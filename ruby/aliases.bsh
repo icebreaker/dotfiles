@@ -1,5 +1,6 @@
 alias s='rails server'
 alias c='rails console'
+alias j='rake jobs:work'
 alias r='rake'
 alias u='rake test:units'
 alias f='rake test:functionals'
