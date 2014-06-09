@@ -232,10 +232,10 @@ function! s:Init()
    " background.  I would rather not have the script change the
    " current color scheme since there is no good way to restore them
    " afterwards.
-   hi MatrixHidden ctermfg=Black ctermbg=Black guifg=#000000 guibg=#000000
-   hi MatrixNormal ctermfg=DarkGreen ctermbg=Black guifg=#008000 guibg=#000000
-   hi MatrixBold ctermfg=LightGreen ctermbg=Black guifg=#00ff00 guibg=#000000
-   hi MatrixHead ctermfg=White ctermbg=Black guifg=#ffffff guibg=#000000
+   hi MatrixHidden ctermfg=Black ctermbg=none guifg=#000000 guibg=#000000
+   hi MatrixNormal ctermfg=DarkGreen ctermbg=none guifg=#008000 guibg=#000000
+   hi MatrixBold ctermfg=LightGreen ctermbg=none guifg=#00ff00 guibg=#000000
+   hi MatrixHead ctermfg=White ctermbg=none guifg=#ffffff guibg=#000000
    sy match MatrixNormal /^.*/ contains=MatrixHidden
    sy match MatrixHidden contained /.`/ contains=MatrixBold
    sy match MatrixHidden contained /._/ contains=MatrixHead

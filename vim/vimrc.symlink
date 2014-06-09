@@ -121,7 +121,9 @@ let g:solarized_termcolors=256
 "colorscheme gummybears
 
 "let g:hybrid_use_Xresources = 1
-colorscheme hybrid
+"colorscheme hybrid
+colorscheme iceberg
+"colorscheme candyVirus
 
 hi Normal ctermbg=none
 hi Normal ctermfg=251
@@ -217,3 +219,5 @@ vmap  <expr>  <C-LEFT>   DVB_Drag('left')
 vmap  <expr>  <C-RIGHT>  DVB_Drag('right')
 vmap  <expr>  <C-DOWN>   DVB_Drag('down')
 vmap  <expr>  <C-UP>     DVB_Drag('up') 
+
+nnoremap ; :

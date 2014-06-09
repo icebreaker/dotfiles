@@ -7,5 +7,7 @@ elif [ -f "/usr/lib/libv4l/v4l1compat.so" ]; then
 elif [ -f "/usr/libv4l/v4l1compat.so" ]; then
 	export LD_PRELOAD=/usr/libv4l/v4l1compat.so
 fi
-	
+
+export LD_LIBRARY_PATH=/usr/lib/nvidia:$LD_LIBRARY_PATH
+
 skype "@$"
