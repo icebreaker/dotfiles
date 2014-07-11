@@ -1,0 +1,70 @@
+#!/bin/bash
+function help()
+{
+	echo "$0 input.mp4 output.gif [fps] [00:00:02] [00:00:05]"
+}
+
+function warning()
+{
+	echo "WARNING: No start or end time specified the resulting GIF might be large."
+}
+
+function extract_frames()
+{
+	echo "Extracting frames ..."
+	ffmpeg -i $1 $2 -r $3 2gif_frames_%05d.png
+}
+
+function build_gif()
+{
+	echo "Building GIF ..."
+	convert -layers optimize -delay $2 -loop 0 2gif_frames_*.png $1
+}
+
+function clean_up()
+{
+	echo "Cleaning up ..."
+	rm 2gif_frames_*.png
+}
+
+if [ $# -lt 2 ]; then
+	help
+	exit 65
+fi
+
+INPUT=$1
+shift
+
+OUTPUT=$1
+shift
+
+FPS=$1
+shift
+
+START=$1
+shift
+
+END=$1
+shift
+
+OPTIONS=''
+
+if [ -z $FPS ]; then
+	FPS=29
+fi
+
+DELAY=$((100/$FPS))
+
+if [ -z $END ]; then
+	if [ -z $START ]; then
+		warning
+	else
+		OPTIONS="-t $START"
+	fi
+else
+	OPTIONS="-ss $START -t $END"
+fi
+
+extract_frames "$INPUT" "$OPTIONS" $FPS
+build_gif "$OUTPUT" "$DELAY"
+clean_up
