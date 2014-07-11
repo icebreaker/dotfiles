@@ -33,7 +33,7 @@
   </placement>
   <theme>
     <name>ObBear2</name>
-    <titleLayout>DSLIMC</titleLayout>
+    <titleLayout>LIMC</titleLayout>
     <!--
       avaible characters are NDSLIMC, each can occur at most once.
       N: window icon
@@ -44,8 +44,8 @@
       S: shade (roll up/down)
       D: omnipresent (on all desktops).
   -->
-    <keepBorder>yes</keepBorder>
-    <animateIconify>yes</animateIconify>
+    <keepBorder>no</keepBorder>
+    <animateIconify>no</animateIconify>
     <font place="ActiveWindow">
       <name>Droid Sans</name>
       <size>10</size>
