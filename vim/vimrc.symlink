@@ -118,12 +118,14 @@ let g:solarized_termcolors=256
 "let g:solarized_termtrans = 1
 
 "set background=dark
+"colorscheme base16-default
 "colorscheme gummybears
 
 "let g:hybrid_use_Xresources = 1
 colorscheme hybrid
 "colorscheme iceberg
 "colorscheme candyVirus
+"colorscheme mango
 
 hi Normal ctermbg=none
 hi Normal ctermfg=251
