@@ -12,7 +12,7 @@
   go_right = <Shift><Alt>Right
   new_tab = <Shift><Control><Alt>t
   go_left = <Shift><Alt>Left
-  hide_window = <Super>grave
+  hide_window = <Alt>grave
 [profiles]
   [[default]]
     foreground_color = "#c6c6c6"
@@ -28,7 +28,7 @@
     scrollbar_position = hidden
     show_titlebar = False
     color_scheme = custom
-    font = Meslo LG M for Powerline 14
+    font = Meslo LG M for Powerline 12
     background_color = "#121212"
     cursor_blink = False
 [layouts]

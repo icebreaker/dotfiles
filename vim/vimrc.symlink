@@ -121,8 +121,8 @@ let g:solarized_termcolors=256
 "colorscheme gummybears
 
 "let g:hybrid_use_Xresources = 1
-"colorscheme hybrid
-colorscheme iceberg
+colorscheme hybrid
+"colorscheme iceberg
 "colorscheme candyVirus
 
 hi Normal ctermbg=none
@@ -132,7 +132,7 @@ hi Search cterm=none ctermfg=1 ctermbg=172
 hi Todo ctermbg=none ctermfg=107
 hi ColorColumn ctermbg=107 ctermfg=1
 
-call matchadd('ColorColumn', '\%121v', 99)
+call matchadd('ColorColumn', '\%121v', 120)
 
 " Word Completion
 function! Tab_Or_Complete()
