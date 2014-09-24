@@ -18,7 +18,7 @@ function extract_frames()
 function build_gif()
 {
 	echo "Building GIF ..."
-	convert -layers optimize -delay $2 -loop 0 2gif_frames_*.png $1
+	convert -coalesce -layers OptimizeTransparency -delay $2 -loop 0 2gif_frames_*.png $1
 }
 
 function clean_up()

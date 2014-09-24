@@ -75,6 +75,7 @@ set history=1000
 set nofsync
 set clipboard+=unnamed
 set cinoptions+=g0
+set foldmethod=marker
 
 let python_highlight_all=1
 
@@ -90,6 +91,8 @@ set t_AF=^[[38;5;%dm
 set t_Co=256
 "set term=gnome-256color
 set term=xterm-256color
+
+let g:CSApprox_attr_map = { 'bold' : 'bold', 'italic' : '', 'sp' : ''  }
 
 if has("gui_running")
 	set guifont=Meslo\ LG\ M\ for\ Powerline\ 12
@@ -119,13 +122,14 @@ let g:solarized_termcolors=256
 
 "set background=dark
 "colorscheme base16-default
-"colorscheme gummybears
+colorscheme gummybears
 
 "let g:hybrid_use_Xresources = 1
-colorscheme hybrid
+"colorscheme hybrid
 "colorscheme iceberg
 "colorscheme candyVirus
 "colorscheme mango
+"colorscheme obsidian2
 
 hi Normal ctermbg=none
 hi Normal ctermfg=251
