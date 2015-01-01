@@ -66,9 +66,9 @@ set shortmess=asI
 set showcmd
 set ignorecase
 "set mouse=a
-set columns=120
+"set columns=120
 "set colorcolumn=120
-set tw=119
+"set tw=119
 set ruler
 set undolevels=500
 set history=1000
@@ -95,7 +95,7 @@ set term=xterm-256color
 let g:CSApprox_attr_map = { 'bold' : 'bold', 'italic' : '', 'sp' : ''  }
 
 if has("gui_running")
-	set guifont=Meslo\ LG\ M\ for\ Powerline\ 12
+	set guifont=Meslo\ LG\ M\ for\ Powerline\ 14
 endif
 
 set completeopt=menu,menuone
@@ -136,9 +136,9 @@ hi Normal ctermfg=251
 hi NonText ctermbg=none
 hi Search cterm=none ctermfg=1 ctermbg=172
 hi Todo ctermbg=none ctermfg=107
-hi ColorColumn ctermbg=107 ctermfg=1
+" hi ColorColumn ctermbg=107 ctermfg=1
 
-call matchadd('ColorColumn', '\%121v', 120)
+" call matchadd('ColorColumn', '\%121v', 120)
 
 " Word Completion
 function! Tab_Or_Complete()
@@ -173,6 +173,7 @@ au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandt
 au! BufRead,BufNewFile *.coffee set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.lua set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.hx set filetype=haxe tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile *.glsl set filetype=glsl
 au! BufRead,BufNewFile *.md,*.markdown,*.mkd call DistractionFreeWriting()
 au! BufRead,BufNewFile *.c,*.h,*.cpp,*.hpp,*.cxx,*.hxx,*.cc,*.hh call FoldLicense()
 au! BufRead,BufNewFile * set formatoptions=tcq
@@ -209,7 +210,7 @@ function! DistractionFreeWriting()
 	hi clear SpellRare
 	hi SpellRare term=standout ctermfg=4 term=none cterm=none
 	
-	call matchadd('ColorColumn', '\%81v', 99)
+	"call matchadd('ColorColumn', '\%81v', 99)
 endfunction
 
 " Swap Directory

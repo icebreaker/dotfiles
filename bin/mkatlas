@@ -1,0 +1,246 @@
+#!/usr/bin/env bash
+
+# Find nearest power of two
+#
+# @param1 - number
+atlas_nearest_power_of_two()
+{
+	local N=1
+
+	while [ $N -lt $1 ]
+	do
+		let N*=2
+	done
+
+	echo $N
+}
+
+# Compose images into atlas
+atlas_cache_compose()
+{
+	local WIDTH=`< $CACHE/width`
+	local HEIGHT=`< $CACHE/height`
+	local EXTENT_WIDTH=`atlas_nearest_power_of_two $WIDTH`
+	local EXTENT_HEIGHT=`atlas_nearest_power_of_two $HEIGHT`
+
+	[ -f $CACHE/args ] && convert \
+		-size "${WIDTH}x${HEIGHT}" \
+		xc:transparent \
+		`< $CACHE/args` \
+		-strip \
+		-bordercolor none -border $BORDER \
+		-background none -extent "${EXTENT_WIDTH}x${EXTENT_HEIGHT}" \
+		"$ATLAS"
+}
+
+# Print JSON and build arguments for convert
+atlas_cache_summarize()
+{
+	REGIONS=""
+
+	for REPLY in $(find $CACHE -type f -name image)
+	do
+		local X Y W H FILE
+		read X Y W H FILE < $REPLY
+
+		echo "$FILE -geometry +$X+$Y -composite" >> $CACHE/args
+
+		local NAME=${FILE##*/}
+		REGIONS+="\n    \"${NAME%.*}\": { \"x\": $X, \"y\": $Y, \"w\": $W, \"h\": $H },"
+	done
+
+	REGIONS=${REGIONS::-1} # remove last comma to make the JSON valid :)
+
+	echo -e "{\n  \"src\": \"$ATLAS\",\n  \"regions\":\n  { $REGIONS\n  }\n}"
+}
+
+# Insert image, packing algorithm from
+# http://www.blackpawn.com/texts/lightmaps/default.html
+#
+# @param 1 - image width
+# @param 2 - image height
+# @param 3 - image file
+atlas_cache_insert()
+{
+	[ -f $CACHE/candidates ] || return 1
+
+	local INDEX TARGET
+	while read INDEX TARGET
+	do
+		break
+	done <<< "`sort $CACHE/candidates`"
+
+	[ -f $TARGET/rect ] || return 1
+
+	local X Y W H
+	read X Y W H < $TARGET/rect
+
+	if (( W < $1 )) || (( H < $2 ))
+	then
+		return 1
+	fi
+
+	mkdir $TARGET/child0 $TARGET/child1 || return $?
+
+	local RW=$(( W-$1 ))
+	local RH=$(( H-$2 ))
+
+	if (( RW > RH ))
+	then
+		# +-------+---+
+		# | image |   |
+		# +-------+   |
+		# |       | r |
+		# |   b   |   |
+		# |       |   |
+		# +-------+---+
+		echo $(( X+$1 )) $Y $RW $H > $TARGET/child0/rect
+		echo $X $(( Y+$2 )) $1 $RH > $TARGET/child1/rect
+	else
+		# +-------+---+
+		# | image | r |
+		# +-------+---+
+		# |           |
+		# |     b     |
+		# |           |
+		# +-----------+
+		echo $(( X+$1 )) $Y $RW $2 > $TARGET/child0/rect
+		echo $X $(( Y+$2 )) $W $RH > $TARGET/child1/rect
+	fi
+
+	local RIGHT=$(( X+$1 ))
+	(( $RIGHT > `< $CACHE/width` )) && echo $RIGHT > $CACHE/width
+
+	local BOTTOM=$(( Y+$2 ))
+	(( $BOTTOM > `< $CACHE/height` )) && echo $BOTTOM > $CACHE/height
+
+	echo $X $Y $1 $2 $3 > $TARGET/image
+}
+
+# Find possible candidates and give them a sort index
+#
+# @param 1 - image width
+# @param 2 - image height
+# @param 3 - image file
+atlas_cache_find_nodes()
+{
+	if [ -d "$NODE/child0" ]
+	then
+		NODE=$NODE/child0 atlas_cache_find_nodes $1 $2 $3
+		NODE=$NODE/child1 atlas_cache_find_nodes $1 $2 $3
+
+		return
+	fi
+
+	[ -f $NODE/rect ] || return 1
+
+	local X Y W H
+	read X Y W H < $NODE/rect
+
+	if (( W < $1 )) || (( H < $2 ))
+	then
+		return
+	fi
+
+	local MAX_WIDTH=`< $CACHE/width`
+	local MAX_HEIGHT=`< $CACHE/height`
+	local RIGHT=$(( X+$1 ))
+	local BOTTOM=$(( Y+$2 ))
+
+	(( RIGHT > MAX_WIDTH )) && MAX_WIDTH=$RIGHT
+	(( BOTTOM > MAX_HEIGHT )) && MAX_HEIGHT=$BOTTOM
+
+	printf '%08d %s\n' \
+		$(( MAX_WIDTH+MAX_HEIGHT )) \
+		$NODE >> $CACHE/candidates
+}
+
+# Sort files and insert them into the atlas
+atlas_cache_compile()
+{
+	local NODE=$CACHE
+	local W H FILE
+
+	while read W H FILE
+	do
+		[ "$FILE" ] || continue
+
+		printf '%08d %d %d %s\n' $(( W+H )) $W $H $FILE
+	done | sort -r | while read MAX W H FILE
+	do
+		rm -f $CACHE/candidates
+
+		if ! atlas_cache_find_nodes $W $H $FILE ||
+			! atlas_cache_insert $W $H $FILE
+		then
+			echo 'error: cannot insert' $FILE >&2
+			return 1
+		fi
+	done
+}
+
+# Read 'width height file' from standard input and create atlas
+atlas_create_from_list()
+{
+	local CACHE
+	CACHE=`mktemp -d ${0##*/}.XXXXXXXXXX` || return $?
+
+	local MAX_SIZE=${MAX_SIZE:-2048}
+	echo 0 0 $MAX_SIZE $MAX_SIZE > $CACHE/rect
+
+	echo 0 > $CACHE/width
+	echo 0 > $CACHE/height
+
+	atlas_cache_compile &&
+		atlas_cache_summarize &&
+		atlas_cache_compose
+
+	rm -rf $CACHE
+}
+
+# Create texture atlas from given image files
+#
+# @param ... - image files
+atlas_create()
+{
+	local INKSCAPE=${INKSCAPE:-`which inkscape`}
+	local TMPDIR
+	TMPDIR=`mktemp -d ${0##*/}.XXXXXXXXXX` || return $?
+
+	# prepare source files
+	local SRC
+	for SRC
+	do
+		local COPY="$TMPDIR/${SRC##*/}"
+
+		case ${SRC##*.} in
+			svg)
+				COPY="${COPY%.*}.png"
+
+				# use inkscape if available
+				[ "$INKSCAPE" ] &&
+					$INKSCAPE "$SRC" \
+						-z -e "$COPY" &>/dev/null &&
+					SRC=${COPY}
+				;;
+		esac
+
+		convert \
+			-background none \
+			"$SRC" \
+			-strip \
+			-bordercolor none -border ${BORDER} \
+			"$COPY"
+	done
+
+	identify -format '%w %h %d/%f\n' "$TMPDIR/*" | atlas_create_from_list
+	rm -rf $TMPDIR
+}
+
+readonly BORDER=${BORDER:-0}
+readonly ATLAS=${ATLAS:-atlas.png}
+
+if [ "$BASH_SOURCE" == "$0" ]
+then
+	atlas_create "$@"
+fi

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+SEARCH_URL='https://twitter.com/search?q=%23gamedev%20OR%20%23screenshotsaturday&src=typd&mode=photos'
+CACHE_DIR=$HOME/.scrsat
+CACHE_FILE=$CACHE_DIR/cache
+
+mkdir -p $CACHE_DIR
+touch $CACHE_FILE
+
+function get_images()
+{
+	curl -s "$SEARCH_URL" | grep 'data-resolved-url-large="' | cut -d'"' -f2
+}
+
+function get_first_image()
+{
+	echo $1 | head -n 1
+}
+
+function download_image()
+{
+	local filename=$(echo $1 | cut -d"/" -f5 | cut -d":" -f1)
+	wget -q -nc -O "$CACHE_DIR/$filename" "$1"
+}
+
+IMAGES=$(get_images)
+
+CACHE_IMAGE=`< $CACHE_FILE`
+FRESH_IMAGE=$(get_first_image $IMAGES)
+
+if [ "$CACHE_IMAGE" = "$FRESH_IMAGE" ]; then
+	exit
+fi
+
+for URL in $IMAGES; do
+	download_image "$URL"
+done
+
+echo $FRESH_IMAGE > $CACHE_FILE

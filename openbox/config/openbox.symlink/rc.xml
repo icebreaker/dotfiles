@@ -29,7 +29,7 @@
     <!-- whether to place windows in the center of the free area found or
        the top left corner -->
     <monitor>Mouse</monitor>
-    <primaryMonitor/>
+    <primaryMonitor>Mouse</primaryMonitor>
   </placement>
   <theme>
     <name>ObBear2</name>

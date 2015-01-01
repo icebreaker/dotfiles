@@ -1,6 +1,8 @@
 if [ -x /usr/games/fortune -o -x /usr/bin/fortune ]; then
 	if [ -d /usr/share/cowsay/cows/ ]; then
 		fortune | cowsay -n -f $(ls /usr/share/cowsay/cows/ | shuf -n1) 
+	elif [ -d /usr/share/cows/ ]; then
+		fortune | cowsay -n -f $(ls /usr/share/cows/ | shuf -n1) 
 	else
 		fortune
 	fi
