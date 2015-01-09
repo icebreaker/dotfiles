@@ -231,7 +231,7 @@ nnoremap ; :
 
 let g:dmenu_select_dir = ''
 let g:dmenu_select_cmd = 'find . -type f'
-let g:dmenu_select_font = 'Meslo LG M'
+let g:dmenu_select_font = 'Meslo LG M-14'
 let g:dmenu_select_font_args = ''
 
 " Credit: Original Idea from http://leafo.net/posts/using_dmenu_to_open_quickly.html
@@ -248,11 +248,11 @@ function! DMenuSelect()
 		end
 
 		if exists("g:dmenu_select_font")
-			let g:dmenu_select_font_args = "-fn '" . g:dmenu_select_font . "'"
+			let g:dmenu_select_font_args = "-fn '" . g:dmenu_select_font . "' -sb '#afd700' -sf '#106900' -nb '#121212' -nf '#C6C6C6' "
 		endif
 	endif
 
-	let file = substitute(system(g:dmenu_select_cmd . " | dmenu " .	g:dmenu_select_font_args . " -i -l 10 -p Open"), '\n$', '', '')
+	let file = substitute(system(g:dmenu_select_cmd . " | dmenu " . g:dmenu_select_font_args . " -i -l 10"), '\n$', '', '')
 	
 	if empty(file)
 		return

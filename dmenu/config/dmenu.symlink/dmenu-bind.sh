@@ -1,2 +1,3 @@
 #!/bin/bash
-exe=`dmenu_path | dmenu -nb '#000000' -nf '#d8d8d8' -sb '#d8d8d8' -sf '#000000'` && eval "exec $exe"
+
+dmenu_run -fn 'Meslo LG M-14' -sb '#afd700' -sf '#106900' -nb '#121212' -nf '#C6C6C6' -i -l 10

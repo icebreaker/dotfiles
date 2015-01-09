@@ -15,7 +15,7 @@
   rotate_ccw = <Primary><Shift><Alt>exclam
   reset_clear = <Primary><Shift><Alt>exclam
   go_right = <Primary><Shift><Alt>exclam
-  new_tab = <Primary><Shift><Alt>t
+  new_tab = <Primary><Shift>t
   resize_right = <Primary><Shift><Alt>exclam
   resize_down = <Primary><Shift><Alt>exclam
   toggle_zoom = <Primary><Shift><Alt>exclam
