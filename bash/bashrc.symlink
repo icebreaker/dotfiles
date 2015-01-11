@@ -5,15 +5,15 @@ else
 	if [ -x /usr/bin/lsb_release ]; then
 		export DOT_OS=$(lsb_release -d | awk '{ print tolower($2) }')
 	else
-		export DOT_OS="linux"
+		export DOT_OS="generic"
 	fi
 fi
 
 # atomic location of the dotfiles
-export DOTFILES=$HOME/.dotfiles
+export DOT_HOME=$HOME/.dotfiles
 
 # atomic location of the dotfiles bin (provided for convenience!)
-export DOT_BIN=$DOTFILES/bin
+export DOT_BIN=$DOT_HOME/bin
 
 # source global definitions
 if [ -f /etc/bashrc ]; then
@@ -21,7 +21,7 @@ if [ -f /etc/bashrc ]; then
 fi
 
 # source every .bsh file
-for config_file in $(find $DOTFILES -name "*.bsh" -print);
+for config_file in $(find $DOT_HOME -name "*.bsh" -print);
 do
 	. $config_file
 done
@@ -31,4 +31,5 @@ if [ -f ~/.localrc ]; then
     . ~/.localrc
 fi
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+# add DOT_BIN and RVM
+export PATH=$DOT_BIN:$PATH:$HOME/.rvm/bin

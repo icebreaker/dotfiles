@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openbox_menu xmlns="http://openbox.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://openbox.org/                 file:///usr/share/openbox/menu.xsd">
 	<menu id="root-menu" label="Openbox 3">
-		<item label="Run Program">
-			<action name="Execute">
-				<execute>
-					gmrun
-				</execute>
-			</action>
-		</item>
-		<separator/>
 		<item label="Terminal">
 			<action name="Execute">
 				<execute>
@@ -26,7 +18,7 @@
 		<item label="Skype">
 			<action name="Execute">
 				<execute>
-					~/.dotfiles/bin/skype2
+					skype2
 				</execute>
 			</action>
 		</item>
@@ -54,7 +46,7 @@
 		<item label="Media Player">
 			<action name="Execute">
 				<execute>
-					rhythmbox
+					vlc
 				</execute>
 			</action>
 		</item>
@@ -97,81 +89,9 @@
 					</execute>
 				</action>
 			</item>
-			<item label="XChat">
-				<action name="Execute">
-					<execute>
-						xchat
-					</execute>
-				</action>
-			</item>
 		</menu>
 		<separator/>
 		<menu id="settings" label="Settings">
-			<menu id="conkyconfig" label="Conky Config">
-				<item label="Edit .conkyrc">
-					<action name="Execute">
-						<execute>
-							gedit ~/.conkyrc
-						</execute>
-					</action>
-				</item>
-				<item label="Restart Conky">
-					<action name="Execute">
-						<execute>
-							conkywonky
-						</execute>
-					</action>
-				</item>
-				<separator label="Help?"/>
-				<item label="man page">
-					<action name="Execute">
-						<execute>
-							terminator --command="man conky"
-						</execute>
-					</action>
-				</item>
-				<item label="Wiki Page">
-					<action name="Execute">
-						<execute>
-							x-www-browser http://crunchbanglinux.org/wiki/conky
-						</execute>
-					</action>
-				</item>
-			</menu>
-			<menu id="dmenuconfig" label="dmenu Config">
-				<item label="Edit start-up script">
-					<action name="Execute">
-						<execute>
-							gedit ~/.config/dmenu/dmenu-bind.sh
-						</execute>
-					</action>
-				</item>
-				<separator label="Help?"/>
-				<item label="man page">
-					<action name="Execute">
-						<execute>
-							terminator --command="man dmenu"
-						</execute>
-					</action>
-				</item>
-			</menu>
-			<menu id="gmrunconfig" label="gmrun Config">
-				<item label="Edit config file">
-					<action name="Execute">
-						<execute>
-							gedit ~/.gmrunrc
-						</execute>
-					</action>
-				</item>
-				<separator label="Help?"/>
-				<item label="man page">
-					<action name="Execute">
-						<execute>
-							terminator --command="man gmrun"
-						</execute>
-					</action>
-				</item>
-			</menu>
 			<menu id="obConfig" label="Openbox Config">
 				<item label="Edit menu.xml">
 					<action name="Execute">
@@ -215,23 +135,6 @@
 					<action name="Restart"/>
 				</item>
 			</menu>
-			<menu id="terminatorconfig" label="Terminator Config">
-				<item label="Edit config file">
-					<action name="Execute">
-						<execute>
-							gedit ~/.config/terminator/config
-						</execute>
-					</action>
-				</item>
-				<separator label="Help?"/>
-				<item label="man page">
-					<action name="Execute">
-						<execute>
-							terminator --command="man terminator_config"
-						</execute>
-					</action>
-				</item>
-			</menu>
 			<menu id="tint2config" label="tint2 Panel Config">
 				<item label="Edit config file">
 					<action name="Execute">
@@ -247,38 +150,6 @@
 						</execute>
 					</action>
 				</item>
-				<separator label="Help?"/>
-				<item label="man page">
-					<action name="Execute">
-						<execute>
-							terminator --command="man tint2"
-						</execute>
-					</action>
-				</item>
-				<item label="Online Help">
-					<action name="Execute">
-						<execute>
-							x-www-browser http://code.google.com/p/tint2/wiki/Welcome
-						</execute>
-					</action>
-				</item>
-			</menu>
-			<menu id="DisplaySettings" label="Display Settings">
-			    <item label="Adjust with grandr">
-				    <action name="Execute">
-					    <execute>
-						    grandr
-					    </execute>
-				    </action>
-			    </item>
-			    <separator label="Help?"/>
-			    <item label="man xrandr">
-				    <action name="Execute">
-					    <execute>
-						    terminator --command="man xrandr"
-					    </execute>
-				    </action>
-			    </item>
 			</menu>
 			<menu id="NotificationsSettings" label="Notifications">
 			    <item label="Edit config file">
@@ -352,19 +223,10 @@
 		<item label="Lock Screen">
 			<action name="Execute">
 				<execute>
-					xscreensaver-command -lock
+					dot-lock
 				</execute>
 			</action>
 		</item>
-		
-		<item label="Logout">
-			<action name="Execute">
-				<execute>
-					xdg-su -c /sbin/logout
-				</execute>
-			</action>
-		</item>
-		
 		<item label="Restart">
 			<action name="Execute">
 				<execute>
@@ -372,7 +234,6 @@
 				</execute>
 			</action>
 		</item>
-		
 		<item label="Shutdown">
 			<action name="Execute">
 				<execute>

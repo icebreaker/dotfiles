@@ -28,10 +28,10 @@ Getting Started
 ---------------
 * `git clone git://github.com/icebreaker/dotfiles ~/.dotfiles`
 * `cd ~/.dotfiles`
-* `make install` (or if you don't have `make`, then `./install`)
+* `bin/dot-install`
 
 If you `clone` to a non-standard location a.k.a not `$HOME/.dotfiles` be sure
-to edit `bash/bashrc.symlink` and update the `DOTFILES` variable.
+to edit `bash/bashrc.symlink` and update the `DOT_HOME` variable.
 
 Behind the scenes magic
 -----------------------
@@ -41,14 +41,14 @@ break down your `EXPORTS`, `ENV` at your hearts content without stuffing everyth
 in a single file by just *simply* dropping in a *new file* somewhere within `.dotfiles`
 and `presto` you don't even need to edit anything. Neat isn't it?
 
-Secondly, whenever you execute `make install` your `.dotfiles` directory is scanned for 
+Secondly, whenever you execute `dot-install` your `.dotfiles` directory is scanned for 
 files ending with `.symlink`.
 
 Some real life examples in order to illustrate how this works:
 
-* `$DOTFILES`/vim/vimrc.symlink => `$HOME`/.vimrc
-* `$DOTFILES`/vim/vim.symlink => `$HOME`/.vim
-* `$DOTFILES`/gnome/gnome2/gedit/themes.symlink => `$HOME`/.gnome2/gedit/themes
+* `$DOT_HOME`/vim/vimrc.symlink => `$HOME`/.vimrc
+* `$DOT_HOME`/vim/vim.symlink => `$HOME`/.vim
+* `$DOT_HOME`/gnome/gnome2/gedit/themes.symlink => `$HOME`/.gnome2/gedit/themes
 
 That's all folks. Simple huh? 
 
@@ -56,22 +56,14 @@ A small price to pay for well a organized `.dotfiles` collection which makes upd
 
 Scripts
 -------
-In the `$DOTFILES/bin` directory (which is automatically added to the PATH) there are
+In the `$DOT_HOME/bin` directory (which is automatically added to the PATH) there are
 a couple of `helper` or `wrapper` scripts which make my life easier in the first place
 and they might do the same for yours.
 
 I would like to highlight the `dot-aliases` script which will list all your registered aliases
 sorted by topic inside your `.dotfiles` directory. You can even filter by topic using `dot-aliases mytopic`.
 
-Also the `dot-update` will update your `.dotfiles` regardless of your current directory and it will also
-automatically reload your `.bashrc`.
-
-TODO
-----
-- use [pathogen](git://github.com/tpope/vim-pathogen.git) and git submodules for Vim
-	- CSApprox as submodule
-	- Solarized as submodule
-	- ScrollColor as submodule
+Also the `dot-update` will update your `.dotfiles` regardless of your current directory.
 
 Contribute
 ----------
@@ -81,7 +73,7 @@ Contribute
 
 License
 -------
-Copyright (c) 2011, Mihail Szabolcs
+Copyright (c) 2011-2015, Mihail Szabolcs
 
 Everything is provided **as-is** under the **MIT** license. For more information,
 see *LICENSE*.

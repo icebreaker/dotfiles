@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd $DOTFILES
+cd $DOT_HOME
 git add .
 git commit -m "$@"
 git push origin master

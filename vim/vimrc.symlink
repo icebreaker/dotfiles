@@ -229,36 +229,4 @@ vmap  <expr>  <C-UP>     DVB_Drag('up')
 
 nnoremap ; :
 
-let g:dmenu_select_dir = ''
-let g:dmenu_select_cmd = 'find . -type f'
-let g:dmenu_select_font = 'Meslo LG M-14'
-let g:dmenu_select_font_args = ''
-
-" Credit: Original Idea from http://leafo.net/posts/using_dmenu_to_open_quickly.html
-function! DMenuSelect()
-	if !exists("g:dmenu_select_loaded")
-		let g:dmenu_select_loaded = 1
-
-		if exists("g:loaded_fugitive")
-			let dir = substitute(fugitive#extract_git_dir(expand('%:p')), '\.git$', '', '')
-			if !empty(dir)
-				let g:dmenu_select_cmd = 'git ls-tree -r --full-tree --full-name --name-only HEAD'
-				let g:dmenu_select_dir = dir
-			endif
-		end
-
-		if exists("g:dmenu_select_font")
-			let g:dmenu_select_font_args = "-fn '" . g:dmenu_select_font . "' -sb '#afd700' -sf '#106900' -nb '#121212' -nf '#C6C6C6' "
-		endif
-	endif
-
-	let file = substitute(system(g:dmenu_select_cmd . " | dmenu " . g:dmenu_select_font_args . " -i -l 10"), '\n$', '', '')
-	
-	if empty(file)
-		return
-	endif
-
-	execute "argedit " . g:dmenu_select_dir . file
-endfunction
-
-map <c-l> :call DMenuSelect()<cr>
+map <c-l> :call fastopen#show('argedit')<cr>

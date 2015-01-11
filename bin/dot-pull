@@ -1,4 +1,5 @@
 #!/bin/bash
 
-cd $DOTFILES
-./update
+cd $DOT_HOME
+git pull origin master
+dot-install

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z "$DOTFILES" ]; then
+if [ -z "$DOT_HOME" ]; then
 	echo "Not installed."
 else
 	LOG=`git shortlog -n -s`
@@ -10,7 +10,7 @@ else
 	REMOTE=`git remote show -n origin | grep "Fetch URL:" | awk '{split($0, a," "); print a[3]}'`
 	echo -e "os\t: $DOT_OS"
 	echo -e "bin\t: $DOT_BIN"
-	echo -e "source\t: $DOTFILES"
+	echo -e "home\t: $DOT_HOME"
 	echo -e "remote\t: $REMOTE"
 	echo -e "author\t: $AUTHOR"
 	echo -e "commits\t: $COMMITS"

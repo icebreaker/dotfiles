@@ -121,7 +121,7 @@
       <name>III</name>
       <name>IV</name>
     </names>
-    <popupTime>875</popupTime>
+    <popupTime>0</popupTime>
     <!-- The number of milliseconds to show the popup for when switching
        desktops.  Set this to 0 to disable the popup. -->
   </desktops>
@@ -254,12 +254,12 @@
     </keybind>
     <keybind key="Print">
       <action name="Execute">
-        <execute>scrot '%Y-%m-%d--%s_$wx$h_scrot.png' -e 'mv $f ~/screenshots/ &amp; viewnior ~/screenshots/$f'</execute>
+        <execute>dot-screenshot</execute>
       </action>
     </keybind>
     <keybind key="A-Print">
       <action name="Execute">
-        <execute>scrot -b -s '%Y-%m-%d--%s_$wx$h_scrot.png' -e 'mv $f ~/screenshots/ &amp; viewnior ~/screenshots/$f'</execute>
+        <execute>dot-screenshot -b -s</execute>
       </action>
     </keybind>
     <!-- Keybindings for window switching -->
@@ -280,9 +280,9 @@
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
-          <name>dmenu-bind</name>
+          <name>dmenu_run</name>
         </startupnotify>
-        <command>~/.config/dmenu/dmenu-bind.sh</command>
+        <command>dmenu_run</command>
       </action>
     </keybind>
     <keybind key="W-f">
@@ -312,42 +312,6 @@
         <command>x-www-browser</command>
       </action>
     </keybind>
-    <keybind key="W-F12">
-      <action name="Execute">
-        <startupnotify>
-          <enabled>true</enabled>
-          <name>Wine Screenshot</name>
-        </startupnotify>
-        <command>/home/coderguy/.dotfiles/bin/winescreenshot</command>
-      </action>
-    </keybind>
-    <keybind key="W-l">
-      <action name="Execute">
-        <startupnotify>
-          <enabled>true</enabled>
-          <name>Lock screen</name>
-        </startupnotify>
-        <command>dot-lock</command>
-      </action>
-    </keybind>
-    <keybind key="W-e">
-      <action name="Execute">
-        <startupnotify>
-          <enabled>true</enabled>
-          <name>Editor</name>
-        </startupnotify>
-        <command>gedit</command>
-      </action>
-    </keybind>
-    <keybind key="W-m">
-      <action name="Execute">
-        <startupnotify>
-          <enabled>true</enabled>
-          <name>Mediaplayer</name>
-        </startupnotify>
-        <command>rhythmbox</command>
-      </action>
-    </keybind>
     <keybind key="W-s">
       <action name="Execute">
         <startupnotify>
@@ -366,40 +330,22 @@
         <command>pidgin</command>
       </action>
     </keybind>
-    <keybind key="W-g">
+  	<keybind key="W-F8">
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
-          <name>Gimp</name>
+          <name>Dual Monitor</name>
         </startupnotify>
-        <command>gimp</command>
+        <command>dot-monitor</command>
       </action>
     </keybind>
-    <keybind key="W-i">
+    <keybind key="W-l">
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
-          <name>Inkscape</name>
+          <name>Lock screen</name>
         </startupnotify>
-        <command>inkscape</command>
-      </action>
-    </keybind>
-    <keybind key="W-v">
-      <action name="Execute">
-        <startupnotify>
-          <enabled>true</enabled>
-          <name>Volume</name>
-        </startupnotify>
-        <command>xfce4-mixer</command>
-      </action>
-    </keybind>
-    <keybind key="W-x">
-      <action name="Execute">
-        <startupnotify>
-          <enabled>true</enabled>
-          <name>Logout</name>
-        </startupnotify>
-        <command>openbox-logout</command>
+        <command>dot-lock</command>
       </action>
     </keybind>
     <keybind key="XF86Calculator">
@@ -421,7 +367,7 @@
         <menu>root-menu</menu>
       </action>
     </keybind>
-    <keybind key="A-C-q">
+    <keybind key="W-Menu">
       <action name="ShowMenu">
         <menu>root-menu</menu>
       </action>

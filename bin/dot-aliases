@@ -6,7 +6,7 @@ if test -n "$1"; then
 fi
 
 # look for all the available aliases and make a nice list
-for SRC in $(find $DOTFILES -name "aliases.bsh" -print | sort); do
+for SRC in $(find $DOT_HOME -name "aliases.bsh" -print | sort); do
 	DIR=$(basename $(dirname $SRC))
 
 	# filter by topic

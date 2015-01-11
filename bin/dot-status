@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd $DOTFILES
+cd $DOT_HOME
 git status

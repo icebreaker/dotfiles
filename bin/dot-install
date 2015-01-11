@@ -1,4 +1,41 @@
 #!/bin/bash
 
-cd $DOTFILES
-./install
+if [ -z "$DOT_HOME" ]; then
+	# pre-load .bashrc
+	DOT_HOME=$(cd "$(dirname "$0")" && cd .. && pwd)
+	. $DOT_HOME/bash/bashrc.symlink &> /dev/null
+fi
+
+SYMLINK=".symlink"
+for src in $(find $DOT_HOME -name "*$SYMLINK" -print); do
+
+	SRC=$(basename $src $SYMLINK)
+	DIR=$(dirname $src)
+	PARENT=$(dirname $DIR)
+	
+	if test "$PARENT" != "$DOT_HOME"; then # second or Nth level dirs
+		TARGET_DIR=$HOME/.${DIR#$DOT_HOME/*/}
+		mkdir -p -v $TARGET_DIR
+		
+		TARGET=$TARGET_DIR/$SRC
+	else # first level dirs
+		TARGET=$HOME/.$SRC
+	fi
+	
+	# take extra care for nested symlinked dirs as targets
+	# even though -n should suffice, but sometimes it doesn't
+	if [ ! -d "$TARGET" ]; then
+		if [ ! -f "$TARGET" ]; then
+			ln -v -s -n $src $TARGET
+		fi
+	fi
+	
+done
+
+INSTALL=".install"
+for src in $(find $DOT_HOME -name "*$INSTALL" -print); do
+	. $src
+done
+
+# reload the installed / updated .bashrc
+. ~/.bashrc &> /dev/null

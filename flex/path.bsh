@@ -1,2 +1,0 @@
-#export FLEX=/opt/adobeflex/bin
-#export PATH=$FLEX:$PATH

@@ -1,6 +1,6 @@
-OPENBOX_FOUND=$(which openbox-session 2>/dev/null)
+DOT_OPENBOX=$(which openbox-session 2>/dev/null)
 
-if [ -n "$OPENBOX_FOUND"  ]; then
+if [ -n "$DOT_OPENBOX" ]; then
 	xrdb ~/.Xresources &
 	exec dbus-launch openbox-session
 fi

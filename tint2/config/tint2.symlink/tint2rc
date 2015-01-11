@@ -11,20 +11,20 @@
 # ID 1
 rounded = 0
 border_width = 1
-background_color = #0A0A0A 90
-border_color = #121212 90
+background_color = #121212 100
+border_color = #121212 100
 
 # ID 2 - task active
 rounded = 1
 border_width = 0
-background_color = #d8d8d8 30
-border_color = #d8d8d8 30
+background_color = #303030 100
+border_color = #303030 100
 
 # ID 3 - task
 rounded = 1
 border_width = 0
-background_color = #000000 0
-border_color = #000000 0
+background_color = #121212 0
+border_color = #121212 0
 
 # ID 4
 rounded = 1
@@ -35,20 +35,20 @@ border_color = #ED2323 60
 # ID 5 - taskbar
 rounded = 0
 border_width = 1
-background_color = #000000 0
-border_color = #000000 0
+background_color = #121212 100
+border_color = #121212 100
 
 # ID 6 - active taskbar
 rounded = 0
 border_width = 1
-background_color = #d8d8d8 8
-border_color = #d8d8d8 0
+background_color = #585858 10
+border_color = #585858 10
 
 # ID 7 - tooltip
 rounded = 3
 border_width = 0
-background_color = #222222 90
-border_color = #222222 90
+background_color = #585858 100
+border_color = #585858 100
 
 # ID 8
 rounded = 1
@@ -83,9 +83,9 @@ taskbar_active_background_id = 6
 taskbar_name = 1
 taskbar_name_background_id = 0
 taskbar_name_active_background_id = 0
-taskbar_name_font = sans 9
-taskbar_name_font_color = #d8d8d8 100
-taskbar_name_active_font_color = #d8d8d8 100
+taskbar_name_font = "Droid Sans" 9
+taskbar_name_font_color = #c6c6c6 100
+taskbar_name_active_font_color = #c6c6c6 100
 
 # Tasks
 urgent_nb_of_blink = 20
@@ -106,7 +106,7 @@ task_urgent_icon_asb = 100 0 0
 task_iconified_icon_asb = 80 0 0
 
 # Fonts
-task_font = sans 06_55 6
+task_font = "Droid Sans" 06_55 6
 task_font_color = #d8d8d8 60
 task_active_font_color = #d8d8d8 100
 task_urgent_font_color = #FFFFFF 100
@@ -136,9 +136,9 @@ systray_icon_asb = 100 0 0
 
 # Clock
 time1_format = %H:%M:%S
-time1_font = sans 8
+time1_font = "Droid Sans" 8
 time2_format = %A %d %B
-time2_font = sans 6
+time2_font = "Droid Sans" 6
 clock_font_color = #d8d8d8 100
 clock_padding = 4 4
 clock_background_id = 0
@@ -151,8 +151,8 @@ tooltip_padding = 2 2
 tooltip_show_timeout = 0.0
 tooltip_hide_timeout = 0.0
 tooltip_background_id = 7
-tooltip_font_color = #d8d8d8 100
-tooltip_font = sans normal 8.0
+tooltip_font_color = #C6C6C6 100
+tooltip_font = "Droid Sans" normal 8.0
 
 # Mouse
 mouse_middle = none
@@ -165,8 +165,8 @@ battery = 1
 battery_low_status = 20
 battery_low_cmd = notify-send "battery low"
 battery_hide = 96
-bat1_font = Sans 10
-bat2_font = Sans 8
+bat1_font = "Droid Sans" 10
+bat2_font = "Droid Sans" 8
 battery_font_color = #FFFFFF 100
 battery_padding = 2 0
 battery_background_id = 0

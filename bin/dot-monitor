@@ -1,0 +1,25 @@
+#!/bin/bash
+
+VGA1="VGA1 connected"
+
+if [ -z "$(xrandr | grep "$VGA1")" ]; then
+	exit
+fi
+
+if [ -z "$1" ]; then
+	if [ -z "$(xrandr | grep "${VGA1} 1440x900")" ]; then
+		MONITOR="on"
+	else
+		MONITOR="off"
+	fi
+else
+	MONITOR=$1
+fi
+
+if [ "$MONITOR" == "on" ]; then
+	xrandr --output LVDS1 --mode 1366x768 --pos 0x0 --dpi 96 --output VGA1 --mode 1440x900 --pos 1366x0 --dpi 96
+elif [ "$MONITOR" == "off" ]; then
+	xrandr --output LVDS1 --mode 1366x768 --pos 0x0 --dpi 96 --output VGA1 --off
+fi
+
+nitrogen --restore
