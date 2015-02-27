@@ -10,4 +10,8 @@ fi
 
 export LD_LIBRARY_PATH=/usr/lib/nvidia:$LD_LIBRARY_PATH
 
-skype "@$"
+if [ -x "`which apulse 2>/dev/null`"  ]; then
+	apulse skype "@$"
+else
+	skype "@$"
+fi
