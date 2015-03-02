@@ -29,7 +29,7 @@ fi
 TWITCH_STREAM_URL="rtmp://live.justin.tv/app/$TWITCH_KEY"
 
 # position chat to the right location
-xdotool search --name --onlyvisible "$TWITCH_CHAT_TITLE" windowsize 334 870 windowmove 1366 0
+xdotool search --name --onlyvisible "$TWITCH_CHAT_TITLE" windowsize 334 905 windowmove 1366 -60
 
 # open up brb image
 viewnior --fullscreen $DOT_HOME/twitch/brb.png &
