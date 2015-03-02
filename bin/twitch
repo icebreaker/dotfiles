@@ -1,0 +1,44 @@
+#!/bin/bash
+
+if [ -z "$TWITCH_INRES" ]; then
+	TWITCH_INRES="1700x768"
+fi
+
+if [ -z "$TWITCH_OUTRES" ]; then
+	TWITCH_OUTRES="1700x768"
+fi
+
+if [ -z "$TWITCH_FPS" ]; then
+	TWITCH_FPS="32"
+fi
+
+if [ -z "$TWITCH_QUALITY" ]; then
+	TWITCH_QUALITY="ultrafast"
+fi
+
+if [ -z "$TWITCH_CHAT_TITLE" ]; then
+	echo "TWITCH_CHAT_TITLE is not set"
+	exit
+fi
+
+if [ -z "$TWITCH_KEY" ]; then
+	echo "TWITCH_KEY is not set"
+	exit
+fi
+
+TWITCH_STREAM_URL="rtmp://live.justin.tv/app/$TWITCH_KEY"
+
+# position chat to the right location
+xdotool search --name --onlyvisible "$TWITCH_CHAT_TITLE" windowsize 334 870 windowmove 1366 0
+
+# open up brb image
+viewnior --fullscreen $DOT_HOME/twitch/brb.png &
+
+# wait for confirmation that the layout has been setup correctly
+read -p "Press [Enter] to start the stream ..."
+
+# do it ...
+ffmpeg -f x11grab -s "$TWITCH_INRES" -r "$TWITCH_FPS" -i :0.0+0,0 -itsoffset \
+	   00:00:01 -ac 2 -f alsa -i hw:0 -vcodec libx264 -preset "$TWITCH_QUALITY" \
+	   -pix_fmt yuvj420p -s "$TWITCH_OUTRES" -acodec libmp3lame -ab 64k -ar 44100 \
+	   -threads 0 -qscale 5 -b 1024k -f flv "$TWITCH_STREAM_URL"
