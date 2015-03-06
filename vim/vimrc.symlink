@@ -138,7 +138,7 @@ hi Search cterm=none ctermfg=1 ctermbg=172
 hi Todo ctermbg=none ctermfg=107
 hi ColorColumn ctermbg=107 ctermfg=1
 
-call matchadd('ColorColumn', '\%121v', 100)
+call matchadd('ColorColumn', '\%100v', 100)
 
 " Word Completion
 function! Tab_Or_Complete()
@@ -195,8 +195,9 @@ function! DistractionFreeWriting()
 	set noruler
 	set linebreak
 	set nonumber
-	set foldcolumn=12
+"	set foldcolumn=5
 	set columns=80
+	set colorcolumn=80
 	set tw=79
 	set noshowmode 
 	
@@ -210,7 +211,7 @@ function! DistractionFreeWriting()
 	hi clear SpellRare
 	hi SpellRare term=standout ctermfg=4 term=none cterm=none
 	
-	call matchadd('ColorColumn', '\%81v', 80)
+	call matchadd('ColorColumn', '\%80v', 80)
 endfunction
 
 " Swap Directory
