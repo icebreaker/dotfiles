@@ -142,13 +142,14 @@ call matchadd('ColorColumn', '\%100v', 100)
 
 " Word Completion
 function! Tab_Or_Complete()
-	if col('.')>1 && strpart(getline('.'), col('.')-2, 3) =~ '^\w'
+	if col('.') > 1 && strpart(getline('.'), col('.')-2, 3) =~ '^\w'
 		return "\<C-N>"
 	else
 		return "\<Tab>"
 	endif
 endfunction
 inoremap <Tab> <C-R>=Tab_Or_Complete()<CR>
+inoremap <C-@> <C-X><C-U>
 
 " File Types
 au! BufRead,BufNewFile *.json set filetype=json
@@ -235,3 +236,7 @@ map <c-l> :call fastopen#show('argedit')<cr>
 " RuboCop
 let g:vimrubocop_keymap = 0
 nmap <Leader>r :RuboCop<CR>
+
+let g:delimitMate_expand_cr=1
+
+

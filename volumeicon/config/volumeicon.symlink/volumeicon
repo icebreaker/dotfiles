@@ -1,9 +1,9 @@
 [StatusIcon]
-stepsize=4
+stepsize=2
 lmb_slider=true
 mmb_mute=false
 use_horizontal_slider=false
-show_sound_level=false
+show_sound_level=true
 use_transparent_background=false
 onclick=xfce4-mixer
 theme=Default
@@ -18,4 +18,4 @@ mute=XF86AudioMute
 
 [Alsa]
 card=hw:0
-channel=Headphone
+channel=Master
