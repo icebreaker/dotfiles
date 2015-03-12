@@ -68,7 +68,7 @@ set ignorecase
 "set mouse=a
 set columns=100
 set colorcolumn=100
-set tw=99
+"set tw=99
 set ruler
 set undolevels=500
 set history=1000
