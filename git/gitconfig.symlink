@@ -15,7 +15,7 @@
 	changed = green
 	untracked = cyan
 [user]
-	name = icebreaker
+	name = Mihail Szabolcs
 	email = theicebreaker007@gmail.com
 [push]
 	default = current
