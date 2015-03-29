@@ -1,0 +1,3 @@
+#!/bin/bash
+
+viewnior --fullscreen $DOT_HOME/twitch/brb.png &
