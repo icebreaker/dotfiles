@@ -469,4 +469,3 @@ GtkAssistant .sidebar.frame {
 /* quark */
 Desktop.background:backdrop {
   color: @fg_color; }
-@import url("gtk-main.css");
