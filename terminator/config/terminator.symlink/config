@@ -38,7 +38,7 @@
   copy = <Primary><Shift><Alt>exclam
   hide_window = <Primary><Shift><Alt>exclam
   reset = <Primary><Shift><Alt>exclam
-  search = <Primary><Shift><Alt>exclam
+  search = <Primary>f
   go_up = <Primary><Shift><Alt>exclam
   resize_up = <Primary><Shift><Alt>exclam
   rotate_cw = <Primary><Shift><Alt>exclam
@@ -64,7 +64,7 @@
     scrollbar_position = hidden
     show_titlebar = False
     color_scheme = custom
-    font = Meslo LG M for Powerline 16
+    font = Meslo LG M for Powerline 14
     background_color = "#121212"
     cursor_blink = False
     scrollback_infinite = True
