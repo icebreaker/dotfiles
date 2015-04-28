@@ -1,0 +1,3 @@
+#!/bin/bash
+
+mono $DOT_BIN/ImageResizer.exe "$@"

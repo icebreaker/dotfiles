@@ -12,15 +12,15 @@
 " The syntax highlighting scheme is taken from jellybeans.vim:
 " https://github.com/nanotech/jellybeans.vim
 "
-" The code taken from solarized.vim
+" The is code taken from solarized.vim:
 " https://github.com/altercation/vim-colors-solarized
 
 "}}}
 " Requirements And Recommendations:"{{{
 " ----------------------------------------------------------------------------
 " This colourscheme is intended for use on:
-"   - gVim 7.3 for Linux, Mac and Windows.
-"   - Vim 7.3 for Linux, using a 256 colour enabled terminal.
+"   - gVim 7.3 for Linux, Mac and Windows
+"   - Vim 7.3 for Linux, using a 256 colour enabled terminal
 "
 " By default, Vim will use the closest matching cterm equivalent of the RGB
 " colours.
@@ -39,13 +39,14 @@
 "       colorscheme hybrid
 "
 " For iTerm2 users:
+"
 " 1.  Install this color preset on your iTerm2:
 "
-"       https://gist.github.com/luan/6362811
+"       https://github.com/w0ng/dotfiles/blob/master/iterm2/hybrid.itermcolors
 "
 " 2. Use iTerm colours by setting in ~/.vimrc:
 "
-"       let g:hybrid_use_iTerm_colors = 1
+"       let g:hybrid_use_Xresources = 1
 "       colorscheme hybrid
 "
 
@@ -58,10 +59,6 @@ endif
 
 if !exists("g:hybrid_use_Xresources")
   let g:hybrid_use_Xresources = 0
-endif
-
-if !exists("g:hybrid_use_iTerm_colors")
-  let g:hybrid_use_iTerm_colors = 0
 endif
 
 set background=dark
@@ -125,19 +122,6 @@ else
     let s:aqua       = "14"   " LightCyan
     let s:blue       = "12"   " LightBlue
     let s:purple     = "13"   " LightMagenta
-  elseif g:hybrid_use_iTerm_colors == 1
-    let s:background = "NONE"
-    let s:foreground = "7"
-    let s:selection  = "0"
-    let s:line       = "0"
-    let s:comment    = "15"
-    let s:red        = "1"
-    let s:orange     = "11"
-    let s:yellow     = "3"
-    let s:green      = "2"
-    let s:aqua       = "6"
-    let s:blue       = "4"
-    let s:purple     = "5"
   else
     let s:foreground = "250"
     let s:selection  = "237"
@@ -145,7 +129,7 @@ else
     let s:comment    = "243"
     let s:red        = "167"
     let s:orange     = "173"
-    let s:yellow     = "214"
+    let s:yellow     = "221"
     let s:green      = "143"
     let s:aqua       = "109"
     let s:blue       = "110"
@@ -291,14 +275,14 @@ exe "hi! DiffAdd"       .s:fg_addfg       .s:bg_addbg       .s:fmt_none
 exe "hi! DiffChange"    .s:fg_changefg    .s:bg_changebg    .s:fmt_none
 exe "hi! DiffDelete"    .s:fg_background  .s:bg_red         .s:fmt_none
 exe "hi! DiffText"      .s:fg_background  .s:bg_blue        .s:fmt_none
-exe "hi! ErrorMsg"      .s:fg_red		  .s:bg_none        .s:fmt_none
+exe "hi! ErrorMsg"      .s:fg_background  .s:bg_red         .s:fmt_stnd
 exe "hi! VertSplit"     .s:fg_window      .s:bg_none        .s:fmt_none
 exe "hi! Folded"        .s:fg_comment     .s:bg_darkcolumn  .s:fmt_none
 exe "hi! FoldColumn"    .s:fg_none        .s:bg_darkcolumn  .s:fmt_none
 exe "hi! SignColumn"    .s:fg_none        .s:bg_darkcolumn  .s:fmt_none
 "		Incsearch"
 exe "hi! LineNr"        .s:fg_selection   .s:bg_none        .s:fmt_none
-exe "hi! CursorLineNr"  .s:fg_yellow      .s:bg_none        .s:fmt_bold
+exe "hi! CursorLineNr"  .s:fg_yellow      .s:bg_none        .s:fmt_none
 exe "hi! MatchParen"    .s:fg_background  .s:bg_changebg    .s:fmt_none
 exe "hi! ModeMsg"       .s:fg_green       .s:bg_none        .s:fmt_none
 exe "hi! MoreMsg"       .s:fg_green       .s:bg_none        .s:fmt_none
@@ -326,7 +310,7 @@ exe "hi! WarningMsg"    .s:fg_red         .s:bg_none        .s:fmt_none
 "		WildMenu"
 
 " Use Xresources for background colour
-if has('gui_running') || (g:hybrid_use_Xresources != 1 && g:hybrid_use_iTerm_colors != 1)
+if has('gui_running') || g:hybrid_use_Xresources != 1
   exe "hi! Normal"        .s:fg_foreground  .s:bg_background  .s:fmt_none
 else
   exe "hi! Normal"        .s:fg_foreground  .s:bg_none        .s:fmt_none
