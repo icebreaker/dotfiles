@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+if ARGV.first.to_s =~ /\/(.*?)\/(.*?)\/(.*?)?$/
+	matcher = Regexp.new($1)
+	replacement = $2
+else
+	matcher = ''
+	replacement = ''
+end
+
+while line = STDIN.gets do
+	STDOUT.puts(line.gsub(matcher, replacement))
+end
