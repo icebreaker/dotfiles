@@ -20,4 +20,4 @@ if [ "$DOT_OS" == "opensuse" ]; then
 	fi
 fi
 	
-exec -a "$0" "google-chrome" --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=4096 "$@"
+exec -a "$0" "google-chrome" --high-dpi-support=1 --force-device-scale-factor=1 --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=4096 "$@"
