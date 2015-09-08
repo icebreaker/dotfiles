@@ -3,6 +3,7 @@
 if [ -z "$DOT_HOME" ]; then
 	echo "Not installed."
 else
+	cd $DOT_HOME
 	LOG=`git shortlog -n -s`
 	COMMITS=`echo $LOG | awk '{split($0, a," "); print a[1]}'`
 	AUTHOR=`echo $LOG | awk '{split($0, a," "); print a[2]}'`
