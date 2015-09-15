@@ -13,10 +13,6 @@ map <c-g> <ESC>:make generate<CR>
 map <F4> :set spell! spelllang=en_us<CR>
 " Toggle Line Numbers
 map <F2> :set nonumber!<CR>
-" Run C (file in the current dir)
-map <F9> :!./%<CR>
-" Send to Twitter (will prompt)
-map <F12> :PosttoTwitter<CR>
 
 " Copy Paste with Ctrl+C and Ctrl+V
 vmap <c-c> :w! ~/.vim/swap/.buffer<CR>
@@ -242,5 +238,3 @@ let g:vimrubocop_keymap = 0
 nmap <Leader>r :RuboCop<CR>
 
 let g:delimitMate_expand_cr=1
-
-
