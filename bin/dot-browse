@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd $DOT_HOME
-git hub browse
+git hub browse dotfiles
