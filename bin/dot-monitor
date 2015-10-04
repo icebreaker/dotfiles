@@ -22,4 +22,8 @@ elif [ "$MONITOR" == "off" ]; then
 	xrandr --output LVDS1 --mode 1366x768 --pos 0x0 --dpi 96 --output VGA1 --off
 fi
 
-nitrogen --restore
+NITROGEN=$(which nitrogen 2>/dev/null)
+
+if [ -x "$NITROGEN" ]; then
+	$NITROGEN --restore
+fi
