@@ -39,7 +39,7 @@
 		<item label="Text Editor">
 			<action name="Execute">
 				<execute>
-					gedit
+					gvim
 				</execute>
 			</action>
 		</item>
@@ -96,28 +96,21 @@
 				<item label="Edit menu.xml">
 					<action name="Execute">
 						<execute>
-							gedit ~/.config/openbox/menu.xml
+							gvim ~/.config/openbox/menu.xml
 						</execute>
 					</action>
 				</item>
 				<item label="Edit rc.xml">
 					<action name="Execute">
 						<execute>
-							gedit ~/.config/openbox/rc.xml
+							gvim ~/.config/openbox/rc.xml
 						</execute>
 					</action>
 				</item>
 				<item label="Edit autostart">
 					<action name="Execute">
 						<execute>
-							gedit ~/.config/openbox/autostart
-						</execute>
-					</action>
-				</item>
-				<item label="GUI Menu Editor">
-					<action name="Execute">
-						<execute>
-							obmenu
+							gvim ~/.config/openbox/autostart
 						</execute>
 					</action>
 				</item>
@@ -139,7 +132,7 @@
 				<item label="Edit config file">
 					<action name="Execute">
 						<execute>
-							gedit ~/.config/tint2/tint2rc
+							gvim ~/.config/tint2/tint2rc
 						</execute>
 					</action>
 				</item>
@@ -155,7 +148,7 @@
 			    <item label="Edit config file">
 				    <action name="Execute">
 					    <execute>
-						    gedit ~/.notify-osd
+						    gvim ~/.notify-osd
 					    </execute>
 				    </action>
 			    </item>
@@ -197,13 +190,6 @@
 			</item>
 		</menu>
 		<menu id="system" label="System">
-		    <item label="GParted">
-				<action name="Execute">
-					<execute>
-						xdg-su -c gparted
-					</execute>
-				</action>
-			</item>
 			<item label="Login Set-up">
 				<action name="Execute">
 					<execute>

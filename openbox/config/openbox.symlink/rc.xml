@@ -330,7 +330,7 @@
         <command>pidgin</command>
       </action>
     </keybind>
-   <keybind key="W-b">
+    <keybind key="W-b">
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
@@ -339,7 +339,7 @@
         <command>viewnior --fullscreen ~/.dotfiles/twitch/brb.png</command>
       </action>
     </keybind>
-  	<keybind key="W-F8">
+    <keybind key="W-F8">
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>

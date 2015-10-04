@@ -15,7 +15,7 @@ fi
 nitrogen --restore &
 
 ## Start session manager
-#lxsession &
+# lxsession &
 
 ## Enable power management
 xfce4-power-manager &
@@ -30,7 +30,7 @@ tint2 &
 # xcompmgr -n -I 0 -O 0 -D 0 -C &
 
 ## Launch network manager applet
-# (sleep 5s && nm-applet) &
+(sleep 5s && nm-applet) &
 
 ## Detect and configure touchpad. See 'man synclient' for more info.
 if egrep -iq 'touchpad' /proc/bus/input/devices; then
@@ -42,16 +42,10 @@ fi
 xscreensaver -no-splash &
 
 ## Start Volumeicon
-(sleep 3s && volumeicon) &
+(sleep 5s && volumeicon) &
 
 ## Start Clipboard manager
 # (sleep 3s && parcellite) &
 
 ## Start Dropbox Daemon
 (sleep 10s && ~/.dropbox-dist/dropboxd) &
-
-## Start Check GMail
-# (sleep 10s && checkgmail) &
-
-## Start Conky
-# (sleep 20s && conky -q) &
