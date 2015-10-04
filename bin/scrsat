@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SEARCH_URL='https://twitter.com/search?q=%23gamedev%20OR%20%23screenshotsaturday&src=typd&mode=photos'
+SEARCH_URL='https://twitter.com/search?f=images&q=%23gamedev%20OR%20%23screenshotsaturday'
 CACHE_DIR=$HOME/.scrsat
 CACHE_FILE=$CACHE_DIR/cache
 
@@ -9,7 +9,7 @@ touch $CACHE_FILE
 
 function get_images()
 {
-	curl -s "$SEARCH_URL" | grep 'data-resolved-url-large="' | cut -d'"' -f2
+	curl -L -s "$SEARCH_URL" | grep 'data-resolved-url-large="' | cut -d'"' -f2
 }
 
 function get_first_image()
