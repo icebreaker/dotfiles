@@ -8,10 +8,17 @@ elif [ -f "/usr/libv4l/v4l1compat.so" ]; then
 	export LD_PRELOAD=/usr/libv4l/v4l1compat.so
 fi
 
-export LD_LIBRARY_PATH=/usr/lib/nvidia:$LD_LIBRARY_PATH
+if [ -x "/opt/skype/skype" ]; then
+	echo "Using static skype from /opt/skype ..."
+	cd /opt/skype
+	SKYPE_BIN=./skype
+else
+	SKYPE_BIN=skype
+fi
 
 if [ -x "`which apulse 2>/dev/null`"  ]; then
-	apulse skype "@$"
+	echo "Emulating Pulse Audio ..."
+	apulse $SKYPE_BIN "@$"
 else
-	skype "@$"
+	$SKYPE_BIN "@$"
 fi
