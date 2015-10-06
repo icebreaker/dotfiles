@@ -96,6 +96,8 @@ if has("gui_running")
 	set guifont=Meslo\ LG\ M\ for\ Powerline\ 15
 	set guicursor+=a:blinkon0
 	set guioptions=i
+	set lines=999
+	set columns=999
 endif
 
 set completeopt=menu,menuone
