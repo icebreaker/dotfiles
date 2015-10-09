@@ -92,7 +92,7 @@ hi  StatusLineNC guifg=#000000 guibg=#202020 gui=bold      ctermfg=0     ctermbg
 hi  FoldColumn   guifg=#a8a8a8 guibg=#444444 gui=NONE      ctermfg=248   ctermbg=238  cterm=NONE
 hi  Folded       guifg=#a8a8a8 guibg=#444444 gui=NONE      ctermfg=248   ctermbg=238  cterm=NONE
 
-hi  Title        guifg=#5f87d7 guibg=NONE    gui=BOLD,ITALIC      ctermfg=67     ctermbg=NONE cterm=BOLD
+hi  Title        guifg=#5f87d7 guibg=NONE    gui=BOLD      ctermfg=67     ctermbg=NONE cterm=BOLD
 hi  Visual       guifg=NONE    guibg=#262D51 gui=NONE      ctermfg=NONE  ctermbg=237  cterm=NONE
 
 hi  SpecialKey   guifg=#4e4e4e guibg=#000000 gui=NONE      ctermfg=239   ctermbg=0    term=NONE
@@ -124,21 +124,21 @@ endif
 hi IncSearch      guifg=#1c1c1c guibg=#00d7ff gui=NONE   ctermfg=234 ctermbg=45 cterm=NONE
 "}}}
 " Syntax highlighting"{{{
-hi Comment     guifg=#585858 guibg=NONE    gui=ITALIC ctermfg=240 ctermbg=NONE cterm=NONE
+hi Comment     guifg=#585858 guibg=NONE    gui=NONE ctermfg=240 ctermbg=NONE cterm=NONE
 hi String      guifg=#afaf5f guibg=NONE    gui=NONE   ctermfg=143 ctermbg=NONE cterm=NONE
 hi Number      guifg=#af5f00 guibg=NONE    gui=NONE   ctermfg=130 ctermbg=NONE cterm=NONE
 
-hi Keyword     guifg=#ffaf00 guibg=NONE    gui=ITALIC ctermfg=214 ctermbg=NONE cterm=BOLD
+hi Keyword     guifg=#ffaf00 guibg=NONE    gui=NONE ctermfg=214 ctermbg=NONE cterm=BOLD
 hi PreProc     guifg=#00afd7 guibg=NONE    gui=BOLD   ctermfg=38  ctermbg=NONE cterm=BOLD
 hi Conditional guifg=#ffd75f guibg=NONE    gui=NONE   ctermfg=222 ctermbg=NONE cterm=NONE
 
 hi Todo        guifg=#87005f guibg=#ffff5f gui=BOLD,UNDERLINE   ctermfg=89  ctermbg=227  cterm=BOLD
-hi Constant    guifg=#d75f5f guibg=NONE    gui=BOLD,ITALIC ctermfg=167 ctermbg=NONE cterm=BOLD
+hi Constant    guifg=#d75f5f guibg=NONE    gui=BOLD ctermfg=167 ctermbg=NONE cterm=BOLD
 
 hi Identifier  guifg=#8787d7 guibg=NONE    gui=NONE   ctermfg=104 ctermbg=NONE cterm=NONE
 hi Function    guifg=#d78787 guibg=NONE    gui=BOLD   ctermfg=174 ctermbg=NONE cterm=BOLD
-hi Type        guifg=#d78700 guibg=NONE    gui=BOLD,ITALIC   ctermfg=172 ctermbg=NONE cterm=BOLD
-hi Statement   guifg=#87af5f guibg=NONE    gui=ITALIC   ctermfg=107 ctermbg=NONE cterm=NONE
+hi Type        guifg=#d78700 guibg=NONE    gui=BOLD   ctermfg=172 ctermbg=NONE cterm=BOLD
+hi Statement   guifg=#87af5f guibg=NONE    gui=NONE   ctermfg=107 ctermbg=NONE cterm=NONE
 
 hi Special     guifg=#5faf00 guibg=NONE    gui=NONE   ctermfg=70 ctermbg=NONE cterm=NONE
 hi Delimiter   guifg=#5fafd7 guibg=NONE    gui=NONE   ctermfg=74  ctermbg=NONE cterm=NONE
@@ -172,7 +172,7 @@ hi link VisualNOS   Ignore
 "}}}
 " VimDiff colors"{{{
 hi DiffAdd     guifg=#bcbcbc guibg=#005f00    gui=NONE   ctermfg=250 ctermbg=22 cterm=NONE
-hi DiffChange  guifg=#bcbcbc guibg=#875fd7    gui=ITALIC ctermfg=250 ctermbg=98 cterm=NONE
+hi DiffChange  guifg=#bcbcbc guibg=#875fd7    gui=NONE ctermfg=250 ctermbg=98 cterm=NONE
 hi DiffDelete  guifg=#d7afff guibg=#870000    gui=NONE   ctermfg=183 ctermbg=88 cterm=NONE
 hi DiffText    guifg=#080808 guibg=#ff5fff    gui=BOLD   ctermfg=232 ctermbg=207 cterm=BOLD
 "}}}
@@ -249,12 +249,12 @@ hi link CTagsMember           htmlString
 	hi markdownCodeBlock guifg=#c5b1e4 ctermfg=182
 	hi markdownLinkText  guifg=#0087af gui=UNDERLINE ctermfg=31
 
-	hi markdownH1        guifg=#d75f00 guibg=NONE gui=BOLD,ITALIC,UNDERLINE ctermfg=166  ctermbg=NONE cterm=BOLD
+	hi markdownH1        guifg=#d75f00 guibg=NONE gui=BOLD,UNDERLINE ctermfg=166  ctermbg=NONE cterm=BOLD
 	hi markdownH2        guifg=#d75f87 guibg=NONE gui=BOLD,UNDERLINE ctermfg=168  ctermbg=NONE cterm=BOLD
-	hi markdownH3        guifg=#d78787 guibg=NONE gui=ITALIC,UNDERLINE ctermfg=174  ctermbg=NONE cterm=BOLD
+	hi markdownH3        guifg=#d78787 guibg=NONE gui=UNDERLINE ctermfg=174  ctermbg=NONE cterm=BOLD
 
 	hi markdownBold    guifg=#ffd75f guibg=NONE gui=BOLD      ctermfg=221 ctermbg=NONE cterm=BOLD
-	hi markdownItalic    guifg=#afff87 guibg=NONE gui=ITALIC      ctermfg=156 ctermbg=NONE cterm=NONE
+	hi markdownItalic    guifg=#afff87 guibg=NONE gui=NONE      ctermfg=156 ctermbg=NONE cterm=NONE
 
 	hi markdownOrderedListMarker  guifg=#5fff00  gui=BOLD ctermfg=82 cterm=BOLD
 	hi markdownListMarker  guifg=#ffff00  gui=BOLD ctermfg=226 cterm=BOLD
@@ -262,7 +262,7 @@ hi link CTagsMember           htmlString
 	hi markdownBlockQuote   guifg=#00ffff gui=BOLD ctermfg=14 cterm=BOLD
 	"}}}
 	" Special for Javascript"{{{
-	hi JavaScriptStrings          guifg=#26b3ac guibg=NONE gui=ITALIC ctermfg=45  ctermbg=NONE  cterm=NONE
+	hi JavaScriptStrings          guifg=#26b3ac guibg=NONE gui=NONE ctermfg=45  ctermbg=NONE  cterm=NONE
 	hi link javaScriptNumber      Number
 	hi link javaScript  Normal
 	hi link javaScriptBrowserObjects PreProc
@@ -270,7 +270,7 @@ hi link CTagsMember           htmlString
 	"}}}
 	" Special for Python"{{{
 	"hi  link pythonEscape         Keyword
-	hi pythonBuiltin          guifg=#50bf95 guibg=NONE  gui=ITALIC ctermfg=42  cterm=UNDERLINE
+	hi pythonBuiltin          guifg=#50bf95 guibg=NONE  gui=NONE ctermfg=42  cterm=UNDERLINE
 	"}}}
 	" Special for PHP"{{{
 	hi phpDefine  guifg=#ffc795    gui=BOLD ctermfg=209 cterm=BOLD
