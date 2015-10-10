@@ -240,3 +240,5 @@ let g:vimrubocop_keymap = 0
 nmap <Leader>r :RuboCop<CR>
 
 let g:delimitMate_expand_cr=1
+
+map <F12> :!yapvp '%' --expandsrc > /tmp/yapvp.html; xdg-open /tmp/yapvp.html<CR>

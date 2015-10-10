@@ -1,0 +1,128 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'haml'
+require 'github/markup'
+
+class Template
+	attr_reader :context, :engine
+
+	def initialize(context)
+		@context  = context
+    @engine   = Haml::Engine.new((File.read(context.template) rescue ''))
+	end
+
+	def render
+    engine.render(context)
+	end
+end
+
+class Context < OpenStruct
+   def merge!(hash)
+    hash.each do |k, v|
+      self[k] = v
+    end
+  end
+end
+
+class Slide < OpenStruct
+  class << self
+    def parse(filename, content)
+      slides = []
+
+      prev_match = false
+
+      html = GitHub::Markup.render(filename, content)
+      html.gsub!(/(^(<h1>|<h2>)(.*?)(<\/h1>|<\/h2>)$)/m) do |m|
+        str = "***___SLIDE_BEGIN___***\n#{m}"
+
+        if prev_match
+          str = "\n***___SLIDE_END___***\n#{str}"
+        else
+          prev_match = true
+        end
+
+        str
+      end
+      html += "\n***___SLIDE_END___***\n" if prev_match
+
+      html.scan(/\*\*\*___SLIDE_BEGIN___\*\*\*\n(.*?)\n\*\*\*___SLIDE_END___\*\*\*\n/m) do
+        slides << new.tap do |slide|
+          slide.content = $1.strip
+          slide.classes = 'slide'
+        end
+      end
+
+      slides.first.classes += ' active' if slides.any?
+
+      slides
+    end
+  end
+end
+
+class Presentation
+  YAML_OPTIONS_MATCHER = /\A(---\s*\n.*?\n?)^((---|\.\.\.)\s*$\n?)/m
+  ARGS_OPTIONS_MATCHER = /^--(.*?)$/
+
+	attr_reader :filename, :arguments, :context, :content, :template
+
+	def initialize(filename, arguments)
+    @filename	  = filename
+    @arguments  = arguments
+    @context    = Context.new
+    @content    = File.read(filename) rescue ''
+
+    if @content =~ YAML_OPTIONS_MATCHER
+      @content = $' # $POSTMATCH
+      @context.merge!((YAML.load($1) rescue {}))
+		end
+
+		arguments.each do |arg|
+      next unless arg =~ ARGS_OPTIONS_MATCHER
+      @context[$1] = true
+		end
+
+    @context.cwd = File.expand_path(File.dirname(filename))
+    @context.name = File.basename(filename, File.extname(filename))
+    @context.template ||= File.join(File.dirname(__FILE__), File.basename(__FILE__, File.extname(__FILE__)) + '.haml')
+    @context.title ||= @context.name
+    @context.slides = Slide.parse(File.basename(filename), content)
+
+    expand_src!
+
+    @template = Template.new(context)
+	end
+
+	def render
+    template.render
+	end
+
+  protected
+
+  def expand_src!
+    return unless context.expandsrc
+
+    context.slides.each do |slide|
+      slide.content.gsub!(/src=\"(.*?)\"/) do
+        url = $1
+
+        if url !~ /https?:\/\/?/
+          url = url.slice(1, -1) if ['.', '/'].include?(url[0])
+          url = File.join(context.cwd, url)
+        end
+
+        "src=\"#{url}\""
+      end
+    end
+  end
+end
+
+if ARGV.any?
+  puts Presentation.new(ARGV.shift, ARGV).render
+  exit 0
+else
+	puts "usage: %s presentation.md [options]" % File.basename(__FILE__)
+	exit -1
+end
+
+# vim: set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab :
