@@ -26,11 +26,11 @@ thunar --daemon &
 ## Launch panel
 tint2 &
 
-## Start Composite Manager
-# xcompmgr -n -I 0 -O 0 -D 0 -C &
-
 ## Launch network manager applet
-(sleep 5s && nm-applet) &
+NM_APPLET_PID=$(pgrep 'nm-applet' 2> /dev/null)
+if [ -z "$NM_APPLET_PID" ]; then
+	(sleep 5s && nm-applet) &
+fi
 
 ## Detect and configure touchpad. See 'man synclient' for more info.
 if egrep -iq 'touchpad' /proc/bus/input/devices; then
