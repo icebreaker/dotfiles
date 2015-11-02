@@ -8,7 +8,7 @@ fi
 COMMAND=$1
 shift
 
-DOT_COMMAND=dot-$(which $COMMAND 2>/dev/null)
+DOT_COMMAND=$(which dot-$COMMAND 2>/dev/null)
 
 if [ -x "$DOT_COMMAND" ]; then
 	$DOT_COMMAND "$@"

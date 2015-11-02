@@ -1,6 +1,10 @@
 #!/bin/bash
 
 cd $DOT_HOME
-git add .
-git commit -m "$@"
+
+if [ -n "$1" ]; then
+	git add .
+	git commit -m "$1"
+fi
+
 git push origin master
