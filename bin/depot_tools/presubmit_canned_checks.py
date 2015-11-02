@@ -1,9 +1,33 @@
-# Copyright (c) 2011 The Chromium Authors. All rights reserved.
+# Copyright (c) 2012 The Chromium Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
 """Generic presubmit checks that can be reused by other presubmit checks."""
 
+import os as _os
+_HERE = _os.path.dirname(_os.path.abspath(__file__))
+
+# Justifications for each filter:
+#
+# - build/include       : Too many; fix in the future.
+# - build/include_order : Not happening; #ifdefed includes.
+# - build/namespace     : I'm surprised by how often we violate this rule.
+# - readability/casting : Mistakes a whole bunch of function pointer.
+# - runtime/int         : Can be fixed long term; volume of errors too high
+# - runtime/virtual     : Broken now, but can be fixed in the future?
+# - whitespace/braces   : We have a lot of explicit scoping in chrome code.
+# - readability/inheritance : Temporary, while the OVERRIDE and FINAL fixup
+#                             is in progress.
+DEFAULT_LINT_FILTERS = [
+  '-build/include',
+  '-build/include_order',
+  '-build/namespace',
+  '-readability/casting',
+  '-runtime/int',
+  '-runtime/virtual',
+  '-whitespace/braces',
+  '-readability/inheritance'
+]
 
 ### Description checks
 
@@ -43,9 +67,9 @@ def CheckChangeHasQaField(input_api, output_api):
 
 
 def CheckDoNotSubmitInDescription(input_api, output_api):
-  """Checks that the user didn't add 'DO NOT ' + 'SUBMIT' to the CL description.
+  """Checks that the user didn't add 'DO NOT ''SUBMIT' to the CL description.
   """
-  keyword = 'DO NOT ' + 'SUBMIT'
+  keyword = 'DO NOT ''SUBMIT'
   if keyword in input_api.change.DescriptionText():
     return [output_api.PresubmitError(
         keyword + ' is present in the changelist description.')]
@@ -58,9 +82,9 @@ def CheckChangeHasDescription(input_api, output_api):
   text = input_api.change.DescriptionText()
   if text.strip() == '':
     if input_api.is_committing:
-      return [output_api.PresubmitError('Add a description.')]
+      return [output_api.PresubmitError('Add a description to the CL.')]
     else:
-      return [output_api.PresubmitNotifyResult('Add a description.')]
+      return [output_api.PresubmitNotifyResult('Add a description to the CL.')]
   return []
 
 
@@ -75,11 +99,11 @@ def CheckChangeWasUploaded(input_api, output_api):
 ### Content checks
 
 def CheckDoNotSubmitInFiles(input_api, output_api):
-  """Checks that the user didn't add 'DO NOT ' + 'SUBMIT' to any files."""
+  """Checks that the user didn't add 'DO NOT ''SUBMIT' to any files."""
   # We want to check every text file, not just source files.
   file_filter = lambda x : x
-  keyword = 'DO NOT ' + 'SUBMIT'
-  errors = _FindNewViolationsOfRule(lambda line : keyword not in line,
+  keyword = 'DO NOT ''SUBMIT'
+  errors = _FindNewViolationsOfRule(lambda _, line : keyword not in line,
                                     input_api, file_filter)
   text = '\n'.join('Found %s in %s' % (keyword, loc) for loc in errors)
   if text:
@@ -87,29 +111,19 @@ def CheckDoNotSubmitInFiles(input_api, output_api):
   return []
 
 
-def CheckChangeLintsClean(input_api, output_api, source_file_filter=None):
+def CheckChangeLintsClean(input_api, output_api, source_file_filter=None,
+                          lint_filters=None, verbose_level=None):
   """Checks that all '.cc' and '.h' files pass cpplint.py."""
   _RE_IS_TEST = input_api.re.compile(r'.*tests?.(cc|h)$')
   result = []
 
-  # Initialize cpplint.
-  import cpplint
+  cpplint = input_api.cpplint
   # Access to a protected member _XX of a client class
   # pylint: disable=W0212
   cpplint._cpplint_state.ResetErrorCounts()
 
-  # Justifications for each filter:
-  #
-  # - build/include       : Too many; fix in the future.
-  # - build/include_order : Not happening; #ifdefed includes.
-  # - build/namespace     : I'm surprised by how often we violate this rule.
-  # - readability/casting : Mistakes a whole bunch of function pointer.
-  # - runtime/int         : Can be fixed long term; volume of errors too high
-  # - runtime/virtual     : Broken now, but can be fixed in the future?
-  # - whitespace/braces   : We have a lot of explicit scoping in chrome code.
-  cpplint._SetFilters('-build/include,-build/include_order,-build/namespace,'
-                      '-readability/casting,-runtime/int,-runtime/virtual,'
-                      '-whitespace/braces')
+  lint_filters = lint_filters or DEFAULT_LINT_FILTERS
+  cpplint._SetFilters(','.join(lint_filters))
 
   # We currently are more strict with normal code than unit tests; 4 and 5 are
   # the verbosity level that would normally be passed to cpplint.py through
@@ -122,7 +136,8 @@ def CheckChangeLintsClean(input_api, output_api, source_file_filter=None):
     else:
       level = 4
 
-    cpplint.ProcessFile(file_name, level)
+    verbose_level = verbose_level or level
+    cpplint.ProcessFile(file_name, verbose_level)
 
   if cpplint._cpplint_state.error_count > 0:
     if input_api.is_committing:
@@ -224,9 +239,9 @@ def CheckChangeHasNoCrAndHasOnlyOneEol(input_api, output_api,
   return outputs
 
 
-def _ReportErrorFileAndLine(filename, line_num, line):
+def _ReportErrorFileAndLine(filename, line_num, dummy_line):
   """Default error formatter for _FindNewViolationsOfRule."""
-  return '%s, line %s' % (filename, line_num)
+  return '%s:%s' % (filename, line_num)
 
 
 def _FindNewViolationsOfRule(callable_rule, input_api, source_file_filter=None,
@@ -234,8 +249,8 @@ def _FindNewViolationsOfRule(callable_rule, input_api, source_file_filter=None,
   """Find all newly introduced violations of a per-line rule (a callable).
 
   Arguments:
-    callable_rule: a callable taking a line of input and returning True
-      if the rule is satisfied and False if there was a problem.
+    callable_rule: a callable taking a file extension and line of input and
+      returning True if the rule is satisfied and False if there was a problem.
     input_api: object to enumerate the affected files.
     source_file_filter: a filter to be passed to the input api.
     error_formatter: a callable taking (filename, line_number, line) and
@@ -251,11 +266,12 @@ def _FindNewViolationsOfRule(callable_rule, input_api, source_file_filter=None,
     # to the SCM to determine the changed region can be quite expensive on
     # Win32.  Assuming that most files will be kept problem-free, we can
     # skip the SCM operations most of the time.
-    if all(callable_rule(line) for line in f.NewContents()):
+    extension = str(f.LocalPath()).rsplit('.', 1)[-1]
+    if all(callable_rule(extension, line) for line in f.NewContents()):
       continue  # No violation found in full text: can skip considering diff.
 
     for line_num, line in f.ChangedContents():
-      if not callable_rule(line):
+      if not callable_rule(extension, line):
         errors.append(error_formatter(f.LocalPath(), line_num, line))
 
   return errors
@@ -270,11 +286,12 @@ def CheckChangeHasNoTabs(input_api, output_api, source_file_filter=None):
     # It's the default filter.
     source_file_filter = input_api.FilterSourceFile
   def filter_more(affected_file):
-    return (not input_api.os_path.basename(affected_file.LocalPath()) in
-                ('Makefile', 'makefile') and
+    basename = input_api.os_path.basename(affected_file.LocalPath())
+    return (not (basename in ('Makefile', 'makefile') or
+                 basename.endswith('.mk')) and
             source_file_filter(affected_file))
 
-  tabs = _FindNewViolationsOfRule(lambda line : '\t' not in line,
+  tabs = _FindNewViolationsOfRule(lambda _, line : '\t' not in line,
                                   input_api, filter_more)
 
   if tabs:
@@ -286,10 +303,10 @@ def CheckChangeHasNoTabs(input_api, output_api, source_file_filter=None):
 def CheckChangeTodoHasOwner(input_api, output_api, source_file_filter=None):
   """Checks that the user didn't add TODO(name) without an owner."""
 
-  unowned_todo = input_api.re.compile('TO' + 'DO[^(]')
-  errors = _FindNewViolationsOfRule(lambda x : not unowned_todo.search(x),
+  unowned_todo = input_api.re.compile('TO''DO[^(]')
+  errors = _FindNewViolationsOfRule(lambda _, x : not unowned_todo.search(x),
                                     input_api, source_file_filter)
-  errors = ['Found TO' + 'DO with no owner in ' + x for x in errors]
+  errors = ['Found TO''DO with no owner in ' + x for x in errors]
   if errors:
     return [output_api.PresubmitPromptWarning('\n'.join(errors))]
   return []
@@ -298,7 +315,7 @@ def CheckChangeTodoHasOwner(input_api, output_api, source_file_filter=None):
 def CheckChangeHasNoStrayWhitespace(input_api, output_api,
                                     source_file_filter=None):
   """Checks that there is no stray whitespace at source lines end."""
-  errors = _FindNewViolationsOfRule(lambda line : line.rstrip() == line,
+  errors = _FindNewViolationsOfRule(lambda _, line : line.rstrip() == line,
                                     input_api, source_file_filter)
   if errors:
     return [output_api.PresubmitPromptWarning(
@@ -307,29 +324,74 @@ def CheckChangeHasNoStrayWhitespace(input_api, output_api,
   return []
 
 
-def CheckLongLines(input_api, output_api, maxlen=80, source_file_filter=None):
+def CheckLongLines(input_api, output_api, maxlen, source_file_filter=None):
   """Checks that there aren't any lines longer than maxlen characters in any of
   the text files to be submitted.
   """
-  # Stupidly long symbols that needs to be worked around if takes 66% of line.
-  long_symbol = maxlen * 2 / 3
-  # Hard line length limit at 50% more.
-  extra_maxlen = maxlen * 3 / 2
-  # Note: these are C++ specific but processed on all languages. :(
-  MACROS = ('#define', '#include', '#import', '#pragma', '#if', '#endif')
+  maxlens = {
+      'java': 100,
+      # This is specifically for Android's handwritten makefiles (Android.mk).
+      'mk': 200,
+      '': maxlen,
+  }
 
-  def no_long_lines(line):
-    if len(line) <= maxlen:
+  # Language specific exceptions to max line length.
+  # '.h' is considered an obj-c file extension, since OBJC_EXCEPTIONS are a
+  # superset of CPP_EXCEPTIONS.
+  CPP_FILE_EXTS = ('c', 'cc')
+  CPP_EXCEPTIONS = ('#define', '#endif', '#if', '#include', '#pragma')
+  JAVA_FILE_EXTS = ('java',)
+  JAVA_EXCEPTIONS = ('import ', 'package ')
+  JS_FILE_EXTS = ('js',)
+  JS_EXCEPTIONS = ("GEN('#include",)
+  OBJC_FILE_EXTS = ('h', 'm', 'mm')
+  OBJC_EXCEPTIONS = ('#define', '#endif', '#if', '#import', '#include',
+                     '#pragma')
+  PY_FILE_EXTS = ('py',)
+  PY_EXCEPTIONS = ('import', 'from')
+
+  LANGUAGE_EXCEPTIONS = [
+    (CPP_FILE_EXTS, CPP_EXCEPTIONS),
+    (JAVA_FILE_EXTS, JAVA_EXCEPTIONS),
+    (JS_FILE_EXTS, JS_EXCEPTIONS),
+    (OBJC_FILE_EXTS, OBJC_EXCEPTIONS),
+    (PY_FILE_EXTS, PY_EXCEPTIONS),
+  ]
+
+  def no_long_lines(file_extension, line):
+    # Check for language specific exceptions.
+    if any(file_extension in exts and line.startswith(exceptions)
+           for exts, exceptions in LANGUAGE_EXCEPTIONS):
       return True
 
-    if len(line) > extra_maxlen:
+    file_maxlen = maxlens.get(file_extension, maxlens[''])
+    # Stupidly long symbols that needs to be worked around if takes 66% of line.
+    long_symbol = file_maxlen * 2 / 3
+    # Hard line length limit at 50% more.
+    extra_maxlen = file_maxlen * 3 / 2
+
+    line_len = len(line)
+    if line_len <= file_maxlen:
+      return True
+
+    # Allow long URLs of any length.
+    if any((url in line) for url in ('file://', 'http://', 'https://')):
+      return True
+
+    if line_len > extra_maxlen:
       return False
 
-    return (
-        line.startswith(MACROS) or
-        any((url in line) for url in ('http://', 'https://')) or
-        input_api.re.match(
-          r'.*[A-Za-z][A-Za-z_0-9]{%d,}.*' % long_symbol, line))
+    if 'url(' in line and file_extension == 'css':
+      return True
+
+    if '<include' in line and file_extension in ('css', 'html', 'js'):
+      return True
+
+    if 'pylint: disable=line-too-long' in line and file_extension == 'py':
+      return True
+
+    return input_api.re.match(
+        r'.*[A-Za-z][A-Za-z_0-9]{%d,}.*' % long_symbol, line)
 
   def format_error(filename, line_num, line):
     return '%s, line %s, %s chars' % (filename, line_num, len(line))
@@ -458,16 +520,16 @@ def CheckTreeIsOpen(input_api, output_api,
         long_text = status + '\n' + url
         return [output_api.PresubmitError('The tree is closed.',
                                           long_text=long_text)]
-  except IOError:
-    pass
+  except IOError as e:
+    return [output_api.PresubmitError('Error fetching tree status.',
+                                      long_text=str(e))]
   return []
 
-
-def RunUnitTestsInDirectory(
-    input_api, output_api, directory, whitelist=None, blacklist=None):
+def GetUnitTestsInDirectory(
+    input_api, output_api, directory, whitelist=None, blacklist=None, env=None):
   """Lists all files in a directory and runs them. Doesn't recurse.
 
-  It's mainly a wrapper for RunUnitTests. USe whitelist and blacklist to filter
+  It's mainly a wrapper for RunUnitTests. Use whitelist and blacklist to filter
   tests accordingly.
   """
   unit_tests = []
@@ -496,10 +558,10 @@ def RunUnitTestsInDirectory(
           'Out of %d files, found none that matched w=%r, b=%r in directory %s'
           % (found, whitelist, blacklist, directory))
     ]
-  return RunUnitTests(input_api, output_api, unit_tests)
+  return GetUnitTests(input_api, output_api, unit_tests, env)
 
 
-def RunUnitTests(input_api, output_api, unit_tests):
+def GetUnitTests(input_api, output_api, unit_tests, env=None):
   """Runs all unit tests in a directory.
 
   On Windows, sys.executable is used for unit tests ending with ".py".
@@ -518,22 +580,49 @@ def RunUnitTests(input_api, output_api, unit_tests):
       cmd = [input_api.python_executable]
     cmd.append(unit_test)
     if input_api.verbose:
-      print('Running %s' % unit_test)
       cmd.append('--verbose')
-    try:
-      if input_api.verbose:
-        input_api.subprocess.check_call(cmd, cwd=input_api.PresubmitLocalPath())
-      else:
-        input_api.subprocess.check_output(
-            cmd,
-            stderr=input_api.subprocess.STDOUT,
-            cwd=input_api.PresubmitLocalPath())
-    except (OSError, input_api.subprocess.CalledProcessError), e:
-      results.append(message_type('%s failed!\n%s' % (unit_test, e)))
+    kwargs = {'cwd': input_api.PresubmitLocalPath()}
+    if env:
+      kwargs['env'] = env
+    results.append(input_api.Command(
+        name=unit_test,
+        cmd=cmd,
+        kwargs=kwargs,
+        message=message_type))
   return results
 
 
-def RunPythonUnitTests(input_api, output_api, unit_tests):
+def GetUnitTestsRecursively(input_api, output_api, directory,
+                            whitelist, blacklist):
+  """Gets all files in the directory tree (git repo) that match the whitelist.
+
+  Restricts itself to only find files within the Change's source repo, not
+  dependencies.
+  """
+  def check(filename):
+    return (any(input_api.re.match(f, filename) for f in whitelist) and
+            not any(input_api.re.match(f, filename) for f in blacklist))
+
+  tests = []
+
+  to_run = found = 0
+  for filepath in input_api.change.AllFiles(directory):
+    found += 1
+    if check(filepath):
+      to_run += 1
+      tests.append(filepath)
+  input_api.logging.debug('Found %d files, running %d' % (found, to_run))
+  if not to_run:
+    return [
+        output_api.PresubmitPromptWarning(
+          'Out of %d files, found none that matched w=%r, b=%r in directory %s'
+          % (found, whitelist, blacklist, directory))
+    ]
+
+  return GetUnitTests(input_api, output_api, tests)
+
+
+def GetPythonUnitTests(input_api, output_api, unit_tests):
   """Run the unit tests out of process, capture the output and use the result
   code to determine success.
 
@@ -569,12 +658,40 @@ def RunPythonUnitTests(input_api, output_api, unit_tests):
         backpath.append(env.get('PYTHONPATH'))
       env['PYTHONPATH'] = input_api.os_path.pathsep.join((backpath))
     cmd = [input_api.python_executable, '-m', '%s' % unit_test]
-    try:
-      input_api.subprocess.check_output(
-          cmd, stderr=input_api.subprocess.STDOUT, cwd=cwd, env=env)
-    except (OSError, input_api.subprocess.CalledProcessError), e:
-      results.append(message_type('%s failed!\n%s' % (unit_test_name, e)))
+    results.append(input_api.Command(
+        name=unit_test_name,
+        cmd=cmd,
+        kwargs={'env': env, 'cwd': cwd},
+        message=message_type))
   return results
+
+
+def RunUnitTestsInDirectory(input_api, *args, **kwargs):
+  """Run tests in a directory serially.
+
+  For better performance, use GetUnitTestsInDirectory and then
+  pass to input_api.RunTests.
+  """
+  return input_api.RunTests(
+      GetUnitTestsInDirectory(input_api, *args, **kwargs), False)
+
+
+def RunUnitTests(input_api, *args, **kwargs):
+  """Run tests serially.
+
+  For better performance, use GetUnitTests and then pass to
+  input_api.RunTests.
+  """
+  return input_api.RunTests(GetUnitTests(input_api, *args, **kwargs), False)
+
+
+def RunPythonUnitTests(input_api, *args, **kwargs):
+  """Run python tests in a directory serially.
+
+  DEPRECATED
+  """
+  return input_api.RunTests(
+      GetPythonUnitTests(input_api, *args, **kwargs), False)
 
 
 def _FetchAllFiles(input_api, white_list, black_list):
@@ -605,79 +722,128 @@ def _FetchAllFiles(input_api, white_list, black_list):
   return files
 
 
-def RunPylint(input_api, output_api, white_list=None, black_list=None):
+def GetPylint(input_api, output_api, white_list=None, black_list=None,
+              disabled_warnings=None, extra_paths_list=None, pylintrc=None):
   """Run pylint on python files.
 
-  The default white_list enforces looking only a *.py files.
+  The default white_list enforces looking only at *.py files.
   """
   white_list = tuple(white_list or ('.*\.py$',))
   black_list = tuple(black_list or input_api.DEFAULT_BLACK_LIST)
+  extra_paths_list = extra_paths_list or []
+
   if input_api.is_committing:
     error_type = output_api.PresubmitError
   else:
     error_type = output_api.PresubmitPromptWarning
 
   # Only trigger if there is at least one python file affected.
-  src_filter = lambda x: input_api.FilterSourceFile(x, white_list, black_list)
+  def rel_path(regex):
+    """Modifies a regex for a subject to accept paths relative to root."""
+    def samefile(a, b):
+      # Default implementation for platforms lacking os.path.samefile
+      # (like Windows).
+      return input_api.os_path.abspath(a) == input_api.os_path.abspath(b)
+    samefile = getattr(input_api.os_path, 'samefile', samefile)
+    if samefile(input_api.PresubmitLocalPath(),
+                input_api.change.RepositoryRoot()):
+      return regex
+
+    prefix = input_api.os_path.join(input_api.os_path.relpath(
+        input_api.PresubmitLocalPath(), input_api.change.RepositoryRoot()), '')
+    return input_api.re.escape(prefix) + regex
+  src_filter = lambda x: input_api.FilterSourceFile(
+      x, map(rel_path, white_list), map(rel_path, black_list))
   if not input_api.AffectedSourceFiles(src_filter):
+    input_api.logging.info('Skipping pylint: no matching changes.')
     return []
 
-  # On certain pylint/python version combination, running pylint throws a lot of
-  # warning messages.
-  import warnings
-  warnings.filterwarnings('ignore', category=DeprecationWarning)
-  try:
-    files = _FetchAllFiles(input_api, white_list, black_list)
-    if not files:
-      return []
-    # Now that at least one python file was modified and all the python files
-    # were listed, try to run pylint.
-    try:
-      from pylint import lint
-      from pylint.utils import UnknownMessage
-      input_api.logging.debug(
-          'Using pylint v%s from %s' % (lint.version, lint.__file__))
-    except ImportError:
-      if input_api.platform == 'win32':
-        return [output_api.PresubmitNotifyResult(
-          'Warning: Can\'t run pylint because it is not installed. Please '
-          'install manually\n'
-          'Cannot do static analysis of python files.')]
-      return [output_api.PresubmitError(
-          'Please install pylint with "sudo apt-get install python-setuptools; '
-          'sudo easy_install pylint"\n'
-          'or visit http://pypi.python.org/pypi/setuptools.\n'
-          'Cannot do static analysis of python files.')]
+  if pylintrc is not None:
+    pylintrc = input_api.os_path.join(input_api.PresubmitLocalPath(), pylintrc)
+  else:
+    pylintrc = input_api.os_path.join(_HERE, 'pylintrc')
+  extra_args = ['--rcfile=%s' % pylintrc]
+  if disabled_warnings:
+    extra_args.extend(['-d', ','.join(disabled_warnings)])
 
-    def run_lint(files):
-      try:
-        lint.Run(files)
-        assert False
-      except SystemExit, e:
-        # pylint has the bad habit of calling sys.exit(), trap it here.
-        return e.code
-      except UnknownMessage, e:
-        return 'Please upgrade pylint: %s' % e
+  files = _FetchAllFiles(input_api, white_list, black_list)
+  if not files:
+    return []
+  files.sort()
 
-    result = None
-    if not input_api.verbose:
-      result = run_lint(sorted(files))
+  input_api.logging.info('Running pylint on %d files', len(files))
+  input_api.logging.debug('Running pylint on: %s', files)
+  # Copy the system path to the environment so pylint can find the right
+  # imports.
+  env = input_api.environ.copy()
+  import sys
+  env['PYTHONPATH'] = input_api.os_path.pathsep.join(
+      extra_paths_list + sys.path).encode('utf8')
+
+  def GetPylintCmd(flist, extra, parallel):
+    # Windows needs help running python files so we explicitly specify
+    # the interpreter to use. It also has limitations on the size of
+    # the command-line, so we pass arguments via a pipe.
+    cmd = [input_api.python_executable,
+           input_api.os_path.join(_HERE, 'third_party', 'pylint.py'),
+           '--args-on-stdin']
+    if len(flist) == 1:
+      description = flist[0]
     else:
-      for filename in sorted(files):
-        print('Running pylint on %s' % filename)
-        result = run_lint([filename]) or result
-    if isinstance(result, basestring):
-      return [error_type(result)]
-    elif result:
-      return [error_type('Fix pylint errors first.')]
-    return []
-  finally:
-    warnings.filterwarnings('default', category=DeprecationWarning)
+      description = '%s files' % len(flist)
+
+    args = extra_args[:]
+    if extra:
+      args.extend(extra)
+      description += ' using %s' % (extra,)
+    if parallel:
+      args.append('--jobs=%s' % input_api.cpu_count)
+      description += ' on %d cores' % input_api.cpu_count
+
+    return input_api.Command(
+        name='Pylint (%s)' % description,
+        cmd=cmd,
+        kwargs={'env': env, 'stdin': '\n'.join(args + flist)},
+        message=error_type)
+
+  # Always run pylint and pass it all the py files at once.
+  # Passing py files one at time is slower and can produce
+  # different results.  input_api.verbose used to be used
+  # to enable this behaviour but differing behaviour in
+  # verbose mode is not desirable.
+  # Leave this unreachable code in here so users can make
+  # a quick local edit to diagnose pylint issues more
+  # easily.
+  if True:
+    # pylint's cycle detection doesn't work in parallel, so spawn a second,
+    # single-threaded job for just that check.
+
+    # Some PRESUBMITs explicitly mention cycle detection.
+    if not any('R0401' in a or 'cyclic-import' in a for a in extra_args):
+      return [
+        GetPylintCmd(files, ["--disable=cyclic-import"], True),
+        GetPylintCmd(files, ["--disable=all", "--enable=cyclic-import"], False)
+      ]
+    else:
+      return [ GetPylintCmd(files, [], True) ]
+
+  else:
+    return map(lambda x: GetPylintCmd([x], [], 1), files)
+
+
+def RunPylint(input_api, *args, **kwargs):
+  """Legacy presubmit function.
+
+  For better performance, get all tests and then pass to
+  input_api.RunTests.
+  """
+  return input_api.RunTests(GetPylint(input_api, *args, **kwargs), False)
 
 
 # TODO(dpranke): Get the host_url from the input_api instead
-def CheckRietveldTryJobExecution(input_api, output_api, host_url, platforms,
-                                 owner):
+def CheckRietveldTryJobExecution(dummy_input_api, dummy_output_api,
+                                 dummy_host_url, dummy_platforms,
+                                 dummy_owner):
   # Temporarily 'fix' the check while the Rietveld API is being upgraded to
   # something sensible.
   return []
@@ -685,9 +851,6 @@ def CheckRietveldTryJobExecution(input_api, output_api, host_url, platforms,
 
 def CheckBuildbotPendingBuilds(input_api, output_api, url, max_pendings,
     ignored):
-  if not input_api.json:
-    return [output_api.PresubmitPromptWarning(
-      'Please install simplejson or upgrade to python 2.6+')]
   try:
     connection = input_api.urllib2.urlopen(url)
     raw_data = connection.read()
@@ -720,47 +883,93 @@ def CheckBuildbotPendingBuilds(input_api, output_api, url, max_pendings,
 
 
 def CheckOwners(input_api, output_api, source_file_filter=None):
-  if not input_api.is_committing:
-    return []
-  if input_api.tbr:
-    return [output_api.PresubmitNotifyResult(
-        '--tbr was specified, skipping OWNERS check')]
-  if not input_api.change.issue:
-    return [output_api.PresubmitError(
-        "OWNERS check failed: this change has no Rietveld issue number, so "
-        "we can't check it for approvals.")]
+  if input_api.is_committing:
+    if input_api.tbr:
+      return [output_api.PresubmitNotifyResult(
+          '--tbr was specified, skipping OWNERS check')]
+    if input_api.change.issue:
+      if _GetRietveldIssueProps(input_api, None).get('cq_dry_run', False):
+        return [output_api.PresubmitNotifyResult(
+            'This is a CQ dry run, skipping OWNERS check')]
+    else:
+      return [output_api.PresubmitError("OWNERS check failed: this change has "
+          "no Rietveld issue number, so we can't check it for approvals.")]
+    needed = 'LGTM from an OWNER'
+    output = output_api.PresubmitError
+  else:
+    needed = 'OWNER reviewers'
+    output = output_api.PresubmitNotifyResult
 
   affected_files = set([f.LocalPath() for f in
       input_api.change.AffectedFiles(file_filter=source_file_filter)])
 
   owners_db = input_api.owners_db
-  owner_email, approvers = _RietveldOwnerAndApprovers(input_api,
-                                                      owners_db.email_regexp)
-  if not owner_email:
-    return [output_api.PresubmitWarning(
-        'The issue was not uploaded so you have no OWNER approval.')]
+  owner_email, reviewers = _RietveldOwnerAndReviewers(
+      input_api,
+      owners_db.email_regexp,
+      approval_needed=input_api.is_committing)
 
-  approvers_plus_owner = approvers.union(set([owner_email]))
+  owner_email = owner_email or input_api.change.author_email
 
-  missing_files = owners_db.files_not_covered_by(affected_files,
-                                                 approvers_plus_owner)
+  if owner_email:
+    reviewers_plus_owner = set([owner_email]).union(reviewers)
+    missing_files = owners_db.files_not_covered_by(affected_files,
+        reviewers_plus_owner)
+  else:
+    missing_files = owners_db.files_not_covered_by(affected_files, reviewers)
+
   if missing_files:
-    return [output_api.PresubmitError('Missing LGTM from an OWNER for: %s' %
-                                      ','.join(missing_files))]
+    output_list = [
+        output('Missing %s for these files:\n    %s' %
+               (needed, '\n    '.join(sorted(missing_files))))]
+    if not input_api.is_committing:
+      suggested_owners = owners_db.reviewers_for(missing_files, owner_email)
+      output_list.append(output('Suggested OWNERS: ' +
+          '(Use "git-cl owners" to interactively select owners.)\n    %s' %
+          ('\n    '.join(suggested_owners or []))))
+    return output_list
 
-  if not approvers:
-    return [output_api.PresubmitError('Missing LGTM from someone other than %s'
-                                      % owner_email)]
+  if input_api.is_committing and not reviewers:
+    return [output('Missing LGTM from someone other than %s' % owner_email)]
   return []
 
 
-def _RietveldOwnerAndApprovers(input_api, email_regexp):
-  """Return the owner and approvers of a change, if any."""
-  if not input_api.change.issue:
-    return None, None
+def _GetRietveldIssueProps(input_api, messages):
+  """Gets the issue properties from rietveld."""
+  issue = input_api.change.issue
+  if issue and input_api.rietveld:
+    return input_api.rietveld.get_issue_properties(
+        issue=int(issue), messages=messages)
 
-  issue_props = input_api.rietveld.get_issue_properties(
-      int(input_api.change.issue), True)
+
+def _ReviewersFromChange(change):
+  """Return the reviewers specified in the |change|, if any."""
+  reviewers = set()
+  if change.R:
+    reviewers.update(set([r.strip() for r in change.R.split(',')]))
+  if change.TBR:
+    reviewers.update(set([r.strip() for r in change.TBR.split(',')]))
+
+  # Drop reviewers that aren't specified in email address format.
+  return set(reviewer for reviewer in reviewers if '@' in reviewer)
+
+
+def _RietveldOwnerAndReviewers(input_api, email_regexp, approval_needed=False):
+  """Return the owner and reviewers of a change, if any.
+
+  If approval_needed is True, only reviewers who have approved the change
+  will be returned.
+  """
+  issue_props = _GetRietveldIssueProps(input_api, True)
+  if not issue_props:
+    reviewers = set()
+    if not approval_needed:
+      reviewers = _ReviewersFromChange(input_api.change)
+    return None, reviewers
+
+  if not approval_needed:
+    return issue_props['owner_email'], set(issue_props['reviewers'])
+
   owner_email = issue_props['owner_email']
 
   def match_reviewer(r):
@@ -777,7 +986,8 @@ def _RietveldOwnerAndApprovers(input_api, email_regexp):
 def _CheckConstNSObject(input_api, output_api, source_file_filter):
   """Checks to make sure no objective-c files have |const NSSomeClass*|."""
   pattern = input_api.re.compile(
-      r'const\s+NS(?!(Point|Range|Rect|Size)\s*\*)\w*\s*\*')
+    r'(?<!reinterpret_cast<)'
+    r'const\s+NS(?!(Point|Range|Rect|Size)\s*\*)\w*\s*\*')
 
   def objective_c_filter(f):
     return (source_file_filter(f) and
@@ -800,33 +1010,18 @@ def _CheckConstNSObject(input_api, output_api, source_file_filter):
   return []
 
 
-def _CheckSingletonInHeaders(input_api, output_api, source_file_filter):
-  """Checks to make sure no header files have |Singleton<|."""
-  pattern = input_api.re.compile(r'Singleton\s*<')
-  files = []
-  for f in input_api.AffectedSourceFiles(source_file_filter):
-    if (f.LocalPath().endswith('.h') or f.LocalPath().endswith('.hxx') or
-        f.LocalPath().endswith('.hpp') or f.LocalPath().endswith('.inl')):
-      contents = input_api.ReadFile(f)
-      for line in contents.splitlines(False):
-        line = input_api.re.sub(r'//.*$', '', line)  # Strip C++ comment.
-        if pattern.search(line):
-          files.append(f)
-          break
-
-  if files:
-    return [ output_api.PresubmitError(
-        'Found Singleton<T> in the following header files.\n' +
-        'Please move them to an appropriate source file so that the ' +
-        'template gets instantiated in a single compilation unit.',
-        files) ]
-  return []
+def CheckSingletonInHeaders(input_api, output_api, source_file_filter=None):
+  """Deprecated, must be removed."""
+  return [
+    output_api.PresubmitNotifyResult(
+        'CheckSingletonInHeaders is deprecated, please remove it.')
+  ]
 
 
 def PanProjectChecks(input_api, output_api,
                      excluded_paths=None, text_files=None,
                      license_header=None, project_name=None,
-                     owners_check=True):
+                     owners_check=True, maxlen=80):
   """Checks that ALL chromium orbit projects should use.
 
   These are checks to be run on all Chromium orbit project, including:
@@ -850,14 +1045,23 @@ def PanProjectChecks(input_api, output_api,
       r'.+\.json$',
   ))
   project_name = project_name or 'Chromium'
+
+  # Accept any year number from 2006 to the current year, or the special
+  # 2006-20xx string used on the oldest files. 2006-20xx is deprecated, but
+  # tolerated on old files.
+  current_year = int(input_api.time.strftime('%Y'))
+  allowed_years = (str(s) for s in reversed(xrange(2006, current_year + 1)))
+  years_re = '(' + '|'.join(allowed_years) + '|2006-2008|2006-2009|2006-2010)'
+
+  # The (c) is deprecated, but tolerate it until it's removed from all files.
   license_header = license_header or (
-      r'.*? Copyright \(c\) %(year)s The %(project)s Authors\. '
+      r'.*? Copyright (\(c\) )?%(year)s The %(project)s Authors\. '
         r'All rights reserved\.\n'
       r'.*? Use of this source code is governed by a BSD-style license that '
         r'can be\n'
-      r'.*? found in the LICENSE file\.\n'
+      r'.*? found in the LICENSE file\.(?: \*/)?\n'
   ) % {
-      'year': input_api.time.strftime('%Y'),
+      'year': years_re,
       'project': project_name,
   }
 
@@ -889,7 +1093,7 @@ def PanProjectChecks(input_api, output_api,
 
   snapshot("checking long lines")
   results.extend(input_api.canned_checks.CheckLongLines(
-      input_api, output_api, source_file_filter=sources))
+      input_api, output_api, maxlen, source_file_filter=sources))
   snapshot( "checking tabs")
   results.extend(input_api.canned_checks.CheckChangeHasNoTabs(
       input_api, output_api, source_file_filter=sources))
@@ -898,9 +1102,6 @@ def PanProjectChecks(input_api, output_api,
       input_api, output_api, source_file_filter=sources))
   snapshot("checking nsobjects")
   results.extend(_CheckConstNSObject(
-      input_api, output_api, source_file_filter=sources))
-  snapshot("checking singletons")
-  results.extend(_CheckSingletonInHeaders(
       input_api, output_api, source_file_filter=sources))
 
   # The following checks are only done on commit, since the commit bot will
@@ -918,5 +1119,49 @@ def PanProjectChecks(input_api, output_api,
     snapshot("checking was uploaded")
     results.extend(input_api.canned_checks.CheckChangeWasUploaded(
         input_api, output_api))
+    snapshot("checking description")
+    results.extend(input_api.canned_checks.CheckChangeHasDescription(
+        input_api, output_api))
+    results.extend(input_api.canned_checks.CheckDoNotSubmitInDescription(
+        input_api, output_api))
+    snapshot("checking do not submit in files")
+    results.extend(input_api.canned_checks.CheckDoNotSubmitInFiles(
+        input_api, output_api))
   snapshot("done")
   return results
+
+
+def CheckPatchFormatted(input_api, output_api):
+  import git_cl
+  cmd = ['cl', 'format', '--dry-run', input_api.PresubmitLocalPath()]
+  code, _ = git_cl.RunGitWithCode(cmd, suppress_stderr=True)
+  if code == 2:
+    short_path = input_api.basename(input_api.PresubmitLocalPath())
+    full_path = input_api.os_path.relpath(input_api.PresubmitLocalPath(),
+                                          input_api.change.RepositoryRoot())
+    return [output_api.PresubmitPromptWarning(
+      'The %s directory requires source formatting. '
+      'Please run git cl format %s' %
+      (short_path, full_path))]
+  # As this is just a warning, ignore all other errors if the user
+  # happens to have a broken clang-format, doesn't use git, etc etc.
+  return []
+
+
+def CheckGNFormatted(input_api, output_api):
+  import gn
+  affected_files = input_api.AffectedFiles(
+      include_deletes=False,
+      file_filter=lambda x: x.LocalPath().endswith('.gn') or
+                            x.LocalPath().endswith('.gni'))
+  warnings = []
+  for f in affected_files:
+    cmd = ['gn', 'format', '--dry-run', f.AbsoluteLocalPath()]
+    rc = gn.main(cmd)
+    if rc == 2:
+      warnings.append(output_api.PresubmitPromptWarning(
+          '%s requires formatting. Please run `gn format --in-place %s`.' % (
+              f.AbsoluteLocalPath(), f.LocalPath())))
+  # It's just a warning, so ignore other types of failures assuming they'll be
+  # caught elsewhere.
+  return warnings

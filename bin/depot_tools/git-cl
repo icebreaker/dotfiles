@@ -1,22 +1,6 @@
-#!/bin/sh
-# Copyright (c) 2011 The Chromium Authors. All rights reserved.
+#!/usr/bin/env bash
+# Copyright (c) 2014 The Chromium Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-# git-cl -- a git-command for integrating reviews on Rietveld
-# Copyright (C) 2008 Evan Martin <martine@danga.com>
-
-base_dir=$(dirname "$0")
-
-"$base_dir"/update_depot_tools
-
-# Test if this script is running under a MSys install.  If it is, we will
-# hardcode the path to Python where possible.
-OUTPUT="$(uname | grep 'MINGW')"
-MINGW=$?
-
-if [ -d "$base_dir/python_bin" -a $MINGW = 0 ]; then
-  PYTHONDONTWRITEBYTECODE=1 exec "$base_dir/python_bin/python.exe" "$base_dir"/git_cl.py "$@"
-else
-  PYTHONDONTWRITEBYTECODE=1 exec "$base_dir/git_cl.py" "$@"
-fi
+. $(type -P python_runner.sh)

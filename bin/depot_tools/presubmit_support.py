@@ -6,19 +6,24 @@
 """Enables directory-specific presubmit checks to run at upload and/or commit.
 """
 
-__version__ = '1.6.1'
+__version__ = '1.8.0'
 
 # TODO(joi) Add caching where appropriate/needed. The API is designed to allow
 # caching (between all different invocations of presubmit scripts for a given
 # change). We should add it as our presubmit scripts start feeling slow.
 
+import cpplint
 import cPickle  # Exposed through the API.
 import cStringIO  # Exposed through the API.
+import contextlib
 import fnmatch
 import glob
 import inspect
+import itertools
+import json  # Exposed through the API.
 import logging
 import marshal  # Exposed through the API.
+import multiprocessing
 import optparse
 import os  # Somewhat exposed through the API.
 import pickle  # Exposed through the API.
@@ -33,17 +38,8 @@ import unittest  # Exposed through the API.
 import urllib2  # Exposed through the API.
 from warnings import warn
 
-try:
-  import simplejson as json  # pylint: disable=F0401
-except ImportError:
-  try:
-    import json  # pylint: disable=F0401
-  except ImportError:
-    # Import the one included in depot_tools.
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'third_party'))
-    import simplejson as json  # pylint: disable=F0401
-
 # Local imports.
+import auth
 import fix_encoding
 import gclient_utils
 import owners
@@ -59,6 +55,15 @@ _ASKED_FOR_FEEDBACK = False
 
 class PresubmitFailure(Exception):
   pass
+
+
+class CommandData(object):
+  def __init__(self, name, cmd, kwargs, message):
+    self.name = name
+    self.cmd = cmd
+    self.kwargs = kwargs
+    self.message = message
+    self.info = None
 
 
 def normpath(path):
@@ -111,71 +116,105 @@ class PresubmitOutput(object):
     return ''.join(self.written_output)
 
 
-class OutputApi(object):
-  """This class (more like a module) gets passed to presubmit scripts so that
-  they can specify various types of results.
-  """
-  class PresubmitResult(object):
-    """Base class for result objects."""
-    fatal = False
-    should_prompt = False
+# Top level object so multiprocessing can pickle
+# Public access through OutputApi object.
+class _PresubmitResult(object):
+  """Base class for result objects."""
+  fatal = False
+  should_prompt = False
 
-    def __init__(self, message, items=None, long_text=''):
-      """
-      message: A short one-line message to indicate errors.
-      items: A list of short strings to indicate where errors occurred.
-      long_text: multi-line text output, e.g. from another tool
-      """
-      self._message = message
-      self._items = []
-      if items:
-        self._items = items
-      self._long_text = long_text.rstrip()
+  def __init__(self, message, items=None, long_text=''):
+    """
+    message: A short one-line message to indicate errors.
+    items: A list of short strings to indicate where errors occurred.
+    long_text: multi-line text output, e.g. from another tool
+    """
+    self._message = message
+    self._items = items or []
+    if items:
+      self._items = items
+    self._long_text = long_text.rstrip()
 
-    def handle(self, output):
-      output.write(self._message)
+  def handle(self, output):
+    output.write(self._message)
+    output.write('\n')
+    for index, item in enumerate(self._items):
+      output.write('  ')
+      # Write separately in case it's unicode.
+      output.write(str(item))
+      if index < len(self._items) - 1:
+        output.write(' \\')
       output.write('\n')
-      for index, item in enumerate(self._items):
-        output.write('  ')
-        # Write separately in case it's unicode.
-        output.write(str(item))
-        if index < len(self._items) - 1:
-          output.write(' \\')
-        output.write('\n')
-      if self._long_text:
-        output.write('\n***************\n')
-        # Write separately in case it's unicode.
-        output.write(self._long_text)
-        output.write('\n***************\n')
-      if self.fatal:
-        output.fail()
+    if self._long_text:
+      output.write('\n***************\n')
+      # Write separately in case it's unicode.
+      output.write(self._long_text)
+      output.write('\n***************\n')
+    if self.fatal:
+      output.fail()
 
-  class PresubmitAddReviewers(PresubmitResult):
-    """Add some suggested reviewers to the change."""
-    def __init__(self, reviewers):
-      super(OutputApi.PresubmitAddReviewers, self).__init__('')
-      self.reviewers = reviewers
 
-    def handle(self, output):
-      output.reviewers.extend(self.reviewers)
+# Top level object so multiprocessing can pickle
+# Public access through OutputApi object.
+class _PresubmitAddReviewers(_PresubmitResult):
+  """Add some suggested reviewers to the change."""
+  def __init__(self, reviewers):
+    super(_PresubmitAddReviewers, self).__init__('')
+    self.reviewers = reviewers
 
-  class PresubmitError(PresubmitResult):
-    """A hard presubmit error."""
-    fatal = True
+  def handle(self, output):
+    output.reviewers.extend(self.reviewers)
 
-  class PresubmitPromptWarning(PresubmitResult):
-    """An warning that prompts the user if they want to continue."""
-    should_prompt = True
 
-  class PresubmitNotifyResult(PresubmitResult):
-    """Just print something to the screen -- but it's not even a warning."""
-    pass
+# Top level object so multiprocessing can pickle
+# Public access through OutputApi object.
+class _PresubmitError(_PresubmitResult):
+  """A hard presubmit error."""
+  fatal = True
 
-  class MailTextResult(PresubmitResult):
-    """A warning that should be included in the review request email."""
-    def __init__(self, *args, **kwargs):
-      super(OutputApi.MailTextResult, self).__init__()
-      raise NotImplementedError()
+
+# Top level object so multiprocessing can pickle
+# Public access through OutputApi object.
+class _PresubmitPromptWarning(_PresubmitResult):
+  """An warning that prompts the user if they want to continue."""
+  should_prompt = True
+
+
+# Top level object so multiprocessing can pickle
+# Public access through OutputApi object.
+class _PresubmitNotifyResult(_PresubmitResult):
+  """Just print something to the screen -- but it's not even a warning."""
+  pass
+
+
+# Top level object so multiprocessing can pickle
+# Public access through OutputApi object.
+class _MailTextResult(_PresubmitResult):
+  """A warning that should be included in the review request email."""
+  def __init__(self, *args, **kwargs):
+    super(_MailTextResult, self).__init__()
+    raise NotImplementedError()
+
+
+class OutputApi(object):
+  """An instance of OutputApi gets passed to presubmit scripts so that they
+  can output various types of results.
+  """
+  PresubmitResult = _PresubmitResult
+  PresubmitAddReviewers = _PresubmitAddReviewers
+  PresubmitError = _PresubmitError
+  PresubmitPromptWarning = _PresubmitPromptWarning
+  PresubmitNotifyResult = _PresubmitNotifyResult
+  MailTextResult = _MailTextResult
+
+  def __init__(self, is_committing):
+    self.is_committing = is_committing
+
+  def PresubmitPromptOrNotify(self, *args, **kwargs):
+    """Warn the user when uploading, but only notify if committing."""
+    if self.is_committing:
+      return self.PresubmitNotifyResult(*args, **kwargs)
+    return self.PresubmitPromptWarning(*args, **kwargs)
 
 
 class InputApi(object):
@@ -198,19 +237,21 @@ class InputApi(object):
       # Scripts
       r".+\.js$", r".+\.py$", r".+\.sh$", r".+\.rb$", r".+\.pl$", r".+\.pm$",
       # Other
-      r".+\.java$", r".+\.mk$", r".+\.am$",
+      r".+\.java$", r".+\.mk$", r".+\.am$", r".+\.css$"
   )
 
   # Path regexp that should be excluded from being considered containing source
   # files. Don't modify this list from a presubmit script!
   DEFAULT_BLACK_LIST = (
+      r"testing_support[\\\/]google_appengine[\\\/].*",
       r".*\bexperimental[\\\/].*",
-      r".*\bthird_party[\\\/].*",
+      # Exclude third_party/.* but NOT third_party/WebKit (crbug.com/539768).
+      r".*\bthird_party[\\\/](?!WebKit[\\\/]).*",
       # Output directories (just in case)
       r".*\bDebug[\\\/].*",
       r".*\bRelease[\\\/].*",
       r".*\bxcodebuild[\\\/].*",
-      r".*\bsconsbuild[\\\/].*",
+      r".*\bout[\\\/].*",
       # All caps files like README and LICENCE.
       r".*\b[A-Z0-9_]{2,}$",
       # SCM (can happen in dual SCM configuration). (Slightly over aggressive)
@@ -245,12 +286,15 @@ class InputApi(object):
     # so that presubmit scripts don't have to import them.
     self.basename = os.path.basename
     self.cPickle = cPickle
+    self.cpplint = cpplint
     self.cStringIO = cStringIO
+    self.glob = glob.glob
     self.json = json
     self.logging = logging.getLogger('PRESUBMIT')
     self.os_listdir = os.listdir
     self.os_walk = os.walk
     self.os_path = os.path
+    self.os_stat = os.stat
     self.pickle = pickle
     self.marshal = marshal
     self.re = re
@@ -268,6 +312,14 @@ class InputApi(object):
     # InputApi.platform is the platform you're currently running on.
     self.platform = sys.platform
 
+    self.cpu_count = multiprocessing.cpu_count()
+
+    # this is done here because in RunTests, the current working directory has
+    # changed, which causes Pool() to explode fantastically when run on windows
+    # (because it tries to load the __main__ module, which imports lots of
+    # things relative to the current working directory).
+    self._run_tests_pool = multiprocessing.Pool(self.cpu_count)
+
     # The local path of the currently-being-processed presubmit script.
     self._current_presubmit_path = os.path.dirname(presubmit_path)
 
@@ -277,8 +329,19 @@ class InputApi(object):
     # TODO(dpranke): figure out a list of all approved owners for a repo
     # in order to be able to handle wildcard OWNERS files?
     self.owners_db = owners.Database(change.RepositoryRoot(),
-        fopen=file, os_path=self.os_path)
+        fopen=file, os_path=self.os_path, glob=self.glob)
     self.verbose = verbose
+    self.Command = CommandData
+
+    # Replace <hash_map> and <hash_set> as headers that need to be included
+    # with "base/containers/hash_tables.h" instead.
+    # Access to a protected member _XX of a client class
+    # pylint: disable=W0212
+    self.cpplint._re_pattern_templates = [
+      (a, b, 'base/containers/hash_tables.h')
+        if header in ('<hash_map>', '<hash_set>') else (a, b, header)
+      for (a, b, header) in cpplint._re_pattern_templates
+    ]
 
   def PresubmitLocalPath(self):
     """Returns the local path of the presubmit script currently being run.
@@ -333,7 +396,9 @@ class InputApi(object):
 
   def LocalPaths(self, include_dirs=False):
     """Returns local paths of input_api.AffectedFiles()."""
-    return [af.LocalPath() for af in self.AffectedFiles(include_dirs)]
+    paths = [af.LocalPath() for af in self.AffectedFiles(include_dirs)]
+    logging.debug("LocalPaths: %s", paths)
+    return paths
 
   def AbsoluteLocalPaths(self, include_dirs=False):
     """Returns absolute local paths of input_api.AffectedFiles()."""
@@ -422,12 +487,99 @@ class InputApi(object):
     """Returns if a change is TBR'ed."""
     return 'TBR' in self.change.tags
 
+  def RunTests(self, tests_mix, parallel=True):
+    tests = []
+    msgs = []
+    for t in tests_mix:
+      if isinstance(t, OutputApi.PresubmitResult):
+        msgs.append(t)
+      else:
+        assert issubclass(t.message, _PresubmitResult)
+        tests.append(t)
+        if self.verbose:
+          t.info = _PresubmitNotifyResult
+    if len(tests) > 1 and parallel:
+      # async recipe works around multiprocessing bug handling Ctrl-C
+      msgs.extend(self._run_tests_pool.map_async(CallCommand, tests).get(99999))
+    else:
+      msgs.extend(map(CallCommand, tests))
+    return [m for m in msgs if m]
+
+
+class _DiffCache(object):
+  """Caches diffs retrieved from a particular SCM."""
+  def __init__(self, upstream=None):
+    """Stores the upstream revision against which all diffs will be computed."""
+    self._upstream = upstream
+
+  def GetDiff(self, path, local_root):
+    """Get the diff for a particular path."""
+    raise NotImplementedError()
+
+
+class _SvnDiffCache(_DiffCache):
+  """DiffCache implementation for subversion."""
+  def __init__(self, *args, **kwargs):
+    super(_SvnDiffCache, self).__init__(*args, **kwargs)
+    self._diffs_by_file = {}
+
+  def GetDiff(self, path, local_root):
+    if path not in self._diffs_by_file:
+      self._diffs_by_file[path] = scm.SVN.GenerateDiff([path], local_root,
+                                                       False, None)
+    return self._diffs_by_file[path]
+
+
+class _GitDiffCache(_DiffCache):
+  """DiffCache implementation for git; gets all file diffs at once."""
+  def __init__(self, upstream):
+    super(_GitDiffCache, self).__init__(upstream=upstream)
+    self._diffs_by_file = None
+
+  def GetDiff(self, path, local_root):
+    if not self._diffs_by_file:
+      # Compute a single diff for all files and parse the output; should
+      # with git this is much faster than computing one diff for each file.
+      diffs = {}
+
+      # Don't specify any filenames below, because there are command line length
+      # limits on some platforms and GenerateDiff would fail.
+      unified_diff = scm.GIT.GenerateDiff(local_root, files=[], full_move=True,
+                                          branch=self._upstream)
+
+      # This regex matches the path twice, separated by a space. Note that
+      # filename itself may contain spaces.
+      file_marker = re.compile('^diff --git (?P<filename>.*) (?P=filename)$')
+      current_diff = []
+      keep_line_endings = True
+      for x in unified_diff.splitlines(keep_line_endings):
+        match = file_marker.match(x)
+        if match:
+          # Marks the start of a new per-file section.
+          diffs[match.group('filename')] = current_diff = [x]
+        elif x.startswith('diff --git'):
+          raise PresubmitFailure('Unexpected diff line: %s' % x)
+        else:
+          current_diff.append(x)
+
+      self._diffs_by_file = dict(
+        (normpath(path), ''.join(diff)) for path, diff in diffs.items())
+
+    if path not in self._diffs_by_file:
+      raise PresubmitFailure(
+          'Unified diff did not contain entry for file %s' % path)
+
+    return self._diffs_by_file[path]
+
 
 class AffectedFile(object):
   """Representation of a file in a change."""
+
+  DIFF_CACHE = _DiffCache
+
   # Method could be a function
   # pylint: disable=R0201
-  def __init__(self, path, action, repository_root):
+  def __init__(self, path, action, repository_root, diff_cache):
     self._path = path
     self._action = action
     self._local_root = repository_root
@@ -435,6 +587,7 @@ class AffectedFile(object):
     self._properties = {}
     self._cached_changed_contents = None
     self._cached_new_contents = None
+    self._diff_cache = diff_cache
     logging.debug('%s(%s)' % (self.__class__.__name__, self._path))
 
   def ServerPath(self):
@@ -442,7 +595,7 @@ class AffectedFile(object):
 
     Returns the empty string if the file does not exist in SCM.
     """
-    return ""
+    return ''
 
   def LocalPath(self):
     """Returns the path of this file on the local disk relative to client root.
@@ -499,22 +652,6 @@ class AffectedFile(object):
           pass  # File not found?  That's fine; maybe it was deleted.
     return self._cached_new_contents[:]
 
-  def OldContents(self):
-    """Returns an iterator over the lines in the old version of file.
-
-    The old version is the file in depot, i.e. the "left hand side".
-    """
-    raise NotImplementedError()  # Implement when needed
-
-  def OldFileTempPath(self):
-    """Returns the path on local disk where the old contents resides.
-
-    The old version is the file in depot, i.e. the "left hand side".
-    This is a read-only cached copy of the old contents. *DO NOT* try to
-    modify this file.
-    """
-    raise NotImplementedError()  # Implement if/when needed.
-
   def ChangedContents(self):
     """Returns a list of tuples (line number, line text) of all new lines.
 
@@ -546,7 +683,7 @@ class AffectedFile(object):
     return self.LocalPath()
 
   def GenerateScmDiff(self):
-    raise NotImplementedError()  # Implemented in derived classes.
+    return self._diff_cache.GetDiff(self.LocalPath(), self._local_root)
 
 
 class SvnAffectedFile(AffectedFile):
@@ -554,11 +691,12 @@ class SvnAffectedFile(AffectedFile):
   # Method 'NNN' is abstract in class 'NNN' but is not overridden
   # pylint: disable=W0223
 
+  DIFF_CACHE = _SvnDiffCache
+
   def __init__(self, *args, **kwargs):
     AffectedFile.__init__(self, *args, **kwargs)
     self._server_path = None
     self._is_text_file = None
-    self._diff = None
 
   def ServerPath(self):
     if self._server_path is None:
@@ -598,23 +736,18 @@ class SvnAffectedFile(AffectedFile):
         self._is_text_file = (not mime_type or mime_type.startswith('text/'))
     return self._is_text_file
 
-  def GenerateScmDiff(self):
-    if self._diff is None:
-      self._diff = scm.SVN.GenerateDiff(
-          [self.LocalPath()], self._local_root, False, None)
-    return self._diff
-
 
 class GitAffectedFile(AffectedFile):
   """Representation of a file in a change out of a git checkout."""
   # Method 'NNN' is abstract in class 'NNN' but is not overridden
   # pylint: disable=W0223
 
+  DIFF_CACHE = _GitDiffCache
+
   def __init__(self, *args, **kwargs):
     AffectedFile.__init__(self, *args, **kwargs)
     self._server_path = None
     self._is_text_file = None
-    self._diff = None
 
   def ServerPath(self):
     if self._server_path is None:
@@ -648,12 +781,6 @@ class GitAffectedFile(AffectedFile):
         self._is_text_file = os.path.isfile(self.AbsoluteLocalPath())
     return self._is_text_file
 
-  def GenerateScmDiff(self):
-    if self._diff is None:
-      self._diff = scm.GIT.GenerateDiff(
-          self._local_root, files=[self.LocalPath(),])
-    return self._diff
-
 
 class Change(object):
   """Describe a change.
@@ -662,7 +789,7 @@ class Change(object):
   tested.
 
   Instance members:
-    tags: Dictionnary of KEY=VALUE pairs found in the change description.
+    tags: Dictionary of KEY=VALUE pairs found in the change description.
     self.KEY: equivalent to tags['KEY']
   """
 
@@ -670,42 +797,34 @@ class Change(object):
 
   # Matches key/value (or "tag") lines in changelist descriptions.
   TAG_LINE_RE = re.compile(
-      '^\s*(?P<key>[A-Z][A-Z_0-9]*)\s*=\s*(?P<value>.*?)\s*$')
+      '^[ \t]*(?P<key>[A-Z][A-Z_0-9]*)[ \t]*=[ \t]*(?P<value>.*?)[ \t]*$')
   scm = ''
 
   def __init__(
-      self, name, description, local_root, files, issue, patchset, author):
+      self, name, description, local_root, files, issue, patchset, author,
+      upstream=None):
     if files is None:
       files = []
     self._name = name
-    self._full_description = description
     # Convert root into an absolute path.
     self._local_root = os.path.abspath(local_root)
+    self._upstream = upstream
     self.issue = issue
     self.patchset = patchset
     self.author_email = author
 
-    # From the description text, build up a dictionary of key/value pairs
-    # plus the description minus all key/value or "tag" lines.
-    description_without_tags = []
+    self._full_description = ''
     self.tags = {}
-    for line in self._full_description.splitlines():
-      m = self.TAG_LINE_RE.match(line)
-      if m:
-        self.tags[m.group('key')] = m.group('value')
-      else:
-        description_without_tags.append(line)
-
-    # Change back to text and remove whitespace at end.
-    self._description_without_tags = (
-        '\n'.join(description_without_tags).rstrip())
+    self._description_without_tags = ''
+    self.SetDescriptionText(description)
 
     assert all(
         (isinstance(f, (list, tuple)) and len(f) == 2) for f in files), files
 
+    diff_cache = self._AFFECTED_FILES.DIFF_CACHE(self._upstream)
     self._affected_files = [
-        self._AFFECTED_FILES(info[1], info[0].strip(), self._local_root)
-        for info in files
+        self._AFFECTED_FILES(path, action.strip(), self._local_root, diff_cache)
+        for action, path in files
     ]
 
   def Name(self):
@@ -725,6 +844,27 @@ class Change(object):
     """Returns the complete changelist description including tags."""
     return self._full_description
 
+  def SetDescriptionText(self, description):
+    """Sets the full description text (including tags) to |description|.
+
+    Also updates the list of tags."""
+    self._full_description = description
+
+    # From the description text, build up a dictionary of key/value pairs
+    # plus the description minus all key/value or "tag" lines.
+    description_without_tags = []
+    self.tags = {}
+    for line in self._full_description.splitlines():
+      m = self.TAG_LINE_RE.match(line)
+      if m:
+        self.tags[m.group('key')] = m.group('value')
+      else:
+        description_without_tags.append(line)
+
+    # Change back to text and remove whitespace at end.
+    self._description_without_tags = (
+        '\n'.join(description_without_tags).rstrip())
+
   def RepositoryRoot(self):
     """Returns the repository (checkout) root directory for this change,
     as an absolute path.
@@ -736,6 +876,10 @@ class Change(object):
     if not re.match(r"^[A-Z_]*$", attr):
       raise AttributeError(self, attr)
     return self.tags.get(attr)
+
+  def AllFiles(self, root=None):
+    """List all files under source control in the repo."""
+    raise NotImplementedError()
 
   def AffectedFiles(self, include_dirs=False, include_deletes=True,
                     file_filter=None):
@@ -833,10 +977,22 @@ class SvnChange(Change):
     return [os.path.join(self.RepositoryRoot(), f[1])
             for f in changelists[self.Name()]]
 
+  def AllFiles(self, root=None):
+    """List all files under source control in the repo."""
+    root = root or self.RepositoryRoot()
+    return subprocess.check_output(
+        ['svn', 'ls', '-R', '.'], cwd=root).splitlines()
+
 
 class GitChange(Change):
   _AFFECTED_FILES = GitAffectedFile
   scm = 'git'
+
+  def AllFiles(self, root=None):
+    """List all files under source control in the repo."""
+    root = root or self.RepositoryRoot()
+    return subprocess.check_output(
+        ['git', 'ls-files', '--', '.'], cwd=root).splitlines()
 
 
 def ListRelevantPresubmitFiles(files, root):
@@ -892,6 +1048,8 @@ class GetTrySlavesExecuter(object):
   def ExecPresubmitScript(script_text, presubmit_path, project, change):
     """Executes GetPreferredTrySlaves() from a single presubmit script.
 
+    This will soon be deprecated and replaced by GetPreferredTryMasters().
+
     Args:
       script_text: The text of the presubmit script.
       presubmit_path: Project script to run.
@@ -901,10 +1059,14 @@ class GetTrySlavesExecuter(object):
       A list of try slaves.
     """
     context = {}
+    main_path = os.getcwd()
     try:
+      os.chdir(os.path.dirname(presubmit_path))
       exec script_text in context
     except Exception, e:
       raise PresubmitFailure('"%s" had an exception.\n%s' % (presubmit_path, e))
+    finally:
+      os.chdir(main_path)
 
     function_name = 'GetPreferredTrySlaves'
     if function_name in context:
@@ -921,14 +1083,102 @@ class GetTrySlavesExecuter(object):
             'Presubmit functions must return a list, got a %s instead: %s' %
             (type(result), str(result)))
       for item in result:
-        if not isinstance(item, basestring):
-          raise PresubmitFailure('All try slaves names must be strings.')
-        if item != item.strip():
+        if isinstance(item, basestring):
+          # Old-style ['bot'] format.
+          botname = item
+        elif isinstance(item, tuple):
+          # New-style [('bot', set(['tests']))] format.
+          botname = item[0]
+        else:
+          raise PresubmitFailure('PRESUBMIT.py returned invalid tryslave/test'
+                                 ' format.')
+
+        if botname != botname.strip():
           raise PresubmitFailure(
               'Try slave names cannot start/end with whitespace')
+        if ',' in botname:
+          raise PresubmitFailure(
+              'Do not use \',\' separated builder or test names: %s' % botname)
     else:
       result = []
+
+    def valid_oldstyle(result):
+      return all(isinstance(i, basestring) for i in result)
+
+    def valid_newstyle(result):
+      return (all(isinstance(i, tuple) for i in result) and
+              all(len(i) == 2 for i in result) and
+              all(isinstance(i[0], basestring) for i in result) and
+              all(isinstance(i[1], set) for i in result)
+             )
+
+    # Ensure it's either all old-style or all new-style.
+    if not valid_oldstyle(result) and not valid_newstyle(result):
+      raise PresubmitFailure(
+          'PRESUBMIT.py returned invalid trybot specification!')
+
     return result
+
+
+class GetTryMastersExecuter(object):
+  @staticmethod
+  def ExecPresubmitScript(script_text, presubmit_path, project, change):
+    """Executes GetPreferredTryMasters() from a single presubmit script.
+
+    Args:
+      script_text: The text of the presubmit script.
+      presubmit_path: Project script to run.
+      project: Project name to pass to presubmit script for bot selection.
+
+    Return:
+      A map of try masters to map of builders to set of tests.
+    """
+    context = {}
+    try:
+      exec script_text in context
+    except Exception, e:
+      raise PresubmitFailure('"%s" had an exception.\n%s'
+                             % (presubmit_path, e))
+
+    function_name = 'GetPreferredTryMasters'
+    if function_name not in context:
+      return {}
+    get_preferred_try_masters = context[function_name]
+    if not len(inspect.getargspec(get_preferred_try_masters)[0]) == 2:
+      raise PresubmitFailure(
+          'Expected function "GetPreferredTryMasters" to take two arguments.')
+    return get_preferred_try_masters(project, change)
+
+
+class GetPostUploadExecuter(object):
+  @staticmethod
+  def ExecPresubmitScript(script_text, presubmit_path, cl, change):
+    """Executes PostUploadHook() from a single presubmit script.
+
+    Args:
+      script_text: The text of the presubmit script.
+      presubmit_path: Project script to run.
+      cl: The Changelist object.
+      change: The Change object.
+
+    Return:
+      A list of results objects.
+    """
+    context = {}
+    try:
+      exec script_text in context
+    except Exception, e:
+      raise PresubmitFailure('"%s" had an exception.\n%s'
+                             % (presubmit_path, e))
+
+    function_name = 'PostUploadHook'
+    if function_name not in context:
+      return {}
+    post_upload_hook = context[function_name]
+    if not len(inspect.getargspec(post_upload_hook)[0]) == 3:
+      raise PresubmitFailure(
+          'Expected function "PostUploadHook" to take three arguments.')
+    return post_upload_hook(cl, change, OutputApi(False))
 
 
 def DoGetTrySlaves(change,
@@ -938,7 +1188,7 @@ def DoGetTrySlaves(change,
                    project,
                    verbose,
                    output_stream):
-  """Get the list of try servers from the presubmit scripts.
+  """Get the list of try servers from the presubmit scripts (deprecated).
 
   Args:
     changed_files: List of modified files.
@@ -953,29 +1203,145 @@ def DoGetTrySlaves(change,
   """
   presubmit_files = ListRelevantPresubmitFiles(changed_files, repository_root)
   if not presubmit_files and verbose:
-    output_stream.write("Warning, no presubmit.py found.\n")
+    output_stream.write("Warning, no PRESUBMIT.py found.\n")
   results = []
   executer = GetTrySlavesExecuter()
+
   if default_presubmit:
     if verbose:
       output_stream.write("Running default presubmit script.\n")
     fake_path = os.path.join(repository_root, 'PRESUBMIT.py')
-    results += executer.ExecPresubmitScript(
-        default_presubmit, fake_path, project, change)
+    results.extend(executer.ExecPresubmitScript(
+        default_presubmit, fake_path, project, change))
   for filename in presubmit_files:
     filename = os.path.abspath(filename)
     if verbose:
       output_stream.write("Running %s\n" % filename)
     # Accept CRLF presubmit script.
     presubmit_script = gclient_utils.FileRead(filename, 'rU')
-    results += executer.ExecPresubmitScript(
-        presubmit_script, filename, project, change)
+    results.extend(executer.ExecPresubmitScript(
+        presubmit_script, filename, project, change))
 
-  slaves = list(set(results))
+
+  slave_dict = {}
+  old_style = filter(lambda x: isinstance(x, basestring), results)
+  new_style = filter(lambda x: isinstance(x, tuple), results)
+
+  for result in new_style:
+    slave_dict.setdefault(result[0], set()).update(result[1])
+  slaves = list(slave_dict.items())
+
+  slaves.extend(set(old_style))
+
   if slaves and verbose:
-    output_stream.write(', '.join(slaves))
+    output_stream.write(', '.join((str(x) for x in slaves)))
     output_stream.write('\n')
   return slaves
+
+
+def _MergeMasters(masters1, masters2):
+  """Merges two master maps. Merges also the tests of each builder."""
+  result = {}
+  for (master, builders) in itertools.chain(masters1.iteritems(),
+                                            masters2.iteritems()):
+    new_builders = result.setdefault(master, {})
+    for (builder, tests) in builders.iteritems():
+      new_builders.setdefault(builder, set([])).update(tests)
+  return result
+
+
+def DoGetTryMasters(change,
+                    changed_files,
+                    repository_root,
+                    default_presubmit,
+                    project,
+                    verbose,
+                    output_stream):
+  """Get the list of try masters from the presubmit scripts.
+
+  Args:
+    changed_files: List of modified files.
+    repository_root: The repository root.
+    default_presubmit: A default presubmit script to execute in any case.
+    project: Optional name of a project used in selecting trybots.
+    verbose: Prints debug info.
+    output_stream: A stream to write debug output to.
+
+  Return:
+    Map of try masters to map of builders to set of tests.
+  """
+  presubmit_files = ListRelevantPresubmitFiles(changed_files, repository_root)
+  if not presubmit_files and verbose:
+    output_stream.write("Warning, no PRESUBMIT.py found.\n")
+  results = {}
+  executer = GetTryMastersExecuter()
+
+  if default_presubmit:
+    if verbose:
+      output_stream.write("Running default presubmit script.\n")
+    fake_path = os.path.join(repository_root, 'PRESUBMIT.py')
+    results = _MergeMasters(results, executer.ExecPresubmitScript(
+        default_presubmit, fake_path, project, change))
+  for filename in presubmit_files:
+    filename = os.path.abspath(filename)
+    if verbose:
+      output_stream.write("Running %s\n" % filename)
+    # Accept CRLF presubmit script.
+    presubmit_script = gclient_utils.FileRead(filename, 'rU')
+    results = _MergeMasters(results, executer.ExecPresubmitScript(
+        presubmit_script, filename, project, change))
+
+  # Make sets to lists again for later JSON serialization.
+  for builders in results.itervalues():
+    for builder in builders:
+      builders[builder] = list(builders[builder])
+
+  if results and verbose:
+    output_stream.write('%s\n' % str(results))
+  return results
+
+
+def DoPostUploadExecuter(change,
+                         cl,
+                         repository_root,
+                         verbose,
+                         output_stream):
+  """Execute the post upload hook.
+
+  Args:
+    change: The Change object.
+    cl: The Changelist object.
+    repository_root: The repository root.
+    verbose: Prints debug info.
+    output_stream: A stream to write debug output to.
+  """
+  presubmit_files = ListRelevantPresubmitFiles(
+      change.LocalPaths(), repository_root)
+  if not presubmit_files and verbose:
+    output_stream.write("Warning, no PRESUBMIT.py found.\n")
+  results = []
+  executer = GetPostUploadExecuter()
+  # The root presubmit file should be executed after the ones in subdirectories.
+  # i.e. the specific post upload hooks should run before the general ones.
+  # Thus, reverse the order provided by ListRelevantPresubmitFiles.
+  presubmit_files.reverse()
+
+  for filename in presubmit_files:
+    filename = os.path.abspath(filename)
+    if verbose:
+      output_stream.write("Running %s\n" % filename)
+    # Accept CRLF presubmit script.
+    presubmit_script = gclient_utils.FileRead(filename, 'rU')
+    results.extend(executer.ExecPresubmitScript(
+        presubmit_script, filename, cl, change))
+  output_stream.write('\n')
+  if results:
+    output_stream.write('** Post Upload Hook Messages **\n')
+  for result in results:
+    result.handle(output_stream)
+    output_stream.write('\n')
+
+  return results
 
 
 class PresubmitExecuter(object):
@@ -1023,7 +1389,7 @@ class PresubmitExecuter(object):
     else:
       function_name = 'CheckChangeOnUpload'
     if function_name in context:
-      context['__args'] = (input_api, OutputApi())
+      context['__args'] = (input_api, OutputApi(self.committing))
       logging.debug('Running %s in %s' % (function_name, presubmit_path))
       result = eval(function_name + '(*__args)', context)
       logging.debug('Running %s done.' % function_name)
@@ -1147,8 +1513,10 @@ def DoPresubmitChecks(change,
     global _ASKED_FOR_FEEDBACK
     # Ask for feedback one time out of 5.
     if (len(results) and random.randint(0, 4) == 0 and not _ASKED_FOR_FEEDBACK):
-      output.write("Was the presubmit check useful? Please send feedback "
-                  "& hate mail to maruel@chromium.org!\n")
+      output.write(
+          'Was the presubmit check useful? If not, run "git cl presubmit -v"\n'
+          'to figure out which PRESUBMIT.py was run, then run git blame\n'
+          'on the file to figure out who to ask for help.\n')
       _ASKED_FOR_FEEDBACK = True
     return output
   finally:
@@ -1157,7 +1525,7 @@ def DoPresubmitChecks(change,
 
 def ScanSubDirs(mask, recursive):
   if not recursive:
-    return [x for x in glob.glob(mask) if '.svn' not in x and '.git' not in x]
+    return [x for x in glob.glob(mask) if x not in ('.svn', '.git')]
   else:
     results = []
     for root, dirs, files in os.walk('.'):
@@ -1183,26 +1551,68 @@ def load_files(options, args):
   """Tries to determine the SCM."""
   change_scm = scm.determine_scm(options.root)
   files = []
-  if change_scm == 'svn':
-    change_class = SvnChange
-    status_fn = scm.SVN.CaptureStatus
-  elif change_scm == 'git':
-    change_class = GitChange
-    status_fn = scm.GIT.CaptureStatus
-  else:
-    logging.info('Doesn\'t seem under source control. Got %d files' % len(args))
-    if not args:
-      return None, None
-    change_class = Change
   if args:
     files = ParseFiles(args, options.recursive)
+  if change_scm == 'svn':
+    change_class = SvnChange
+    if not files:
+      files = scm.SVN.CaptureStatus([], options.root)
+  elif change_scm == 'git':
+    change_class = GitChange
+    upstream = options.upstream or None
+    if not files:
+      files = scm.GIT.CaptureStatus([], options.root, upstream)
   else:
-    # Grab modified files.
-    files = status_fn([options.root])
+    logging.info('Doesn\'t seem under source control. Got %d files' % len(args))
+    if not files:
+      return None, None
+    change_class = Change
   return change_class, files
 
 
-def Main(argv):
+class NonexistantCannedCheckFilter(Exception):
+  pass
+
+
+@contextlib.contextmanager
+def canned_check_filter(method_names):
+  filtered = {}
+  try:
+    for method_name in method_names:
+      if not hasattr(presubmit_canned_checks, method_name):
+        raise NonexistantCannedCheckFilter(method_name)
+      filtered[method_name] = getattr(presubmit_canned_checks, method_name)
+      setattr(presubmit_canned_checks, method_name, lambda *_a, **_kw: [])
+    yield
+  finally:
+    for name, method in filtered.iteritems():
+      setattr(presubmit_canned_checks, name, method)
+
+
+def CallCommand(cmd_data):
+  """Runs an external program, potentially from a child process created by the
+  multiprocessing module.
+
+  multiprocessing needs a top level function with a single argument.
+  """
+  cmd_data.kwargs['stdout'] = subprocess.PIPE
+  cmd_data.kwargs['stderr'] = subprocess.STDOUT
+  try:
+    start = time.time()
+    (out, _), code = subprocess.communicate(cmd_data.cmd, **cmd_data.kwargs)
+    duration = time.time() - start
+  except OSError as e:
+    duration = time.time() - start
+    return cmd_data.message(
+        '%s exec failure (%4.2fs)\n   %s' % (cmd_data.name, duration, e))
+  if code != 0:
+    return cmd_data.message(
+        '%s (%4.2fs) failed\n%s' % (cmd_data.name, duration, out))
+  if cmd_data.info:
+    return cmd_data.info('%s (%4.2fs)' % (cmd_data.name, duration))
+
+
+def main(argv=None):
   parser = optparse.OptionParser(usage="%prog [options] <files...>",
                                  version="%prog " + str(__version__))
   parser.add_option("-c", "--commit", action="store_true", default=False,
@@ -1223,45 +1633,118 @@ def Main(argv):
                     "If inherit-review-settings-ok is present in this "
                     "directory, parent directories up to the root file "
                     "system directories will also be searched.")
+  parser.add_option("--upstream",
+                    help="Git only: the base ref or upstream branch against "
+                    "which the diff should be computed.")
   parser.add_option("--default_presubmit")
   parser.add_option("--may_prompt", action='store_true', default=False)
+  parser.add_option("--skip_canned", action='append', default=[],
+                    help="A list of checks to skip which appear in "
+                    "presubmit_canned_checks. Can be provided multiple times "
+                    "to skip multiple canned checks.")
   parser.add_option("--rietveld_url", help=optparse.SUPPRESS_HELP)
   parser.add_option("--rietveld_email", help=optparse.SUPPRESS_HELP)
-  parser.add_option("--rietveld_password", help=optparse.SUPPRESS_HELP)
+  parser.add_option("--rietveld_fetch", action='store_true', default=False,
+                    help=optparse.SUPPRESS_HELP)
+  # These are for OAuth2 authentication for bots. See also apply_issue.py
+  parser.add_option("--rietveld_email_file", help=optparse.SUPPRESS_HELP)
+  parser.add_option("--rietveld_private_key_file", help=optparse.SUPPRESS_HELP)
+
+  parser.add_option("--trybot-json",
+                    help="Output trybot information to the file specified.")
+  auth.add_auth_options(parser)
   options, args = parser.parse_args(argv)
+  auth_config = auth.extract_auth_config_from_options(options)
+
   if options.verbose >= 2:
     logging.basicConfig(level=logging.DEBUG)
   elif options.verbose:
     logging.basicConfig(level=logging.INFO)
   else:
     logging.basicConfig(level=logging.ERROR)
+
+  if options.rietveld_email and options.rietveld_email_file:
+    parser.error("Only one of --rietveld_email or --rietveld_email_file "
+                 "can be passed to this program.")
+
+  if options.rietveld_email_file:
+    with open(options.rietveld_email_file, "rb") as f:
+      options.rietveld_email = f.read().strip()
+
   change_class, files = load_files(options, args)
   if not change_class:
     parser.error('For unversioned directory, <files> is not optional.')
   logging.info('Found %d file(s).' % len(files))
+
   rietveld_obj = None
   if options.rietveld_url:
-    rietveld_obj = rietveld.Rietveld(
+    # The empty password is permitted: '' is not None.
+    if options.rietveld_private_key_file:
+      rietveld_obj = rietveld.JwtOAuth2Rietveld(
         options.rietveld_url,
         options.rietveld_email,
-        options.rietveld_password)
+        options.rietveld_private_key_file)
+    else:
+      rietveld_obj = rietveld.CachingRietveld(
+        options.rietveld_url,
+        auth_config,
+        options.rietveld_email)
+    if options.rietveld_fetch:
+      assert options.issue
+      props = rietveld_obj.get_issue_properties(options.issue, False)
+      options.author = props['owner_email']
+      options.description = props['description']
+      logging.info('Got author: "%s"', options.author)
+      logging.info('Got description: """\n%s\n"""', options.description)
+  if options.trybot_json:
+    with open(options.trybot_json, 'w') as f:
+      # Python's sets aren't JSON-encodable, so we convert them to lists here.
+      class SetEncoder(json.JSONEncoder):
+        # pylint: disable=E0202
+        def default(self, obj):
+          if isinstance(obj, set):
+            return sorted(obj)
+          return json.JSONEncoder.default(self, obj)
+      change = change_class(options.name,
+                      options.description,
+                      options.root,
+                      files,
+                      options.issue,
+                      options.patchset,
+                      options.author,
+                      upstream=options.upstream)
+      trybots = DoGetTrySlaves(
+          change,
+          change.LocalPaths(),
+          change.RepositoryRoot(),
+          None,
+          None,
+          options.verbose,
+          sys.stdout)
+      json.dump(trybots, f, cls=SetEncoder)
   try:
-    results = DoPresubmitChecks(
-        change_class(options.name,
-                    options.description,
-                    options.root,
-                    files,
-                    options.issue,
-                    options.patchset,
-                    options.author),
-        options.commit,
-        options.verbose,
-        sys.stdout,
-        sys.stdin,
-        options.default_presubmit,
-        options.may_prompt,
-        rietveld_obj)
+    with canned_check_filter(options.skip_canned):
+      results = DoPresubmitChecks(
+          change_class(options.name,
+                      options.description,
+                      options.root,
+                      files,
+                      options.issue,
+                      options.patchset,
+                      options.author,
+                      upstream=options.upstream),
+          options.commit,
+          options.verbose,
+          sys.stdout,
+          sys.stdin,
+          options.default_presubmit,
+          options.may_prompt,
+          rietveld_obj)
     return not results.should_continue()
+  except NonexistantCannedCheckFilter, e:
+    print >> sys.stderr, (
+      'Attempted to skip nonexistent canned presubmit check: %s' % e.message)
+    return 2
   except PresubmitFailure, e:
     print >> sys.stderr, e
     print >> sys.stderr, 'Maybe your depot_tools is out of date?'
@@ -1271,4 +1754,8 @@ def Main(argv):
 
 if __name__ == '__main__':
   fix_encoding.fix_encoding()
-  sys.exit(Main(None))
+  try:
+    sys.exit(main())
+  except KeyboardInterrupt:
+    sys.stderr.write('interrupted\n')
+    sys.exit(1)

@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-# Copyright (c) 2011 The Chromium Authors. All rights reserved.
+# Copyright (c) 2012 The Chromium Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import datetime
 import optparse
 import os
 import re
-import string
 import sys
-import urllib2
+import urlparse
 
 import breakpad  # pylint: disable=W0611
 
@@ -26,10 +26,6 @@ Valid parameters:
 [Merge from trunk to branch]
 --merge <revision> --branch <branch_num>
 Example: %(app)s --merge 12345 --branch 187
-
-[Merge from trunk to milestone]
---merge <revision> --milestone <milestone_num>
-Example: %(app)s -- merge 12345 --milestone 16
 
 [Merge from trunk to local copy]
 --merge <revision> --local
@@ -71,15 +67,13 @@ def gclUpload(revision, author):
 
 def getSVNInfo(url, revision):
   info = {}
-  try:
-    svn_info = subprocess2.check_output(
-        ['svn', 'info', '%s@%s' % (url, revision)]).splitlines()
-    for line in svn_info:
-      match = re.search(r"(.*?):(.*)", line)
-      if match:
-        info[match.group(1).strip()] = match.group(2).strip()
-  except subprocess2.CalledProcessError:
-    pass
+  svn_info = subprocess2.capture(
+      ['svn', 'info', '--non-interactive', '%s@%s' % (url, revision)],
+      stderr=subprocess2.VOID).splitlines()
+  for line in svn_info:
+    match = re.search(r"(.*?):(.*)", line)
+    if match:
+      info[match.group(1).strip()] = match.group(2).strip()
   return info
 
 def isSVNDirty():
@@ -168,7 +162,7 @@ def _isMinimumSVNVersion(version, major, minor, patch=0):
   else:
     return False
 
-def checkoutRevision(url, revision, branch_url, revert=False):
+def checkoutRevision(url, revision, branch_url, revert=False, pop=True):
   files_info = getFileInfo(url, revision)
   paths = getBestMergePaths2(files_info, revision)
   export_map = getBestExportPathsMap2(files_info, revision)
@@ -193,7 +187,15 @@ def checkoutRevision(url, revision, branch_url, revert=False):
       print "Exclude new directory " + path
       continue
     subpaths = path.split('/')
-    subpaths.pop(0)
+    #In the normal case, where no url override is specified and it's just
+    # chromium source, it's necessary to remove the 'trunk' from the filepath,
+    # since in the checkout we include 'trunk' or 'branch/\d+'.
+    #
+    # However, when a url is specified we want to preserve that because it's
+    # a part of the filepath and necessary for path operations on svn (because
+    # frankly, we are checking out the correct top level, and not hacking it).
+    if pop:
+      subpaths.pop(0)
     base = ''
     for subpath in subpaths:
       base += '/' + subpath
@@ -266,12 +268,9 @@ def revertExportRevision(url, revision):
     os.system(command)
 
 def revertRevision(url, revision):
-  paths = getBestMergePaths(url, revision)
-  for path in paths:
-    command = ('svn merge -N -r ' + str(revision) + ":" + str(revision-1) +
-                " " + url + path + " ." + path)
-    print command
-    os.system(command)
+  command = ('svn merge --ignore-ancestry -c -%d %s .' % (revision, url))
+  print command
+  os.system(command)
 
 def getFileInfo(url, revision):
   global files_info_
@@ -364,61 +363,41 @@ def getAllFilesInRevision(files_info):
   return ['%s/%s' % (f[2], f[3]) for f in files_info]
 
 
-def getBranchForMilestone(milestone):
-  """Queries omahaproxy.appspot.com for the branch number given |milestone|.
-  """
-  OMAHA_PROXY_URL = "http://omahaproxy.appspot.com"
-  request = urllib2.Request(OMAHA_PROXY_URL)
+def getSVNAuthInfo(folder=None):
+  """Fetches SVN authorization information in the subversion auth folder and
+  returns it as a dictionary of dictionaries."""
+  if not folder:
+    if sys.platform == 'win32':
+      folder = '%%APPDATA%\\Subversion\\auth'
+    else:
+      folder = '~/.subversion/auth'
+  folder = os.path.expandvars(os.path.expanduser(folder))
+  svn_simple_folder = os.path.join(folder, 'svn.simple')
+  results = {}
   try:
-    response = urllib2.urlopen(request)
-  except urllib2.HTTPError, e:
-    print "Failed to query %s: %d" % (OMAHA_PROXY_URL, e.code)
-    return None
+    for auth_file in os.listdir(svn_simple_folder):
+      # Read the SVN auth file, convert it into a dictionary, and store it.
+      results[auth_file] = dict(re.findall(r'K [0-9]+\n(.*)\nV [0-9]+\n(.*)\n', 
+          open(os.path.join(svn_simple_folder, auth_file)).read()))
+  except Exception as _:
+    pass
+  return results
 
-  # Dictionary of [branch: major]. When searching for the appropriate branch
-  # matching |milestone|, all major versions that match are added to the
-  # dictionary. If all of the branches are the same, this branch value is
-  # returned; otherwise, the user is prompted to accept the largest branch
-  # value.
-  branch_dict = {}
 
-  # Slice the first line since it's column information text.
-  for line in response.readlines()[1:]:
-    # Version data is CSV.
-    parameters = string.split(line, ',')
-
-    # Version is the third parameter and consists of a quad of numbers separated
-    # by periods.
-    version = string.split(parameters[2], '.')
-    major = int(version[0], 10)
-    if major != milestone:
-      continue
-
-    # Branch number is the third value in the quad.
-    branch_dict[version[2]] = major
-
-  if not branch_dict:
-    # |milestone| not found.
-    print "Milestone provided is invalid"
-    return None
-
-  # The following returns a sorted list of the keys of |branch_dict|.
-  sorted_branches = sorted(branch_dict)
-  branch = sorted_branches[-1]
-
-  # If all keys match, the branch is the same for all platforms given
-  # |milestone|. This is the safe case, so return the branch.
-  if len(sorted_branches) == 1:
-    return branch
-
-  # Not all of the platforms have the same branch. Prompt the user and return
-  # the greatest (by value) branch on success.
-  if prompt("Not all platforms have the same branch number, "
-            "continue with branch %s?" % branch):
-    return branch
-
-  # User cancelled.
-  return None
+def getCurrentSVNUsers(url):
+  """Tries to fetch the current SVN in the current checkout by scanning the
+  SVN authorization folder for a match with the current SVN URL."""
+  netloc = urlparse.urlparse(url)[1]
+  auth_infos = getSVNAuthInfo()
+  results = []
+  for _, auth_info in auth_infos.iteritems():
+    if ('svn:realmstring' in auth_info 
+        and netloc in auth_info['svn:realmstring']):
+      username = auth_info['username']
+      results.append(username)
+      if 'google.com' in username:
+        results.append(username.replace('google.com', 'chromium.org'))
+  return results
 
 
 def prompt(question):
@@ -445,16 +424,14 @@ def drover(options, args):
   # Initialize some variables used below. They can be overwritten by
   # the drover.properties file.
   BASE_URL = "svn://svn.chromium.org/chrome"
+  REVERT_ALT_URLS = ['svn://svn.chromium.org/blink',
+                     'svn://svn.chromium.org/chrome-internal',
+                     'svn://svn.chromium.org/native_client']
   TRUNK_URL = BASE_URL + "/trunk/src"
   BRANCH_URL = BASE_URL + "/branches/$branch/src"
   SKIP_CHECK_WORKING = True
   PROMPT_FOR_AUTHOR = False
-
-  # Translate a given milestone to the appropriate branch number.
-  if options.milestone:
-    options.branch = getBranchForMilestone(options.milestone)
-    if not options.branch:
-      return 1
+  NO_ALT_URLS = options.no_alt_urls
 
   DEFAULT_WORKING = "drover_" + str(revision)
   if options.branch:
@@ -467,17 +444,24 @@ def drover(options, args):
   # Override the default properties if there is a drover.properties file.
   global file_pattern_
   if os.path.exists("drover.properties"):
+    print 'Using options from %s' % os.path.join(
+        os.getcwd(), 'drover.properties')
     FILE_PATTERN = file_pattern_
     f = open("drover.properties")
     exec(f)
     f.close()
     if FILE_PATTERN:
       file_pattern_ = FILE_PATTERN
+    NO_ALT_URLS = True
 
   if options.revert and options.branch:
+    print 'Note: --branch is usually not needed for reverts.'
     url = BRANCH_URL.replace("$branch", options.branch)
   elif options.merge and options.sbranch:
     url = BRANCH_URL.replace("$branch", options.sbranch)
+  elif options.revert:
+    url = options.url or BASE_URL
+    file_pattern_ = r"[ ]+([MADUC])[ ]+((/.*)/(.*))"
   else:
     url = TRUNK_URL
 
@@ -492,6 +476,20 @@ def drover(options, args):
         prompt("Working copy contains uncommitted files. Continue?")):
       return 1
 
+  if options.revert and not NO_ALT_URLS and not options.url:
+    for cur_url in [url] + REVERT_ALT_URLS:
+      try:
+        commit_date_str = getSVNInfo(
+            cur_url, options.revert).get('Last Changed Date', 'x').split()[0]
+        commit_date = datetime.datetime.strptime(commit_date_str, '%Y-%m-%d')
+        if (datetime.datetime.now() - commit_date).days < 180:
+          if cur_url != url:
+            print 'Guessing svn repo: %s.' % cur_url,
+            print 'Use --no-alt-urls to disable heuristic.'
+            url = cur_url
+          break
+      except ValueError:
+        pass
   command = 'svn log ' + url + " -r "+str(revision) + " -v"
   os.system(command)
 
@@ -523,9 +521,8 @@ def drover(options, args):
     deleteRevision(url, revision)
   elif options.revert:
     action = "Revert"
-    if options.branch:
-      url = BRANCH_URL.replace("$branch", options.branch)
-    checkoutRevision(url, revision, url, True)
+    pop_em = not options.url
+    checkoutRevision(url, revision, url, True, pop_em)
     revertRevision(url, revision)
     revertExportRevision(url, revision)
 
@@ -537,11 +534,27 @@ def drover(options, args):
     if not author:
       author = getAuthor(TRUNK_URL, revision)
 
+  # Check that the author of the CL is different than the user making
+  # the revert.  If they're the same, then we'll want to prompt the user
+  # for a different reviewer to TBR.
+  current_users = getCurrentSVNUsers(BASE_URL)
+  is_self_revert = options.revert and author in current_users
+
   filename = str(revision)+".txt"
   out = open(filename,"w")
-  out.write(action +" " + str(revision) + " - ")
-  out.write(getRevisionLog(url, revision))
-  if (author):
+  drover_title = '%s %s' % (action, revision)
+  revision_log = getRevisionLog(url, revision).splitlines()
+  if revision_log:
+    commit_title = revision_log[0]
+    # Limit title to 68 chars so git log --oneline is <80 chars.
+    max_commit_title = 68 - (len(drover_title) + 3)
+    if len(commit_title) > max_commit_title:
+      commit_title = commit_title[:max_commit_title-3] + '...'
+    drover_title += ' "%s"' % commit_title
+  out.write(drover_title + '\n\n')
+  for line in revision_log:
+    out.write('> %s\n' % line)
+  if author:
     out.write("\nTBR=" + author)
   out.close()
 
@@ -563,7 +576,7 @@ def drover(options, args):
          " --send_mail --no_presubmit --reviewers=" + author)
 
   if options.revertbot or prompt("Would you like to upload?"):
-    if PROMPT_FOR_AUTHOR:
+    if PROMPT_FOR_AUTHOR or is_self_revert:
       author = text_prompt("Enter new author or press enter to accept default",
                            author)
     if options.revertbot and options.revertbot_reviewers:
@@ -592,8 +605,6 @@ def main():
                            help='Revision to merge from trunk to branch')
   option_parser.add_option('-b', '--branch',
                            help='Branch to revert or merge from')
-  option_parser.add_option('-M', '--milestone', type="int",
-                           help='Milestone to revert or merge from')
   option_parser.add_option('-l', '--local', action='store_true',
                            help='Local working copy to merge to')
   option_parser.add_option('-s', '--sbranch',
@@ -602,36 +613,37 @@ def main():
                            help='Revision to revert')
   option_parser.add_option('-w', '--workdir',
                            help='subdir to use for the revert')
+  option_parser.add_option('-u', '--url',
+                           help='svn url to use for the revert')
   option_parser.add_option('-a', '--auditor',
                            help='overrides the author for reviewer')
-  option_parser.add_option('', '--revertbot', action='store_true',
+  option_parser.add_option('--revertbot', action='store_true',
                            default=False)
-  option_parser.add_option('', '--revertbot-commit', action='store_true',
+  option_parser.add_option('--no-alt-urls', action='store_true',
+                           help='Disable heuristics used to determine svn url')
+  option_parser.add_option('--revertbot-commit', action='store_true',
                            default=False)
-  option_parser.add_option('', '--revertbot-reviewers')
+  option_parser.add_option('--revertbot-reviewers')
   options, args = option_parser.parse_args()
 
   if not options.merge and not options.revert:
     option_parser.error("You need at least --merge or --revert")
     return 1
 
-  if options.merge and not (options.branch or options.milestone or
-                            options.local):
-    option_parser.error("--merge requires either --branch "
-                        "or --milestone or --local")
+  if options.merge and not (options.branch or options.local):
+    option_parser.error("--merge requires --branch or --local")
     return 1
 
-  if options.local and (options.revert or options.branch or options.milestone):
-    option_parser.error("--local cannot be used with --revert "
-                        "or --branch or --milestone")
-    return 1
-
-  if options.branch and options.milestone:
-    option_parser.error("--branch cannot be used with --milestone")
+  if options.local and (options.revert or options.branch):
+    option_parser.error("--local cannot be used with --revert or --branch")
     return 1
 
   return drover(options, args)
 
 
 if __name__ == "__main__":
-  sys.exit(main())
+  try:
+    sys.exit(main())
+  except KeyboardInterrupt:
+    sys.stderr.write('interrupted\n')
+    sys.exit(1)

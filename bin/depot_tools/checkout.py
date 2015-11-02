@@ -7,7 +7,6 @@
 Includes support for svn, git-svn and git.
 """
 
-from __future__ import with_statement
 import ConfigParser
 import fnmatch
 import logging
@@ -21,6 +20,18 @@ import tempfile
 import patch
 import scm
 import subprocess2
+
+
+if sys.platform in ('cygwin', 'win32'):
+  # Disable timeouts on Windows since we can't have shells with timeouts.
+  GLOBAL_TIMEOUT = None
+  FETCH_TIMEOUT = None
+else:
+  # Default timeout of 15 minutes.
+  GLOBAL_TIMEOUT = 15*60
+  # Use a larger timeout for checkout since it can be a genuinely slower
+  # operation.
+  FETCH_TIMEOUT = 30*60
 
 
 def get_code_review_setting(path, key,
@@ -48,12 +59,38 @@ def get_code_review_setting(path, key,
   return settings.get(key, None)
 
 
+def align_stdout(stdout):
+  """Returns the aligned output of multiple stdouts."""
+  output = ''
+  for item in stdout:
+    item = item.strip()
+    if not item:
+      continue
+    output += ''.join('  %s\n' % line for line in item.splitlines())
+  return output
+
+
 class PatchApplicationFailed(Exception):
   """Patch failed to be applied."""
-  def __init__(self, filename, status):
-    super(PatchApplicationFailed, self).__init__(filename, status)
-    self.filename = filename
+  def __init__(self, p, status):
+    super(PatchApplicationFailed, self).__init__(p, status)
+    self.patch = p
     self.status = status
+
+  @property
+  def filename(self):
+    if self.patch:
+      return self.patch.filename
+
+  def __str__(self):
+    out = []
+    if self.filename:
+      out.append('Failed to apply patch for %s:' % self.filename)
+    if self.status:
+      out.append(self.status)
+    if self.patch:
+      out.append('Patch: %s' % self.patch.dump())
+    return '\n'.join(out)
 
 
 class CheckoutBase(object):
@@ -78,6 +115,7 @@ class CheckoutBase(object):
     self.post_processors = post_processors
     assert self.root_dir
     assert self.project_path
+    assert os.path.isabs(self.project_path)
 
   def get_settings(self, key):
     return get_code_review_setting(self.project_path, key)
@@ -93,7 +131,7 @@ class CheckoutBase(object):
     """
     raise NotImplementedError()
 
-  def apply_patch(self, patches, post_processors=None):
+  def apply_patch(self, patches, post_processors=None, verbose=False):
     """Applies a patch and returns the list of modified files.
 
     This function should throw patch.UnsupportedPatchFormat or
@@ -108,6 +146,15 @@ class CheckoutBase(object):
     """Commits the patch upstream, while impersonating 'user'."""
     raise NotImplementedError()
 
+  def revisions(self, rev1, rev2):
+    """Returns the count of revisions from rev1 to rev2, e.g. len(]rev1, rev2]).
+
+    If rev2 is None, it means 'HEAD'.
+
+    Returns None if there is no link between the two.
+    """
+    raise NotImplementedError()
+
 
 class RawCheckout(CheckoutBase):
   """Used to apply a patch locally without any intent to commit it.
@@ -118,57 +165,84 @@ class RawCheckout(CheckoutBase):
     """Stubbed out."""
     pass
 
-  def apply_patch(self, patches, post_processors=None):
+  def apply_patch(self, patches, post_processors=None, verbose=False):
     """Ignores svn properties."""
     post_processors = post_processors or self.post_processors or []
     for p in patches:
+      stdout = []
       try:
-        stdout = ''
-        filename = os.path.join(self.project_path, p.filename)
+        filepath = os.path.join(self.project_path, p.filename)
         if p.is_delete:
-          os.remove(filename)
+          os.remove(filepath)
+          assert(not os.path.exists(filepath))
+          stdout.append('Deleted.')
         else:
           dirname = os.path.dirname(p.filename)
           full_dir = os.path.join(self.project_path, dirname)
           if dirname and not os.path.isdir(full_dir):
             os.makedirs(full_dir)
+            stdout.append('Created missing directory %s.' % dirname)
 
-          filepath = os.path.join(self.project_path, p.filename)
           if p.is_binary:
+            content = p.get()
             with open(filepath, 'wb') as f:
-              f.write(p.get())
+              f.write(content)
+            stdout.append('Added binary file %d bytes.' % len(content))
           else:
             if p.source_filename:
               if not p.is_new:
                 raise PatchApplicationFailed(
-                    p.filename,
+                    p,
                     'File has a source filename specified but is not new')
               # Copy the file first.
               if os.path.isfile(filepath):
                 raise PatchApplicationFailed(
-                    p.filename, 'File exist but was about to be overwriten')
+                    p, 'File exist but was about to be overwriten')
               shutil.copy2(
                   os.path.join(self.project_path, p.source_filename), filepath)
+              stdout.append('Copied %s -> %s' % (p.source_filename, p.filename))
             if p.diff_hunks:
-              stdout = subprocess2.check_output(
-                  ['patch', '-u', '--binary', '-p%s' % p.patchlevel],
-                  stdin=p.get(False),
-                  stderr=subprocess2.STDOUT,
-                  cwd=self.project_path)
+              cmd = ['patch', '-u', '--binary', '-p%s' % p.patchlevel]
+              if verbose:
+                cmd.append('--verbose')
+              env = os.environ.copy()
+              env['TMPDIR'] = tempfile.mkdtemp(prefix='crpatch')
+              try:
+                stdout.append(
+                    subprocess2.check_output(
+                        cmd,
+                        stdin=p.get(False),
+                        stderr=subprocess2.STDOUT,
+                        cwd=self.project_path,
+                        timeout=GLOBAL_TIMEOUT,
+                        env=env))
+              finally:
+                shutil.rmtree(env['TMPDIR'])
             elif p.is_new and not os.path.exists(filepath):
               # There is only a header. Just create the file.
               open(filepath, 'w').close()
+              stdout.append('Created an empty file.')
         for post in post_processors:
           post(self, p)
+        if verbose:
+          print p.filename
+          print align_stdout(stdout)
       except OSError, e:
-        raise PatchApplicationFailed(p.filename, '%s%s' % (stdout, e))
+        raise PatchApplicationFailed(p, '%s%s' % (align_stdout(stdout), e))
       except subprocess.CalledProcessError, e:
         raise PatchApplicationFailed(
-            p.filename, '%s%s' % (stdout, getattr(e, 'stdout', None)))
+            p,
+            'While running %s;\n%s%s' % (
+              ' '.join(e.cmd),
+              align_stdout(stdout),
+              align_stdout([getattr(e, 'stdout', '')])))
 
   def commit(self, commit_message, user):
     """Stubbed out."""
     raise NotImplementedError('RawCheckout can\'t commit')
+
+  def revisions(self, _rev1, _rev2):
+    return None
 
 
 class SvnConfig(object):
@@ -222,6 +296,7 @@ class SvnMixIn(object):
     """Runs svn and throws an exception if the command failed."""
     kwargs.setdefault('cwd', self.project_path)
     kwargs.setdefault('stdout', self.VOID)
+    kwargs.setdefault('timeout', GLOBAL_TIMEOUT)
     return subprocess2.check_call_out(
         self._add_svn_flags(args, False), **kwargs)
 
@@ -234,6 +309,7 @@ class SvnMixIn(object):
     return subprocess2.check_output(
         self._add_svn_flags(args, True, credentials),
         stderr=subprocess2.STDOUT,
+        timeout=GLOBAL_TIMEOUT,
         **kwargs)
 
   @staticmethod
@@ -274,17 +350,20 @@ class SvnCheckout(CheckoutBase, SvnMixIn):
           (self.project_name, self.project_path))
     return self._revert(revision)
 
-  def apply_patch(self, patches, post_processors=None):
+  def apply_patch(self, patches, post_processors=None, verbose=False):
     post_processors = post_processors or self.post_processors or []
     for p in patches:
+      stdout = []
       try:
+        filepath = os.path.join(self.project_path, p.filename)
         # It is important to use credentials=False otherwise credentials could
         # leak in the error message. Credentials are not necessary here for the
         # following commands anyway.
-        stdout = ''
         if p.is_delete:
-          stdout += self._check_output_svn(
-              ['delete', p.filename, '--force'], credentials=False)
+          stdout.append(self._check_output_svn(
+              ['delete', p.filename, '--force'], credentials=False))
+          assert(not os.path.exists(filepath))
+          stdout.append('Deleted.')
         else:
           # svn add while creating directories otherwise svn add on the
           # contained files will silently fail.
@@ -297,57 +376,102 @@ class SvnCheckout(CheckoutBase, SvnMixIn):
             dirname = os.path.dirname(dirname)
           for dir_to_create in reversed(dirs_to_create):
             os.mkdir(os.path.join(self.project_path, dir_to_create))
-            stdout += self._check_output_svn(
-                ['add', dir_to_create, '--force'], credentials=False)
+            stdout.append(
+                self._check_output_svn(
+                  ['add', dir_to_create, '--force'], credentials=False))
+            stdout.append('Created missing directory %s.' % dir_to_create)
 
-          filepath = os.path.join(self.project_path, p.filename)
           if p.is_binary:
+            content = p.get()
             with open(filepath, 'wb') as f:
-              f.write(p.get())
+              f.write(content)
+            stdout.append('Added binary file %d bytes.' % len(content))
           else:
             if p.source_filename:
               if not p.is_new:
                 raise PatchApplicationFailed(
-                    p.filename,
+                    p,
                     'File has a source filename specified but is not new')
               # Copy the file first.
               if os.path.isfile(filepath):
                 raise PatchApplicationFailed(
-                    p.filename, 'File exist but was about to be overwriten')
-              shutil.copy2(
-                  os.path.join(self.project_path, p.source_filename), filepath)
+                    p, 'File exist but was about to be overwriten')
+              stdout.append(
+                  self._check_output_svn(
+                    ['copy', p.source_filename, p.filename]))
+              stdout.append('Copied %s -> %s' % (p.source_filename, p.filename))
             if p.diff_hunks:
-              cmd = ['patch', '-p%s' % p.patchlevel, '--forward', '--force']
-              stdout += subprocess2.check_output(
-                  cmd, stdin=p.get(False), cwd=self.project_path)
+              cmd = [
+                'patch',
+                '-p%s' % p.patchlevel,
+                '--forward',
+                '--force',
+                '--no-backup-if-mismatch',
+              ]
+              env = os.environ.copy()
+              env['TMPDIR'] = tempfile.mkdtemp(prefix='crpatch')
+              try:
+                stdout.append(
+                    subprocess2.check_output(
+                      cmd,
+                      stdin=p.get(False),
+                      cwd=self.project_path,
+                      timeout=GLOBAL_TIMEOUT,
+                      env=env))
+              finally:
+                shutil.rmtree(env['TMPDIR'])
+
             elif p.is_new and not os.path.exists(filepath):
               # There is only a header. Just create the file if it doesn't
               # exist.
               open(filepath, 'w').close()
-          if p.is_new:
-            stdout += self._check_output_svn(
-                ['add', p.filename, '--force'], credentials=False)
-          for prop in p.svn_properties:
-            stdout += self._check_output_svn(
-                ['propset', prop[0], prop[1], p.filename], credentials=False)
+              stdout.append('Created an empty file.')
+          if p.is_new and not p.source_filename:
+            # Do not run it if p.source_filename is defined, since svn copy was
+            # using above.
+            stdout.append(
+                self._check_output_svn(
+                  ['add', p.filename, '--force'], credentials=False))
+          for name, value in p.svn_properties:
+            if value is None:
+              stdout.append(
+                  self._check_output_svn(
+                    ['propdel', '--quiet', name, p.filename],
+                    credentials=False))
+              stdout.append('Property %s deleted.' % name)
+            else:
+              stdout.append(
+                  self._check_output_svn(
+                    ['propset', name, value, p.filename], credentials=False))
+              stdout.append('Property %s=%s' % (name, value))
           for prop, values in self.svn_config.auto_props.iteritems():
             if fnmatch.fnmatch(p.filename, prop):
               for value in values.split(';'):
                 if '=' not in value:
-                  params = [value, '*']
+                  params = [value, '.']
                 else:
                   params = value.split('=', 1)
-                stdout += self._check_output_svn(
-                    ['propset'] + params + [p.filename], credentials=False)
+                if params[1] == '*':
+                  # Works around crbug.com/150960 on Windows.
+                  params[1] = '.'
+                stdout.append(
+                    self._check_output_svn(
+                      ['propset'] + params + [p.filename], credentials=False))
+                stdout.append('Property (auto) %s' % '='.join(params))
         for post in post_processors:
           post(self, p)
+        if verbose:
+          print p.filename
+          print align_stdout(stdout)
       except OSError, e:
-        raise PatchApplicationFailed(p.filename, '%s%s' % (stdout, e))
+        raise PatchApplicationFailed(p, '%s%s' % (align_stdout(stdout), e))
       except subprocess.CalledProcessError, e:
         raise PatchApplicationFailed(
-            p.filename,
+            p,
             'While running %s;\n%s%s' % (
-              ' '.join(e.cmd), stdout, getattr(e, 'stdout', '')))
+              ' '.join(e.cmd),
+              align_stdout(stdout),
+              align_stdout([getattr(e, 'stdout', '')])))
 
   def commit(self, commit_message, user):
     logging.info('Committing patch for %s' % user)
@@ -388,15 +512,20 @@ class SvnCheckout(CheckoutBase, SvnMixIn):
     flags = ['--ignore-externals']
     if revision:
       flags.extend(['--revision', str(revision)])
-    if not os.path.isdir(self.project_path):
+    if os.path.isdir(self.project_path):
+      # This may remove any part (or all) of the checkout.
+      scm.SVN.Revert(self.project_path, no_ignore=True)
+
+    if os.path.isdir(self.project_path):
+      # Revive files that were deleted in scm.SVN.Revert().
+      self._check_call_svn(['update', '--force'] + flags,
+                           timeout=FETCH_TIMEOUT)
+    else:
       logging.info(
           'Directory %s is not present, checking it out.' % self.project_path)
       self._check_call_svn(
-          ['checkout', self.svn_url, self.project_path] + flags, cwd=None)
-    else:
-      scm.SVN.Revert(self.project_path)
-      # Revive files that were deleted in scm.SVN.Revert().
-      self._check_call_svn(['update', '--force'] + flags)
+          ['checkout', self.svn_url, self.project_path] + flags, cwd=None,
+          timeout=FETCH_TIMEOUT)
     return self._get_revision()
 
   def _get_revision(self):
@@ -407,17 +536,37 @@ class SvnCheckout(CheckoutBase, SvnMixIn):
       self._last_seen_revision = revision
     return revision
 
+  def revisions(self, rev1, rev2):
+    """Returns the number of actual commits, not just the difference between
+    numbers.
+    """
+    rev2 = rev2 or 'HEAD'
+    # Revision range is inclusive and ordering doesn't matter, they'll appear in
+    # the order specified.
+    try:
+      out = self._check_output_svn(
+          ['log', '-q', self.svn_url, '-r', '%s:%s' % (rev1, rev2)])
+    except subprocess.CalledProcessError:
+      return None
+    # Ignore the '----' lines.
+    return len([l for l in out.splitlines() if l.startswith('r')]) - 1
 
-class GitCheckoutBase(CheckoutBase):
-  """Base class for git checkout. Not to be used as-is."""
-  def __init__(self, root_dir, project_name, remote_branch,
-      post_processors=None):
-    super(GitCheckoutBase, self).__init__(
-        root_dir, project_name, post_processors)
-    # There is no reason to not hardcode it.
-    self.remote = 'origin'
+
+class GitCheckout(CheckoutBase):
+  """Manages a git checkout."""
+  def __init__(self, root_dir, project_name, remote_branch, git_url,
+      commit_user, post_processors=None):
+    super(GitCheckout, self).__init__(root_dir, project_name, post_processors)
+    self.git_url = git_url
+    self.commit_user = commit_user
     self.remote_branch = remote_branch
+    # The working branch where patches will be applied. It will track the
+    # remote branch.
     self.working_branch = 'working_branch'
+    # There is no reason to not hardcode origin.
+    self.remote = 'origin'
+    # There is no reason to not hardcode master.
+    self.master_branch = 'master'
 
   def prepare(self, revision):
     """Resets the git repository in a clean state.
@@ -425,28 +574,65 @@ class GitCheckoutBase(CheckoutBase):
     Checks it out if not present and deletes the working branch.
     """
     assert self.remote_branch
-    assert os.path.isdir(self.project_path)
-    self._check_call_git(['reset', '--hard', '--quiet'])
+    assert self.git_url
+
+    if not os.path.isdir(self.project_path):
+      # Clone the repo if the directory is not present.
+      logging.info(
+          'Checking out %s in %s', self.project_name, self.project_path)
+      self._check_call_git(
+          ['clone', self.git_url, '-b', self.remote_branch, self.project_path],
+          cwd=None, timeout=FETCH_TIMEOUT)
+    else:
+      # Throw away all uncommitted changes in the existing checkout.
+      self._check_call_git(['checkout', self.remote_branch])
+      self._check_call_git(
+          ['reset', '--hard', '--quiet',
+           '%s/%s' % (self.remote, self.remote_branch)])
+
     if revision:
       try:
-        revision = self._check_output_git(['rev-parse', revision])
+        # Look if the commit hash already exist. If so, we can skip a
+        # 'git fetch' call.
+        revision = self._check_output_git(['rev-parse', revision]).rstrip()
       except subprocess.CalledProcessError:
         self._check_call_git(
             ['fetch', self.remote, self.remote_branch, '--quiet'])
-        revision = self._check_output_git(['rev-parse', revision])
+        revision = self._check_output_git(['rev-parse', revision]).rstrip()
       self._check_call_git(['checkout', '--force', '--quiet', revision])
     else:
       branches, active = self._branches()
-      if active != 'master':
-        self._check_call_git(['checkout', '--force', '--quiet', 'master'])
-      self._check_call_git(['pull', self.remote, self.remote_branch, '--quiet'])
+      if active != self.master_branch:
+        self._check_call_git(
+            ['checkout', '--force', '--quiet', self.master_branch])
+      self._sync_remote_branch()
+
       if self.working_branch in branches:
         self._call_git(['branch', '-D', self.working_branch])
+    return self._get_head_commit_hash()
 
-  def apply_patch(self, patches, post_processors=None):
-    """Applies a patch on 'working_branch' and switch to it.
+  def _sync_remote_branch(self):
+    """Syncs the remote branch."""
+    # We do a 'git pull origin master:refs/remotes/origin/master' instead of
+    # 'git pull origin master' because from the manpage for git-pull:
+    #   A parameter <ref> without a colon is equivalent to <ref>: when
+    #   pulling/fetching, so it merges <ref> into the current branch without
+    #   storing the remote branch anywhere locally.
+    remote_tracked_path = 'refs/remotes/%s/%s' % (
+        self.remote, self.remote_branch)
+    self._check_call_git(
+        ['pull', self.remote,
+         '%s:%s' % (self.remote_branch, remote_tracked_path),
+         '--quiet'])
 
-    Also commits the changes on the local branch.
+  def _get_head_commit_hash(self):
+    """Gets the current revision (in unicode) from the local branch."""
+    return unicode(self._check_output_git(['rev-parse', 'HEAD']).strip())
+
+  def apply_patch(self, patches, post_processors=None, verbose=False):
+    """Applies a patch on 'working_branch' and switches to it.
+
+    The changes remain staged on the current branch.
 
     Ignores svn properties and raise an exception on unexpected ones.
     """
@@ -455,84 +641,134 @@ class GitCheckoutBase(CheckoutBase):
     # trying again?
     if self.remote_branch:
       self._check_call_git(
-          ['checkout', '-b', self.working_branch,
-            '%s/%s' % (self.remote, self.remote_branch), '--quiet'])
+          ['checkout', '-b', self.working_branch, '-t', self.remote_branch,
+           '--quiet'])
+
     for index, p in enumerate(patches):
+      stdout = []
       try:
-        stdout = ''
+        filepath = os.path.join(self.project_path, p.filename)
         if p.is_delete:
-          if (not os.path.exists(p.filename) and
+          if (not os.path.exists(filepath) and
               any(p1.source_filename == p.filename for p1 in patches[0:index])):
-            # The file could already be deleted if a prior patch with file
-            # rename was already processed. To be sure, look at all the previous
-            # patches to see if they were a file rename.
+            # The file was already deleted if a prior patch with file rename
+            # was already processed because 'git apply' did it for us.
             pass
           else:
-            stdout += self._check_output_git(['rm', p.filename])
+            stdout.append(self._check_output_git(['rm', p.filename]))
+            assert(not os.path.exists(filepath))
+            stdout.append('Deleted.')
         else:
           dirname = os.path.dirname(p.filename)
           full_dir = os.path.join(self.project_path, dirname)
           if dirname and not os.path.isdir(full_dir):
             os.makedirs(full_dir)
+            stdout.append('Created missing directory %s.' % dirname)
           if p.is_binary:
-            with open(os.path.join(self.project_path, p.filename), 'wb') as f:
-              f.write(p.get())
-            stdout += self._check_output_git(['add', p.filename])
+            content = p.get()
+            with open(filepath, 'wb') as f:
+              f.write(content)
+            stdout.append('Added binary file %d bytes' % len(content))
+            cmd = ['add', p.filename]
+            if verbose:
+              cmd.append('--verbose')
+            stdout.append(self._check_output_git(cmd))
           else:
             # No need to do anything special with p.is_new or if not
             # p.diff_hunks. git apply manages all that already.
-            stdout += self._check_output_git(
-                ['apply', '--index', '-p%s' % p.patchlevel], stdin=p.get(True))
-          for prop in p.svn_properties:
+            cmd = ['apply', '--index', '-3', '-p%s' % p.patchlevel]
+            if verbose:
+              cmd.append('--verbose')
+            stdout.append(self._check_output_git(cmd, stdin=p.get(True)))
+          for key, value in p.svn_properties:
             # Ignore some known auto-props flags through .subversion/config,
             # bails out on the other ones.
             # TODO(maruel): Read ~/.subversion/config and detect the rules that
             # applies here to figure out if the property will be correctly
             # handled.
-            if not prop[0] in (
+            stdout.append('Property %s=%s' % (key, value))
+            if not key in (
                 'svn:eol-style', 'svn:executable', 'svn:mime-type'):
               raise patch.UnsupportedPatchFormat(
                   p.filename,
                   'Cannot apply svn property %s to file %s.' % (
-                        prop[0], p.filename))
+                        key, p.filename))
         for post in post_processors:
           post(self, p)
+        if verbose:
+          print p.filename
+          print align_stdout(stdout)
       except OSError, e:
-        raise PatchApplicationFailed(p.filename, '%s%s' % (stdout, e))
+        raise PatchApplicationFailed(p, '%s%s' % (align_stdout(stdout), e))
       except subprocess.CalledProcessError, e:
         raise PatchApplicationFailed(
-            p.filename, '%s%s' % (stdout, getattr(e, 'stdout', None)))
-    # Once all the patches are processed and added to the index, commit the
-    # index.
-    self._check_call_git(['commit', '-m', 'Committed patch'])
-    # TODO(maruel): Weirdly enough they don't match, need to investigate.
-    #found_files = self._check_output_git(
-    #    ['diff', 'master', '--name-only']).splitlines(False)
-    #assert sorted(patches.filenames) == sorted(found_files), (
-    #    sorted(out), sorted(found_files))
+            p,
+            'While running %s;\n%s%s' % (
+              ' '.join(e.cmd),
+              align_stdout(stdout),
+              align_stdout([getattr(e, 'stdout', '')])))
+    found_files = self._check_output_git(
+        ['diff', '--ignore-submodules',
+         '--name-only', '--staged']).splitlines(False)
+    if sorted(patches.filenames) != sorted(found_files):
+      extra_files = sorted(set(found_files) - set(patches.filenames))
+      unpatched_files = sorted(set(patches.filenames) - set(found_files))
+      if extra_files:
+        print 'Found extra files: %r' % (extra_files,)
+      if unpatched_files:
+        print 'Found unpatched files: %r' % (unpatched_files,)
+
 
   def commit(self, commit_message, user):
-    """Updates the commit message.
-
-    Subclass needs to dcommit or push.
-    """
+    """Commits, updates the commit message and pushes."""
+    # TODO(hinoka): CQ no longer uses this, I think its deprecated.
+    #               Delete this.
+    assert self.commit_user
     assert isinstance(commit_message, unicode)
-    self._check_call_git(['commit', '--amend', '-m', commit_message])
-    return self._check_output_git(['rev-parse', 'HEAD']).strip()
+    current_branch = self._check_output_git(
+        ['rev-parse', '--abbrev-ref', 'HEAD']).strip()
+    assert current_branch == self.working_branch
+
+    commit_cmd = ['commit', '-m', commit_message]
+    if user and user != self.commit_user:
+      # We do not have the first or last name of the user, grab the username
+      # from the email and call it the original author's name.
+      # TODO(rmistry): Do not need the below if user is already in
+      #                "Name <email>" format.
+      name = user.split('@')[0]
+      commit_cmd.extend(['--author', '%s <%s>' % (name, user)])
+    self._check_call_git(commit_cmd)
+
+    # Push to the remote repository.
+    self._check_call_git(
+        ['push', 'origin', '%s:%s' % (self.working_branch, self.remote_branch),
+         '--quiet'])
+    # Get the revision after the push.
+    revision = self._get_head_commit_hash()
+    # Switch back to the remote_branch and sync it.
+    self._check_call_git(['checkout', self.remote_branch])
+    self._sync_remote_branch()
+    # Delete the working branch since we are done with it.
+    self._check_call_git(['branch', '-D', self.working_branch])
+
+    return revision
 
   def _check_call_git(self, args, **kwargs):
     kwargs.setdefault('cwd', self.project_path)
     kwargs.setdefault('stdout', self.VOID)
+    kwargs.setdefault('timeout', GLOBAL_TIMEOUT)
     return subprocess2.check_call_out(['git'] + args, **kwargs)
 
   def _call_git(self, args, **kwargs):
     """Like check_call but doesn't throw on failure."""
     kwargs.setdefault('cwd', self.project_path)
     kwargs.setdefault('stdout', self.VOID)
+    kwargs.setdefault('timeout', GLOBAL_TIMEOUT)
     return subprocess2.call(['git'] + args, **kwargs)
 
   def _check_output_git(self, args, **kwargs):
     kwargs.setdefault('cwd', self.project_path)
+    kwargs.setdefault('timeout', GLOBAL_TIMEOUT)
     return subprocess2.check_output(
         ['git'] + args, stderr=subprocess2.STDOUT, **kwargs)
 
@@ -547,182 +783,24 @@ class GitCheckoutBase(CheckoutBase):
         break
     return branches, active
 
+  def revisions(self, rev1, rev2):
+    """Returns the number of actual commits between both hash."""
+    self._fetch_remote()
 
-class GitSvnCheckoutBase(GitCheckoutBase, SvnMixIn):
-  """Base class for git-svn checkout. Not to be used as-is."""
-  def __init__(self,
-      root_dir, project_name, remote_branch,
-      commit_user, commit_pwd,
-      svn_url, trunk, post_processors=None):
-    """trunk is optional."""
-    GitCheckoutBase.__init__(
-        self, root_dir, project_name + '.git', remote_branch, post_processors)
-    SvnMixIn.__init__(self)
-    self.commit_user = commit_user
-    self.commit_pwd = commit_pwd
-    # svn_url in this case is the root of the svn repository.
-    self.svn_url = svn_url
-    self.trunk = trunk
-    assert bool(self.commit_user) >= bool(self.commit_pwd)
-    assert self.svn_url
-    assert self.trunk
-    self._cache_svn_auth()
-
-  def prepare(self, revision):
-    """Resets the git repository in a clean state."""
-    self._check_call_git(['reset', '--hard', '--quiet'])
-    if revision:
-      try:
-        revision = self._check_output_git(
-            ['svn', 'find-rev', 'r%d' % revision])
-      except subprocess.CalledProcessError:
-        self._check_call_git(
-            ['fetch', self.remote, self.remote_branch, '--quiet'])
-        revision = self._check_output_git(
-            ['svn', 'find-rev', 'r%d' % revision])
-      super(GitSvnCheckoutBase, self).prepare(revision)
-    else:
-      branches, active = self._branches()
-      if active != 'master':
-        if not 'master' in branches:
-          self._check_call_git(
-              ['checkout', '--quiet', '-b', 'master',
-              '%s/%s' % (self.remote, self.remote_branch)])
-        else:
-          self._check_call_git(['checkout', 'master', '--force', '--quiet'])
-      # git svn rebase --quiet --quiet doesn't work, use two steps to silence
-      # it.
-      self._check_call_git_svn(['fetch', '--quiet', '--quiet'])
-      self._check_call_git(
-          ['rebase', '--quiet', '--quiet',
-            '%s/%s' % (self.remote, self.remote_branch)])
-      if self.working_branch in branches:
-        self._call_git(['branch', '-D', self.working_branch])
-    return self._get_revision()
-
-  def _git_svn_info(self, key):
-    """Calls git svn info. This doesn't support nor need --config-dir."""
-    return self._parse_svn_info(self._check_output_git(['svn', 'info']), key)
-
-  def commit(self, commit_message, user):
-    """Commits a patch."""
-    logging.info('Committing patch for %s' % user)
-    # Fix the commit message and author. It returns the git hash, which we
-    # ignore unless it's None.
-    if not super(GitSvnCheckoutBase, self).commit(commit_message, user):
-      return None
-    # TODO(maruel): git-svn ignores --config-dir as of git-svn version 1.7.4 and
-    # doesn't support --with-revprop.
-    # Either learn perl and upstream or suck it.
-    kwargs = {}
-    if self.commit_pwd:
-      kwargs['stdin'] = self.commit_pwd + '\n'
-      kwargs['stderr'] = subprocess2.STDOUT
-    self._check_call_git_svn(
-        ['dcommit', '--rmdir', '--find-copies-harder',
-          '--username', self.commit_user],
-        **kwargs)
-    revision = int(self._git_svn_info('revision'))
-    return revision
-
-  def _cache_svn_auth(self):
-    """Caches the svn credentials. It is necessary since git-svn doesn't prompt
-    for it."""
-    if not self.commit_user or not self.commit_pwd:
-      return
-    # Use capture to lower noise in logs.
-    self._check_output_svn(['ls', self.svn_url], cwd=None)
-
-  def _check_call_git_svn(self, args, **kwargs):
-    """Handles svn authentication while calling git svn."""
-    args = ['svn'] + args
-    if not self.svn_config.default:
-      args.extend(['--config-dir', self.svn_config.svn_config_dir])
-    return self._check_call_git(args, **kwargs)
-
-  def _get_revision(self):
-    revision = int(self._git_svn_info('revision'))
-    if revision != self._last_seen_revision:
-      logging.info('Updated to revision %d' % revision)
-      self._last_seen_revision = revision
-    return revision
-
-
-class GitSvnPremadeCheckout(GitSvnCheckoutBase):
-  """Manages a git-svn clone made out from an initial git-svn seed.
-
-  This class is very similar to GitSvnCheckout but is faster to bootstrap
-  because it starts right off with an existing git-svn clone.
-  """
-  def __init__(self,
-      root_dir, project_name, remote_branch,
-      commit_user, commit_pwd,
-      svn_url, trunk, git_url, post_processors=None):
-    super(GitSvnPremadeCheckout, self).__init__(
-        root_dir, project_name, remote_branch,
-        commit_user, commit_pwd,
-        svn_url, trunk, post_processors)
-    self.git_url = git_url
-    assert self.git_url
-
-  def prepare(self, revision):
-    """Creates the initial checkout for the repo."""
-    if not os.path.isdir(self.project_path):
-      logging.info('Checking out %s in %s' %
-          (self.project_name, self.project_path))
-      assert self.remote == 'origin'
-      # self.project_path doesn't exist yet.
-      self._check_call_git(
-          ['clone', self.git_url, self.project_name, '--quiet'],
-          cwd=self.root_dir,
-          stderr=subprocess2.STDOUT)
+    rev2 = rev2 or '%s/%s' % (self.remote, self.remote_branch)
+    # Revision range is ]rev1, rev2] and ordering matters.
     try:
-      configured_svn_url = self._check_output_git(
-          ['config', 'svn-remote.svn.url']).strip()
+      out = self._check_output_git(
+          ['log', '--format="%H"' , '%s..%s' % (rev1, rev2)])
     except subprocess.CalledProcessError:
-      configured_svn_url = ''
+      return None
+    return len(out.splitlines())
 
-    if configured_svn_url.strip() != self.svn_url:
-      self._check_call_git_svn(
-          ['init',
-           '--prefix', self.remote + '/',
-           '-T', self.trunk,
-           self.svn_url])
-    self._check_call_git_svn(['fetch'])
-    return super(GitSvnPremadeCheckout, self).prepare(revision)
-
-
-class GitSvnCheckout(GitSvnCheckoutBase):
-  """Manages a git-svn clone.
-
-  Using git-svn hides some of the complexity of using a svn checkout.
-  """
-  def __init__(self,
-      root_dir, project_name,
-      commit_user, commit_pwd,
-      svn_url, trunk, post_processors=None):
-    super(GitSvnCheckout, self).__init__(
-        root_dir, project_name, 'trunk',
-        commit_user, commit_pwd,
-        svn_url, trunk, post_processors)
-
-  def prepare(self, revision):
-    """Creates the initial checkout for the repo."""
-    assert not revision, 'Implement revision if necessary'
-    if not os.path.isdir(self.project_path):
-      logging.info('Checking out %s in %s' %
-          (self.project_name, self.project_path))
-      # TODO: Create a shallow clone.
-      # self.project_path doesn't exist yet.
-      self._check_call_git_svn(
-          ['clone',
-           '--prefix', self.remote + '/',
-           '-T', self.trunk,
-           self.svn_url, self.project_path,
-           '--quiet'],
-          cwd=self.root_dir,
-          stderr=subprocess2.STDOUT)
-    return super(GitSvnCheckout, self).prepare(revision)
+  def _fetch_remote(self):
+    """Fetches the remote without rebasing."""
+    # git fetch is always verbose even with -q, so redirect its output.
+    self._check_output_git(['fetch', self.remote, self.remote_branch],
+                           timeout=FETCH_TIMEOUT)
 
 
 class ReadOnlyCheckout(object):
@@ -739,14 +817,17 @@ class ReadOnlyCheckout(object):
   def get_settings(self, key):
     return self.checkout.get_settings(key)
 
-  def apply_patch(self, patches, post_processors=None):
+  def apply_patch(self, patches, post_processors=None, verbose=False):
     return self.checkout.apply_patch(
-        patches, post_processors or self.post_processors)
+        patches, post_processors or self.post_processors, verbose)
 
   def commit(self, message, user):  # pylint: disable=R0201
     logging.info('Would have committed for %s with message: %s' % (
         user, message))
     return 'FAKE'
+
+  def revisions(self, rev1, rev2):
+    return self.checkout.revisions(rev1, rev2)
 
   @property
   def project_name(self):

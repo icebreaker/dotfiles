@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) 2011 The Chromium Authors. All rights reserved.
+# Copyright (c) 2012 The Chromium Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
@@ -14,6 +14,7 @@ import optparse
 import os
 import sys
 
+import auth
 import rietveld
 
 
@@ -61,41 +62,65 @@ class Stats(object):
   def __init__(self):
     self.total = 0
     self.actually_reviewed = 0
-    self.average_latency = 0.
-    self.number_latency = 0
+    self.latencies = []
     self.lgtms = 0
     self.multiple_lgtms = 0
     self.drive_by = 0
     self.not_requested = 0
     self.self_review = 0
 
-    self.percent_done = 0.
     self.percent_lgtm = 0.
     self.percent_drive_by = 0.
     self.percent_not_requested = 0.
     self.days = 0
-    self.review_per_day = 0.
-    self.review_done_per_day = 0.
 
-  def add_latency(self, latency):
-    self.average_latency = (
-        (self.average_latency * self.number_latency + latency) /
-        (self.number_latency + 1.))
-    self.number_latency += 1
+  @property
+  def average_latency(self):
+    if not self.latencies:
+      return 0
+    return sum(self.latencies) / float(len(self.latencies))
+
+  @property
+  def median_latency(self):
+    if not self.latencies:
+      return 0
+    length = len(self.latencies)
+    latencies = sorted(self.latencies)
+    if (length & 1) == 0:
+      return (latencies[length/2] + latencies[length/2-1]) / 2.
+    else:
+      return latencies[length/2]
+
+  @property
+  def percent_done(self):
+    if not self.total:
+      return 0
+    return self.actually_reviewed * 100. / self.total
+
+  @property
+  def review_per_day(self):
+    if not self.days:
+      return 0
+    return self.total * 1. / self.days
+
+  @property
+  def review_done_per_day(self):
+    if not self.days:
+      return 0
+    return self.actually_reviewed * 1. / self.days
 
   def finalize(self, first_day, last_day):
-    if self.total:
-      self.percent_done = (self.actually_reviewed * 100. / self.total)
     if self.actually_reviewed:
+      assert self.actually_reviewed > 0
       self.percent_lgtm = (self.lgtms * 100. / self.actually_reviewed)
       self.percent_drive_by = (self.drive_by * 100. / self.actually_reviewed)
       self.percent_not_requested = (
           self.not_requested * 100. / self.actually_reviewed)
+    assert bool(first_day) == bool(last_day)
     if first_day and last_day:
+      assert first_day <= last_day
       self.days = (to_datetime(last_day) - to_datetime(first_day)).days + 1
-    if self.days:
-      self.review_per_day = self.total * 1. / self.days
-      self.review_done_per_day = self.actually_reviewed * 1. / self.days
+      assert self.days > 0
 
 
 def _process_issue_lgtms(issue, reviewer, stats):
@@ -145,7 +170,7 @@ def _process_issue_latency(issue, reviewer, stats):
     stats.not_requested += 1
     return '<no rqst sent>'
   if latency > 0:
-    stats.add_latency(latency)
+    stats.latencies.append(latency)
   else:
     stats.not_requested += 1
   return to_time(latency)
@@ -190,33 +215,34 @@ def print_issue(issue, reviewer, stats):
       ', '.join(sorted(issue['reviewers'])))
 
 
-def print_reviews(reviewer, created_after, created_before, instance_url):
+def print_reviews(
+    reviewer, created_after, created_before, instance_url, auth_config):
   """Prints issues |reviewer| received and potentially reviewed."""
-  remote = rietveld.Rietveld(instance_url, None, None)
+  remote = rietveld.Rietveld(instance_url, auth_config)
 
   # The stats we gather. Feel free to send me a CL to get more stats.
   stats = Stats()
-
-  last_issue = None
-  first_day = None
-  last_day = None
 
   # Column sizes need to match print_issue() output.
   print >> sys.stderr, (
       'Issue   Creation   Did         Latency Owner           Reviewers')
 
   # See def search() in rietveld.py to see all the filters you can use.
+  issues = []
   for issue in remote.search(
       reviewer=reviewer,
       created_after=created_after,
       created_before=created_before,
       with_messages=True):
-    last_issue = issue
-    if not first_day:
-      first_day = issue['created'][:10]
+    issues.append(issue)
     print_issue(issue, username(reviewer), stats)
-  if last_issue:
-    last_day = last_issue['created'][:10]
+
+  issues.sort(key=lambda x: x['created'])
+  first_day = None
+  last_day = None
+  if issues:
+    first_day = issues[0]['created'][:10]
+    last_day = issues[-1]['created'][:10]
   stats.finalize(first_day, last_day)
 
   print >> sys.stderr, (
@@ -239,10 +265,14 @@ def print_reviews(reviewer, created_after, created_before, instance_url):
   print >> sys.stderr, (
       'Average latency from request to first comment is %s.' %
       to_time(stats.average_latency))
+  print >> sys.stderr, (
+      'Median latency from request to first comment is %s.' %
+      to_time(stats.median_latency))
 
 
-def print_count(reviewer, created_after, created_before, instance_url):
-  remote = rietveld.Rietveld(instance_url, None, None)
+def print_count(
+    reviewer, created_after, created_before, instance_url, auth_config):
+  remote = rietveld.Rietveld(instance_url, auth_config)
   print len(list(remote.search(
       reviewer=reviewer,
       created_after=created_after,
@@ -279,13 +309,18 @@ def main():
   rietveld.upload.verbosity = 0
   today = datetime.date.today()
   begin, end = get_previous_quarter(today)
-  parser = optparse.OptionParser(description=sys.modules[__name__].__doc__)
+  default_email = os.environ.get('EMAIL_ADDRESS')
+  if not default_email:
+    user = os.environ.get('USER')
+    if user:
+      default_email = user + '@chromium.org'
+
+  parser = optparse.OptionParser(description=__doc__)
   parser.add_option(
       '--count', action='store_true',
       help='Just count instead of printing individual issues')
   parser.add_option(
-      '-r', '--reviewer', metavar='<email>',
-      default=os.environ.get('EMAIL_ADDRESS'),
+      '-r', '--reviewer', metavar='<email>', default=default_email,
       help='Filter on issue reviewer, default=%default')
   parser.add_option(
       '-b', '--begin', metavar='<date>',
@@ -295,40 +330,59 @@ def main():
       help='Filter issues created before the date')
   parser.add_option(
       '-Q', '--last_quarter', action='store_true',
-      help='Use last quarter\'s dates, e.g. %s to %s' % (
-        begin, end))
+      help='Use last quarter\'s dates, e.g. %s to %s' % (begin, end))
   parser.add_option(
       '-i', '--instance_url', metavar='<host>',
       default='http://codereview.chromium.org',
       help='Host to use, default is %default')
+  auth.add_auth_options(parser)
   # Remove description formatting
   parser.format_description = (
       lambda _: parser.description)  # pylint: disable=E1101
   options, args = parser.parse_args()
+  auth_config = auth.extract_auth_config_from_options(options)
   if args:
     parser.error('Args unsupported')
-  if not options.reviewer:
-    parser.error('$EMAIL_ADDRESS is not set, please use -r')
+  if options.reviewer is None:
+    parser.error('$EMAIL_ADDRESS and $USER are not set, please use -r')
+
   print >> sys.stderr, 'Searching for reviews by %s' % options.reviewer
   if options.last_quarter:
     options.begin = begin
     options.end = end
     print >> sys.stderr, 'Using range %s to %s' % (
         options.begin, options.end)
+  else:
+    if options.begin is None or options.end is None:
+      parser.error('Please specify either --last_quarter or --begin and --end')
+
+  # Validate dates.
+  try:
+    to_datetime(options.begin)
+    to_datetime(options.end)
+  except ValueError as e:
+    parser.error('%s: %s - %s' % (e, options.begin, options.end))
+
   if options.count:
     print_count(
         options.reviewer,
         options.begin,
         options.end,
-        options.instance_url)
+        options.instance_url,
+        auth_config)
   else:
     print_reviews(
         options.reviewer,
         options.begin,
         options.end,
-        options.instance_url)
+        options.instance_url,
+        auth_config)
   return 0
 
 
 if __name__ == '__main__':
-  sys.exit(main())
+  try:
+    sys.exit(main())
+  except KeyboardInterrupt:
+    sys.stderr.write('interrupted\n')
+    sys.exit(1)

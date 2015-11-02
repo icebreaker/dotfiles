@@ -8,10 +8,12 @@ Wrapper script around Rietveld's upload.py that simplifies working with groups
 of files.
 """
 
+import json
 import optparse
 import os
 import random
 import re
+import ssl
 import string
 import sys
 import tempfile
@@ -20,18 +22,11 @@ import urllib2
 
 import breakpad  # pylint: disable=W0611
 
-try:
-  import simplejson as json  # pylint: disable=F0401
-except ImportError:
-  try:
-    import json  # pylint: disable=F0401
-  except ImportError:
-    # Import the one included in depot_tools.
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'third_party'))
-    import simplejson as json  # pylint: disable=F0401
 
+import auth
 import fix_encoding
 import gclient_utils
+import git_cl
 import presubmit_support
 import rietveld
 from scm import SVN
@@ -52,6 +47,11 @@ CODEREVIEW_SETTINGS = {
 # we store information about changelists.
 REPOSITORY_ROOT = ""
 
+# Printed when people upload patches using svn.
+SWITCH_TO_GIT = """You're using svn to work on depot_tools.
+Consider switching to git today, so that you're ready when svn stops working
+and you need a functional checkout for a future fire."""
+
 # Filename where we store repository specific information for gcl.
 CODEREVIEW_SETTINGS_FILE = "codereview.settings"
 CODEREVIEW_SETTINGS_FILE_NOT_FOUND = (
@@ -66,8 +66,6 @@ FILES_CACHE = {}
 # Valid extensions for files we want to lint.
 DEFAULT_LINT_REGEX = r"(.*\.cpp|.*\.cc|.*\.h)"
 DEFAULT_LINT_IGNORE_REGEX = r"$^"
-
-REVIEWERS_REGEX = r'\s*R=(.+)'
 
 def CheckHomeForFile(filename):
   """Checks the users home dir for the existence of the given file.  Returns
@@ -281,16 +279,12 @@ class ChangeInfo(object):
 
   def __init__(self, name, issue, patchset, description, files, local_root,
                rietveld_url, needs_upload):
+    # Defer the description processing to git_cl.ChangeDescription.
+    self._desc = git_cl.ChangeDescription(description)
     self.name = name
     self.issue = int(issue)
     self.patchset = int(patchset)
-    self._description = None
-    self._subject = None
-    self._reviewers = None
-    self._set_description(description)
-    if files is None:
-      files = []
-    self._files = files
+    self._files = files or  []
     self.patch = None
     self._local_root = local_root
     self.needs_upload = needs_upload
@@ -298,43 +292,22 @@ class ChangeInfo(object):
         rietveld_url or GetCodeReviewSetting('CODE_REVIEW_SERVER'))
     self._rpc_server = None
 
-  def _get_description(self):
-    return self._description
-
-  def _set_description(self, description):
-    # TODO(dpranke): Cloned from git_cl.py. These should be shared.
-    if not description:
-      self._description = description
-      return
-
-    parsed_lines = []
-    reviewers_re = re.compile(REVIEWERS_REGEX)
-    reviewers = ''
-    subject = ''
-    for l in description.splitlines():
-      if not subject:
-        subject = l
-      matched_reviewers = reviewers_re.match(l)
-      if matched_reviewers:
-        reviewers = matched_reviewers.group(1).split(',')
-      parsed_lines.append(l)
-
-    if len(subject) > 100:
-      subject = subject[:97] + '...'
-
-    self._subject = subject
-    self._reviewers = reviewers
-    self._description = '\n'.join(parsed_lines)
-
-  description = property(_get_description, _set_description)
-
   @property
-  def reviewers(self):
-    return self._reviewers
+  def description(self):
+    return self._desc.description
 
-  @property
-  def subject(self):
-    return self._subject
+  def force_description(self, new_description):
+    self._desc = git_cl.ChangeDescription(new_description)
+    self.needs_upload = True
+
+  def append_footer(self, line):
+    self._desc.append_footer(line)
+
+  def get_reviewers(self):
+    return self._desc.get_reviewers()
+
+  def update_reviewers(self, reviewers):
+    self._desc.update_reviewers(reviewers)
 
   def NeedsUpload(self):
     return self.needs_upload
@@ -384,7 +357,10 @@ class ChangeInfo(object):
     if not self._rpc_server:
       if not self.rietveld:
         ErrorExit(CODEREVIEW_SETTINGS_FILE_NOT_FOUND)
-      self._rpc_server = rietveld.Rietveld(self.rietveld, None, None)
+      # TODO(vadimsh): glc.py should be deleted soon. Do not bother much about
+      # authentication options and always use defaults.
+      self._rpc_server = rietveld.CachingRietveld(
+          self.rietveld, auth.make_auth_config())
     return self._rpc_server
 
   def CloseIssue(self):
@@ -409,17 +385,39 @@ class ChangeInfo(object):
     ctype, body = upload.EncodeMultipartFormData(data, [])
     self.SendToRietveld('/%d/description' % self.issue, payload=body,
         content_type=ctype)
+    self.needs_upload = False
 
   def GetIssueDescription(self):
     """Returns the issue description from Rietveld."""
-    return self.SendToRietveld('/%d/description' % self.issue)
+    return self.SendToRietveld('/%d/description' % self.issue).replace('\r\n',
+                                                                       '\n')
+
+  def UpdateDescriptionFromIssue(self):
+    """Updates self.description with the issue description from Rietveld."""
+    self._desc = git_cl.ChangeDescription(self.GetIssueDescription())
+
+  def GetApprovingReviewers(self):
+    """Returns the issue reviewers list from Rietveld."""
+    return git_cl.get_approving_reviewers(
+        self.RpcServer().get_issue_properties(self.issue, True))
+
+  def AddComment(self, comment):
+    """Adds a comment for an issue on Rietveld.
+    As a side effect, this will email everyone associated with the issue."""
+    return self.RpcServer().add_comment(self.issue, comment)
 
   def PrimeLint(self):
     """Do background work on Rietveld to lint the file so that the results are
     ready when the issue is viewed."""
     if self.issue and self.patchset:
-      self.SendToRietveld('/lint/issue%s_%s' % (self.issue, self.patchset),
-          timeout=1)
+      try:
+        self.SendToRietveld('/lint/issue%s_%s' % (self.issue, self.patchset),
+            timeout=60)
+      except ssl.SSLError as e:
+        # It takes more than 60 seconds to lint some CLs. Silently ignore
+        # the expected timeout.
+        if e.message != 'The read operation timed out':
+          raise
 
   def SendToRietveld(self, request_path, timeout=None, **kwargs):
     """Send a POST/GET to Rietveld.  Returns the response body."""
@@ -744,13 +742,18 @@ def GenerateDiff(files):
       files, GetRepositoryRoot(), full_move=False, revision=None)
 
 
+def GetTreeStatus():
+  tree_status_url = GetCodeReviewSetting('STATUS')
+  return git_cl.GetTreeStatus(tree_status_url) if tree_status_url else "unset"
+
+
 def OptionallyDoPresubmitChecks(change_info, committing, args):
   if FilterFlag(args, "--no_presubmit") or FilterFlag(args, "--force"):
     breakpad.SendStack(
         breakpad.DEFAULT_URL + '/breakpad',
         'GclHooksBypassedCommit',
-        'Issue %s/%s bypassed hook when committing' %
-        (change_info.rietveld, change_info.issue),
+        'Issue %s/%s bypassed hook when committing (tree status was "%s")' %
+        (change_info.rietveld, change_info.issue, GetTreeStatus()),
         verbose=False)
     return presubmit_support.PresubmitOutput()
   return DoPresubmitChecks(change_info, committing, True)
@@ -846,10 +849,28 @@ def CMDupload(change_info, args):
   if FilterFlag(args, "--send-mail"):
     args.append("--send_mail")
 
-  upload_arg = ["upload.py", "-y"]
-  upload_arg.append("--server=%s" % change_info.rietveld)
+  # Replace -m with -t and --message with --title, but make sure to
+  # preserve anything after the -m/--message.
+  found_deprecated_arg = [False]
+  def replace_message(a):
+    if a.startswith('-m'):
+      found_deprecated_arg[0] = True
+      return '-t' + a[2:]
+    elif a.startswith('--message'):
+      found_deprecated_arg[0] = True
+      return '--title' + a[9:]
+    return a
+  args = map(replace_message, args)
+  if found_deprecated_arg[0]:
+    print >> sys.stderr, (
+        '\nWARNING: Use -t or --title to set the title of the patchset.\n'
+        'In the near future, -m or --message will send a message instead.\n'
+        'See http://goo.gl/JGg0Z for details.\n')
 
-  reviewers = change_info.reviewers or output.reviewers
+  upload_arg = ["upload.py", "-y"]
+  upload_arg.append("--server=%s" % change_info.rietveld.encode('utf-8'))
+
+  reviewers = change_info.get_reviewers() or output.reviewers
   if (reviewers and
       not any(arg.startswith('-r') or arg.startswith('--reviewer') for
               arg in args)):
@@ -857,68 +878,85 @@ def CMDupload(change_info, args):
 
   upload_arg.extend(args)
 
-  desc_file = ""
-  if change_info.issue:  # Uploading a new patchset.
-    found_message = False
-    for arg in args:
-      if arg.startswith("--message") or arg.startswith("-m"):
-        found_message = True
-        break
-
-    if not found_message:
-      upload_arg.append("--message=''")
-
-    upload_arg.append("--issue=%d" % change_info.issue)
-  else: # First time we upload.
-    handle, desc_file = tempfile.mkstemp(text=True)
-    os.write(handle, change_info.description)
-    os.close(handle)
-
-    # Watchlist processing -- CC people interested in this changeset
-    # http://dev.chromium.org/developers/contributing-code/watchlists
-    if not no_watchlists:
-      import watchlists
-      watchlist = watchlists.Watchlists(change_info.GetLocalRoot())
-      watchers = watchlist.GetWatchersForPaths(change_info.GetFileNames())
-
-    cc_list = GetCodeReviewSetting("CC_LIST")
-    if not no_watchlists and watchers:
-      # Filter out all empty elements and join by ','
-      cc_list = ','.join(filter(None, [cc_list] + watchers))
-    if cc_list:
-      upload_arg.append("--cc=" + cc_list)
-    upload_arg.append("--description_file=" + desc_file + "")
-    if change_info.subject:
-      upload_arg.append("--message=" + change_info.subject)
-
-    if GetCodeReviewSetting("PRIVATE") == "True":
-      upload_arg.append("--private")
-
-  # If we have a lot of files with long paths, then we won't be able to fit
-  # the command to "svn diff".  Instead, we generate the diff manually for
-  # each file and concatenate them before passing it to upload.py.
-  if change_info.patch is None:
-    change_info.patch = GenerateDiff(change_info.GetFileNames())
-
-  # Change the current working directory before calling upload.py so that it
-  # shows the correct base.
-  previous_cwd = os.getcwd()
-  os.chdir(change_info.GetLocalRoot())
+  desc_file = None
   try:
-    try:
-      issue, patchset = upload.RealMain(upload_arg, change_info.patch)
-    except KeyboardInterrupt:
-      sys.exit(1)
-    if issue and patchset:
-      change_info.issue = int(issue)
-      change_info.patchset = int(patchset)
-      change_info.Save()
+    if change_info.issue:
+      # Uploading a new patchset.
+      upload_arg.append("--issue=%d" % change_info.issue)
 
+      project = GetCodeReviewSetting("PROJECT")
+      if project:
+        print SWITCH_TO_GIT
+        upload_arg.append("--project=%s" % project)
+
+      if not any(i.startswith('--title') or i.startswith('-t') for i in args):
+        upload_arg.append('--title= ')
+    else:
+      # First time we upload.
+      handle, desc_file = tempfile.mkstemp(text=True)
+      os.write(handle, change_info.description)
+      os.close(handle)
+
+      # Watchlist processing -- CC people interested in this changeset
+      # http://dev.chromium.org/developers/contributing-code/watchlists
+      if not no_watchlists:
+        import watchlists
+        watchlist = watchlists.Watchlists(change_info.GetLocalRoot())
+        watchers = watchlist.GetWatchersForPaths(change_info.GetFileNames())
+
+      # We check this before applying the "PRIVATE" parameter of codereview
+      # settings assuming that the author of the settings file has put
+      # addresses which we can send private CLs to, and so we should ignore
+      # CC_LIST only when --private is specified explicitly on the command
+      # line.
+      if "--private" in upload_arg:
+        Warn("WARNING: CC_LIST and WATCHLISTS are ignored when --private is "
+             "specified.  You need to review and add them manually if "
+             "necessary.")
+        cc_list = ""
+        no_watchlists = True
+      else:
+        cc_list = GetCodeReviewSetting("CC_LIST")
+      if not no_watchlists and watchers:
+        # Filter out all empty elements and join by ','
+        cc_list = ','.join(filter(None, [cc_list] + watchers))
+      if cc_list:
+        upload_arg.append("--cc=" + cc_list)
+      upload_arg.append("--file=%s" % desc_file)
+
+      if GetCodeReviewSetting("PRIVATE") == "True":
+        upload_arg.append("--private")
+
+      project = GetCodeReviewSetting("PROJECT")
+      if project:
+        print SWITCH_TO_GIT
+        upload_arg.append("--project=%s" % project)
+
+    # If we have a lot of files with long paths, then we won't be able to fit
+    # the command to "svn diff".  Instead, we generate the diff manually for
+    # each file and concatenate them before passing it to upload.py.
+    if change_info.patch is None:
+      change_info.patch = GenerateDiff(change_info.GetFileNames())
+
+    # Change the current working directory before calling upload.py so that it
+    # shows the correct base.
+    previous_cwd = os.getcwd()
+    os.chdir(change_info.GetLocalRoot())
+    try:
+      try:
+        issue, patchset = upload.RealMain(upload_arg, change_info.patch)
+      except KeyboardInterrupt:
+        sys.exit(1)
+      if issue and patchset:
+        change_info.issue = int(issue)
+        change_info.patchset = int(patchset)
+        change_info.Save()
+      change_info.PrimeLint()
+    finally:
+      os.chdir(previous_cwd)
+  finally:
     if desc_file:
       os.remove(desc_file)
-    change_info.PrimeLint()
-  finally:
-    os.chdir(previous_cwd)
   print "*** Upload does not submit a try; use gcl try to submit a try. ***"
   return 0
 
@@ -990,6 +1028,8 @@ def CMDcommit(change_info, args):
     print "Nothing to commit, changelist is empty."
     return 1
 
+  # OptionallyDoPresubmitChecks has a side-effect which eats these flags.
+  bypassed = '--no_presubmit' in args or '--force' in args
   output = OptionallyDoPresubmitChecks(change_info, True, args)
   if not output.should_continue():
     return 1
@@ -1004,17 +1044,19 @@ def CMDcommit(change_info, args):
   commit_cmd = ["svn", "commit"]
   if change_info.issue:
     # Get the latest description from Rietveld.
-    change_info.description = change_info.GetIssueDescription()
+    change_info.UpdateDescriptionFromIssue()
 
-  commit_message = change_info.description.replace('\r\n', '\n')
+  change_info.update_reviewers(change_info.GetApprovingReviewers())
+
+  commit_desc = git_cl.ChangeDescription(change_info.description)
   if change_info.issue:
     server = change_info.rietveld
     if not server.startswith("http://") and not server.startswith("https://"):
       server = "http://" + server
-    commit_message += ('\nReview URL: %s/%d' % (server, change_info.issue))
+    commit_desc.append_footer('Review URL: %s/%d' % (server, change_info.issue))
 
   handle, commit_filename = tempfile.mkstemp(text=True)
-  os.write(handle, commit_message)
+  os.write(handle, commit_desc.description)
   os.close(handle)
   try:
     handle, targets_filename = tempfile.mkstemp(text=True)
@@ -1039,11 +1081,22 @@ def CMDcommit(change_info, args):
     if change_info.issue:
       revision = re.compile(".*?\nCommitted revision (\d+)",
                             re.DOTALL).match(output).group(1)
-      viewvc_url = gclient_utils.UpgradeToHttps(GetCodeReviewSetting('VIEW_VC'))
-      change_info.description += '\n'
-      if viewvc_url:
-        change_info.description += "\nCommitted: " + viewvc_url + revision
+      viewvc_url = GetCodeReviewSetting('VIEW_VC')
+      if viewvc_url and revision:
+        change_info.append_footer('Committed: ' + viewvc_url + revision)
+      elif revision:
+        change_info.append_footer('Committed: ' + revision)
       change_info.CloseIssue()
+      props = change_info.RpcServer().get_issue_properties(
+          change_info.issue, False)
+      patch_num = len(props['patchsets'])
+      comment = "Committed patchset #%d (id:%d) manually as r%s" % (
+          patch_num, props['patchsets'][-1], revision)
+      if bypassed:
+        comment += ' (tree was closed).' if GetTreeStatus() == 'closed' else '.'
+      else:
+        comment += ' (presubmit successful).'
+      change_info.AddComment(comment)
   return 0
 
 
@@ -1107,7 +1160,7 @@ def CMDchange(args):
                 "---Repository Root: " + change_info.GetLocalRoot() + "\n"
                 "---Paths in this changelist (" + change_info.name + "):\n")
   separator2 = "\n\n---Paths modified but not in any changelist:\n\n"
-  
+
   text = (description + separator1 + '\n' +
           '\n'.join([f[0] + f[1] for f in change_info.GetFiles()]))
 
@@ -1131,8 +1184,7 @@ def CMDchange(args):
   new_description = split_result[0]
   cl_files_text = split_result[1]
   if new_description != description or override_description:
-    change_info.description = new_description
-    change_info.needs_upload = True
+    change_info.force_description(new_description)
 
   new_cl_files = []
   for line in cl_files_text.splitlines():
@@ -1151,8 +1203,8 @@ def CMDchange(args):
   change_info._files = new_cl_files
   change_info.Save()
   if svn_info.get('URL', '').startswith('http:'):
-    Warn("WARNING: Creating CL in a read-only checkout.  You will not be "
-         "able to commit it!")
+    Warn("WARNING: Creating CL in a read-only checkout.  You will need to "
+         "commit using a commit queue!")
 
   print change_info.name + " changelist saved."
   if change_info.MissingTests():
@@ -1161,7 +1213,6 @@ def CMDchange(args):
   # Update the Rietveld issue.
   if change_info.issue and change_info.NeedsUpload():
     change_info.UpdateRietveldDescription()
-    change_info.needs_upload = False
     change_info.Save()
   return 0
 
@@ -1332,6 +1383,12 @@ def CMDtry(args):
   else:
     change_info = ChangeInfo.Load(args[0], GetRepositoryRoot(),
                                   True, True)
+
+  props = change_info.RpcServer().get_issue_properties(
+    change_info.issue, False)
+  if props.get('private'):
+    ErrorExit('Cannot use trybots on a private issue')
+
   if change_info.GetFiles():
     args = args[1:]
   else:
@@ -1418,9 +1475,15 @@ def CMDhelp(args):
 
 
 def main(argv):
-  if sys.hexversion < 0x02050000:
+  if sys.hexversion < 0x02060000:
     print >> sys.stderr, (
-        '\nYour python version is unsupported, please upgrade.\n')
+        '\nYour python version %s is unsupported, please upgrade.\n' %
+        sys.version.split(' ', 1)[0])
+    return 2
+
+  sys.stderr.write('Warning: gcl is going away soon. Get off subversion!\n')
+  sys.stderr.write('See http://crbug.com/475321 for more details.\n')
+
   if not argv:
     argv = ['help']
   command = Command(argv[0])
@@ -1467,4 +1530,8 @@ def main(argv):
 
 if __name__ == "__main__":
   fix_encoding.fix_encoding()
-  sys.exit(main(sys.argv[1:]))
+  try:
+    sys.exit(main(sys.argv[1:]))
+  except KeyboardInterrupt:
+    sys.stderr.write('interrupted\n')
+    sys.exit(1)

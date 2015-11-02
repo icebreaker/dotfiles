@@ -1,4 +1,4 @@
-# Copyright (c) 2011 The Chromium Authors. All rights reserved.
+# Copyright (c) 2012 The Chromium Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
@@ -8,42 +8,56 @@ See http://dev.chromium.org/developers/how-tos/depottools/presubmit-scripts for
 details on the presubmit API built into depot_tools.
 """
 
+import fnmatch
+import os
+
 
 def CommonChecks(input_api, output_api, tests_to_black_list):
   results = []
-  import sys
-  if not sys.version.startswith('2.5'):
-    # Depot_tools has the particularity that it needs to be tested on python
-    # 2.5. But we don't want the presubmit check to fail if it is not installed.
-    results.append(output_api.PresubmitNotifyResult(
-        'You should install python 2.5 and run ln -s $(which python2.5) python.'
-        '\n'
-        'A great place to put this symlink is in depot_tools.\n'
-        'Otherwise, you break depot_tools on python 2.5, you get to keep the '
-        'pieces.'))
-
-
   results.extend(input_api.canned_checks.CheckOwners(input_api, output_api))
   black_list = list(input_api.DEFAULT_BLACK_LIST) + [
       r'^cpplint\.py$',
       r'^cpplint_chromium\.py$',
-      r'^python_bin[\/\\].+',
+      r'^external_bin[\/\\].+',
+      r'^python[0-9]*_bin[\/\\].+',
+      r'^site-packages-py[0-9]\.[0-9][\/\\].+',
       r'^svn_bin[\/\\].+',
-      r'^testing_support[\/\\]_rietveld[\/\\].+']
-  results.extend(input_api.canned_checks.RunPylint(
+      r'^testing_support[\/\\]_rietveld[\/\\].+',
+      r'^bootstrap[\/\\].+']
+  if os.path.exists('.gitignore'):
+    with open('.gitignore') as fh:
+      lines = [l.strip() for l in fh.readlines()]
+      black_list.extend([fnmatch.translate(l) for l in lines if
+                         l and not l.startswith('#')])
+  if os.path.exists('.git/info/exclude'):
+    with open('.git/info/exclude') as fh:
+      lines = [l.strip() for l in fh.readlines()]
+      black_list.extend([fnmatch.translate(l) for l in lines if
+                         l and not l.startswith('#')])
+  disabled_warnings = [
+    'R0401',  # Cyclic import
+    'W0613',  # Unused argument
+  ]
+  pylint = input_api.canned_checks.GetPylint(
       input_api,
       output_api,
       white_list=[r'.*\.py$'],
-      black_list=black_list))
-
+      black_list=black_list,
+      disabled_warnings=disabled_warnings)
   # TODO(maruel): Make sure at least one file is modified first.
   # TODO(maruel): If only tests are modified, only run them.
-  results.extend(input_api.canned_checks.RunUnitTestsInDirectory(
+  unit_tests = input_api.canned_checks.GetUnitTestsInDirectory(
       input_api,
       output_api,
       'tests',
       whitelist=[r'.*test\.py$'],
-      blacklist=tests_to_black_list))
+      blacklist=tests_to_black_list)
+  tests = pylint
+  if not input_api.platform.startswith(('cygwin', 'win32')):
+    tests.extend(unit_tests)
+  else:
+    print('Warning: not running unit tests on Windows')
+  results.extend(input_api.RunTests(tests))
   return results
 
 
@@ -102,6 +116,7 @@ def CheckChangeOnUpload(input_api, output_api):
       r'^checkout_test\.py$',
       r'^gclient_smoketest\.py$',
       r'^scm_unittest\.py$',
+      r'^subprocess2_test\.py$',
     ]
   return CommonChecks(input_api, output_api, tests_to_black_list)
 

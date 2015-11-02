@@ -3,86 +3,157 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-"""Meta checkout manager supporting both Subversion and GIT.
+"""Meta checkout manager supporting both Subversion and GIT."""
+# Files
+#   .gclient      : Current client configuration, written by 'config' command.
+#                   Format is a Python script defining 'solutions', a list whose
+#                   entries each are maps binding the strings "name" and "url"
+#                   to strings specifying the name and location of the client
+#                   module, as well as "custom_deps" to a map similar to the
+#                   deps section of the DEPS file below, as well as
+#                   "custom_hooks" to a list similar to the hooks sections of
+#                   the DEPS file below.
+#   .gclient_entries : A cache constructed by 'update' command.  Format is a
+#                   Python script defining 'entries', a list of the names
+#                   of all modules in the client
+#   <module>/DEPS : Python script defining var 'deps' as a map from each
+#                   requisite submodule name to a URL where it can be found (via
+#                   one SCM)
+#
+# Hooks
+#   .gclient and DEPS files may optionally contain a list named "hooks" to
+#   allow custom actions to be performed based on files that have changed in the
+#   working copy as a result of a "sync"/"update" or "revert" operation.  This
+#   can be prevented by using --nohooks (hooks run by default). Hooks can also
+#   be forced to run with the "runhooks" operation.  If "sync" is run with
+#   --force, all known but not suppressed hooks will run regardless of the state
+#   of the working copy.
+#
+#   Each item in a "hooks" list is a dict, containing these two keys:
+#     "pattern"  The associated value is a string containing a regular
+#                expression.  When a file whose pathname matches the expression
+#                is checked out, updated, or reverted, the hook's "action" will
+#                run.
+#     "action"   A list describing a command to run along with its arguments, if
+#                any.  An action command will run at most one time per gclient
+#                invocation, regardless of how many files matched the pattern.
+#                The action is executed in the same directory as the .gclient
+#                file.  If the first item in the list is the string "python",
+#                the current Python interpreter (sys.executable) will be used
+#                to run the command. If the list contains string
+#                "$matching_files" it will be removed from the list and the list
+#                will be extended by the list of matching files.
+#     "name"     An optional string specifying the group to which a hook belongs
+#                for overriding and organizing.
+#
+#   Example:
+#     hooks = [
+#       { "pattern": "\\.(gif|jpe?g|pr0n|png)$",
+#         "action":  ["python", "image_indexer.py", "--all"]},
+#       { "pattern": ".",
+#         "name": "gyp",
+#         "action":  ["python", "src/build/gyp_chromium"]},
+#     ]
+#
+# Pre-DEPS Hooks
+#   DEPS files may optionally contain a list named "pre_deps_hooks".  These are
+#   the same as normal hooks, except that they run before the DEPS are
+#   processed. Pre-DEPS run with "sync" and "revert" unless the --noprehooks
+#   flag is used.
+#
+# Specifying a target OS
+#   An optional key named "target_os" may be added to a gclient file to specify
+#   one or more additional operating systems that should be considered when
+#   processing the deps_os dict of a DEPS file.
+#
+#   Example:
+#     target_os = [ "android" ]
+#
+#   If the "target_os_only" key is also present and true, then *only* the
+#   operating systems listed in "target_os" will be used.
+#
+#   Example:
+#     target_os = [ "ios" ]
+#     target_os_only = True
 
-Files
-  .gclient      : Current client configuration, written by 'config' command.
-                  Format is a Python script defining 'solutions', a list whose
-                  entries each are maps binding the strings "name" and "url"
-                  to strings specifying the name and location of the client
-                  module, as well as "custom_deps" to a map similar to the DEPS
-                  file below.
-  .gclient_entries : A cache constructed by 'update' command.  Format is a
-                  Python script defining 'entries', a list of the names
-                  of all modules in the client
-  <module>/DEPS : Python script defining var 'deps' as a map from each requisite
-                  submodule name to a URL where it can be found (via one SCM)
+__version__ = '0.7'
 
-Hooks
-  .gclient and DEPS files may optionally contain a list named "hooks" to
-  allow custom actions to be performed based on files that have changed in the
-  working copy as a result of a "sync"/"update" or "revert" operation.  This
-  can be prevented by using --nohooks (hooks run by default). Hooks can also
-  be forced to run with the "runhooks" operation.  If "sync" is run with
-  --force, all known hooks will run regardless of the state of the working
-  copy.
-
-  Each item in a "hooks" list is a dict, containing these two keys:
-    "pattern"  The associated value is a string containing a regular
-               expression.  When a file whose pathname matches the expression
-               is checked out, updated, or reverted, the hook's "action" will
-               run.
-    "action"   A list describing a command to run along with its arguments, if
-               any.  An action command will run at most one time per gclient
-               invocation, regardless of how many files matched the pattern.
-               The action is executed in the same directory as the .gclient
-               file.  If the first item in the list is the string "python",
-               the current Python interpreter (sys.executable) will be used
-               to run the command. If the list contains string "$matching_files"
-               it will be removed from the list and the list will be extended
-               by the list of matching files.
-
-  Example:
-    hooks = [
-      { "pattern": "\\.(gif|jpe?g|pr0n|png)$",
-        "action":  ["python", "image_indexer.py", "--all"]},
-    ]
-"""
-
-__version__ = "0.6.3"
-
+import ast
 import copy
+import json
 import logging
 import optparse
 import os
+import platform
 import posixpath
 import pprint
 import re
 import sys
-import urlparse
+import time
 import urllib
+import urlparse
 
 import breakpad  # pylint: disable=W0611
 
 import fix_encoding
 import gclient_scm
 import gclient_utils
+import git_cache
 from third_party.repo.progress import Progress
+import subcommand
 import subprocess2
 from third_party import colorama
-# Import shortcut.
-from third_party.colorama import Fore
+
+CHROMIUM_SRC_URL = 'https://chromium.googlesource.com/chromium/src.git'
 
 
-def attr(attribute, data):
-  """Sets an attribute on a function."""
-  def hook(fn):
-    setattr(fn, attribute, data)
-    return fn
-  return hook
+def ast_dict_index(dnode, key):
+  """Search an ast.Dict for the argument key, and return its index."""
+  idx = [i for i in range(len(dnode.keys)) if (
+      type(dnode.keys[i]) is ast.Str and dnode.keys[i].s == key)]
+  if not idx:
+    return -1
+  elif len(idx) > 1:
+    raise gclient_utils.Error('Multiple dict entries with same key in AST')
+  return idx[-1]
 
-
-## GClient implementation.
+def ast2str(node, indent=0):
+  """Return a pretty-printed rendition of an ast.Node."""
+  t = type(node)
+  if t is ast.Module:
+    return '\n'.join([ast2str(x, indent) for x in node.body])
+  elif t is ast.Assign:
+    return (('  ' * indent) +
+            ' = '.join([ast2str(x) for x in node.targets] +
+                       [ast2str(node.value, indent)]) + '\n')
+  elif t is ast.Name:
+    return node.id
+  elif t is ast.List:
+    if not node.elts:
+      return '[]'
+    elif len(node.elts) == 1:
+      return '[' + ast2str(node.elts[0], indent) + ']'
+    return ('[\n' + ('  ' * (indent + 1)) +
+            (',\n' + ('  ' * (indent + 1))).join(
+                [ast2str(x, indent + 1) for x in node.elts]) +
+            '\n' + ('  ' * indent) + ']')
+  elif t is ast.Dict:
+    if not node.keys:
+      return '{}'
+    elif len(node.keys) == 1:
+      return '{%s: %s}' % (ast2str(node.keys[0]),
+                           ast2str(node.values[0], indent + 1))
+    return ('{\n' + ('  ' * (indent + 1)) +
+            (',\n' + ('  ' * (indent + 1))).join(
+                ['%s: %s' % (ast2str(node.keys[i]),
+                             ast2str(node.values[i], indent + 1))
+                 for i in range(len(node.keys))]) +
+            '\n' + ('  ' * indent) + '}')
+  elif t is ast.Str:
+    return "'%s'" % node.s
+  else:
+    raise gclient_utils.Error("Unexpected AST node at line %d, column %d: %s"
+                              % (node.lineno, node.col_offset, t))
 
 
 class GClientKeywords(object):
@@ -143,7 +214,7 @@ class DependencySettings(GClientKeywords):
   """Immutable configuration settings."""
   def __init__(
       self, parent, url, safesync_url, managed, custom_deps, custom_vars,
-      deps_file, should_process):
+      custom_hooks, deps_file, should_process):
     GClientKeywords.__init__(self)
 
     # These are not mutable:
@@ -159,26 +230,36 @@ class DependencySettings(GClientKeywords):
     # recursion limit and controls gclient's behavior so it does not misbehave.
     self._managed = managed
     self._should_process = should_process
+    # This is a mutable value which has the list of 'target_os' OSes listed in
+    # the current deps file.
+    self.local_target_os = None
 
     # These are only set in .gclient and not in DEPS files.
     self._custom_vars = custom_vars or {}
     self._custom_deps = custom_deps or {}
+    self._custom_hooks = custom_hooks or []
+
+    # TODO(iannucci): Remove this when all masters are correctly substituting
+    # the new blink url.
+    if (self._custom_vars.get('webkit_trunk', '') ==
+        'svn://svn-mirror.golo.chromium.org/webkit-readonly/trunk'):
+      new_url = 'svn://svn-mirror.golo.chromium.org/blink/trunk'
+      print 'Overwriting Var("webkit_trunk") with %s' % new_url
+      self._custom_vars['webkit_trunk'] = new_url
 
     # Post process the url to remove trailing slashes.
     if isinstance(self._url, basestring):
       # urls are sometime incorrectly written as proto://host/path/@rev. Replace
       # it to proto://host/path@rev.
-      if self._url.count('@') > 1:
-        raise gclient_utils.Error('Invalid url "%s"' % self._url)
       self._url = self._url.replace('/@', '@')
     elif not isinstance(self._url,
         (self.FromImpl, self.FileImpl, None.__class__)):
       raise gclient_utils.Error(
           ('dependency url must be either a string, None, '
            'File() or From() instead of %s') % self._url.__class__.__name__)
-    if '/' in self._deps_file or '\\' in self._deps_file:
-      raise gclient_utils.Error('deps_file name must not be a path, just a '
-                                'filename. %s' % self._deps_file)
+    # Make any deps_file path platform-appropriate.
+    for sep in ['/', '\\']:
+      self._deps_file = self._deps_file.replace(sep, os.sep)
 
   @property
   def deps_file(self):
@@ -218,13 +299,19 @@ class DependencySettings(GClientKeywords):
     return self._custom_deps.copy()
 
   @property
+  def custom_hooks(self):
+    return self._custom_hooks[:]
+
+  @property
   def url(self):
     return self._url
 
   @property
-  def recursion_limit(self):
-    """Returns > 0 if this dependency is not too recursed to be processed."""
-    return max(self.parent.recursion_limit - 1, 0)
+  def target_os(self):
+    if self.local_target_os is not None:
+      return tuple(set(self.local_target_os).union(self.parent.target_os))
+    else:
+      return self.parent.target_os
 
   def get_custom_deps(self, name, url):
     """Returns a custom deps if applicable."""
@@ -238,14 +325,16 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
   """Object that represents a dependency checkout."""
 
   def __init__(self, parent, name, url, safesync_url, managed, custom_deps,
-               custom_vars, deps_file, should_process):
+               custom_vars, custom_hooks, deps_file, should_process):
     gclient_utils.WorkItem.__init__(self, name)
     DependencySettings.__init__(
         self, parent, url, safesync_url, managed, custom_deps, custom_vars,
-        deps_file, should_process)
+        custom_hooks, deps_file, should_process)
 
     # This is in both .gclient and DEPS files:
     self._deps_hooks = []
+
+    self._pre_deps_hooks = []
 
     # Calculates properties:
     self._parsed_url = None
@@ -253,13 +342,36 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
     # A cache of the files affected by the current operation, necessary for
     # hooks.
     self._file_list = []
+    # List of host names from which dependencies are allowed.
+    # Default is an empty set, meaning unspecified in DEPS file, and hence all
+    # hosts will be allowed. Non-empty set means whitelist of hosts.
+    # allowed_hosts var is scoped to its DEPS file, and so it isn't recursive.
+    self._allowed_hosts = frozenset()
     # If it is not set to True, the dependency wasn't processed for its child
     # dependency, i.e. its DEPS wasn't read.
     self._deps_parsed = False
     # This dependency has been processed, i.e. checked out
     self._processed = False
+    # This dependency had its pre-DEPS hooks run
+    self._pre_deps_hooks_ran = False
     # This dependency had its hook run
     self._hooks_ran = False
+    # This is the scm used to checkout self.url. It may be used by dependencies
+    # to get the datetime of the revision we checked out.
+    self._used_scm = None
+    self._used_revision = None
+    # The actual revision we ended up getting, or None if that information is
+    # unavailable
+    self._got_revision = None
+
+    # This is a mutable value that overrides the normal recursion limit for this
+    # dependency.  It is read from the actual DEPS file so cannot be set on
+    # class instantiation.
+    self.recursion_override = None
+    # recursedeps is a mutable value that selectively overrides the default
+    # 'no recursion' setting on a dep-by-dep basis.  It will replace
+    # recursion_override.
+    self.recursedeps = None
 
     if not self.name and self.parent:
       raise gclient_utils.Error('Dependency without name')
@@ -300,6 +412,26 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
     logging.info('Dependency(%s).requirements = %s' % (self.name, requirements))
     return requirements
 
+  @property
+  def try_recursedeps(self):
+    """Returns False if recursion_override is ever specified."""
+    if self.recursion_override is not None:
+      return False
+    return self.parent.try_recursedeps
+
+  @property
+  def recursion_limit(self):
+    """Returns > 0 if this dependency is not too recursed to be processed."""
+    # We continue to support the absence of recursedeps until tools and DEPS
+    # using recursion_override are updated.
+    if self.try_recursedeps and self.parent.recursedeps != None:
+      if self.name in self.parent.recursedeps:
+        return 1
+
+    if self.recursion_override is not None:
+      return self.recursion_override
+    return max(self.parent.recursion_limit - 1, 0)
+
   def verify_validity(self):
     """Verifies that this Dependency is fine to add as a child of another one.
 
@@ -318,10 +450,20 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
     # This require a full tree traversal with locks.
     siblings = [d for d in self.root.subtree(False) if d.name == self.name]
     for sibling in siblings:
-      if self.url != sibling.url:
+      self_url = self.LateOverride(self.url)
+      sibling_url = sibling.LateOverride(sibling.url)
+      # Allow to have only one to be None or ''.
+      if self_url != sibling_url and bool(self_url) == bool(sibling_url):
         raise gclient_utils.Error(
-            'Dependency %s specified more than once:\n  %s\nvs\n  %s' %
-            (self.name, sibling.hierarchy(), self.hierarchy()))
+            ('Dependency %s specified more than once:\n'
+            '  %s [%s]\n'
+            'vs\n'
+            '  %s [%s]') % (
+              self.name,
+              sibling.hierarchy(),
+              sibling_url,
+              self.hierarchy(),
+              self_url))
       # In theory we could keep it as a shadow of the other one. In
       # practice, simply ignore it.
       logging.warn('Won\'t process duplicate dependency %s' % sibling)
@@ -369,7 +511,8 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
 
     if isinstance(url, basestring):
       parsed_url = urlparse.urlparse(url)
-      if not parsed_url[0]:
+      if (not parsed_url[0] and
+          not re.match(r'^\w+\@[\w\.-]+\:[\w\/]+', parsed_url[2])):
         # A relative url. Fetch the real base.
         path = parsed_url[2]
         if not path.startswith('/'):
@@ -379,7 +522,8 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
         parent_url = self.parent.parsed_url
         if isinstance(parent_url, self.FileImpl):
           parent_url = parent_url.file_location
-        scm = gclient_scm.CreateSCM(parent_url, self.root.root_dir, None)
+        scm = gclient_scm.CreateSCM(
+            parent_url, self.root.root_dir, None, self.outbuf)
         parsed_url = scm.FullUrlForRelativeUrl(url)
       else:
         parsed_url = url
@@ -401,47 +545,123 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
 
     raise gclient_utils.Error('Unknown url type')
 
+  @staticmethod
+  def MergeWithOsDeps(deps, deps_os, target_os_list):
+    """Returns a new "deps" structure that is the deps sent in updated
+    with information from deps_os (the deps_os section of the DEPS
+    file) that matches the list of target os."""
+    os_overrides = {}
+    for the_target_os in target_os_list:
+      the_target_os_deps = deps_os.get(the_target_os, {})
+      for os_dep_key, os_dep_value in the_target_os_deps.iteritems():
+        overrides = os_overrides.setdefault(os_dep_key, [])
+        overrides.append((the_target_os, os_dep_value))
+
+    # If any os didn't specify a value (we have fewer value entries
+    # than in the os list), then it wants to use the default value.
+    for os_dep_key, os_dep_value in os_overrides.iteritems():
+      if len(os_dep_value) != len(target_os_list):
+        # Record the default value too so that we don't accidently
+        # set it to None or miss a conflicting DEPS.
+        if os_dep_key in deps:
+          os_dep_value.append(('default', deps[os_dep_key]))
+
+    target_os_deps = {}
+    for os_dep_key, os_dep_value in os_overrides.iteritems():
+      # os_dep_value is a list of (os, value) pairs.
+      possible_values = set(x[1] for x in os_dep_value if x[1] is not None)
+      if not possible_values:
+        target_os_deps[os_dep_key] = None
+      else:
+        if len(possible_values) > 1:
+          # It would be possible to abort here but it would be
+          # unfortunate if we end up preventing any kind of checkout.
+          logging.error('Conflicting dependencies for %s: %s. (target_os=%s)',
+                        os_dep_key, os_dep_value, target_os_list)
+        # Sorting to get the same result every time in case of conflicts.
+        target_os_deps[os_dep_key] = sorted(possible_values)[0]
+
+    new_deps = deps.copy()
+    new_deps.update(target_os_deps)
+    return new_deps
+
   def ParseDepsFile(self):
     """Parses the DEPS file for this dependency."""
     assert not self.deps_parsed
     assert not self.dependencies
-    # One thing is unintuitive, vars = {} must happen before Var() use.
-    local_scope = {}
-    var = self.VarImpl(self.custom_vars, local_scope)
-    global_scope = {
-      'File': self.FileImpl,
-      'From': self.FromImpl,
-      'Var': var.Lookup,
-      'deps_os': {},
-    }
-    filepath = os.path.join(self.root.root_dir, self.name, self.deps_file)
-    if not os.path.isfile(filepath):
+
+    deps_content = None
+    use_strict = False
+
+    # First try to locate the configured deps file.  If it's missing, fallback
+    # to DEPS.
+    deps_files = [self.deps_file]
+    if 'DEPS' not in deps_files:
+      deps_files.append('DEPS')
+    for deps_file in deps_files:
+      filepath = os.path.join(self.root.root_dir, self.name, deps_file)
+      if os.path.isfile(filepath):
+        logging.info(
+            'ParseDepsFile(%s): %s file found at %s', self.name, deps_file,
+            filepath)
+        break
       logging.info(
-          'ParseDepsFile(%s): No %s file found at %s' % (
-            self.name, self.deps_file, filepath))
-    else:
+          'ParseDepsFile(%s): No %s file found at %s', self.name, deps_file,
+          filepath)
+
+    if os.path.isfile(filepath):
       deps_content = gclient_utils.FileRead(filepath)
-      logging.debug('ParseDepsFile(%s) read:\n%s' % (self.name, deps_content))
+      logging.debug('ParseDepsFile(%s) read:\n%s', self.name, deps_content)
+      use_strict = 'use strict' in deps_content.splitlines()[0]
+
+    local_scope = {}
+    if deps_content:
+      # One thing is unintuitive, vars = {} must happen before Var() use.
+      var = self.VarImpl(self.custom_vars, local_scope)
+      if use_strict:
+        logging.info(
+          'ParseDepsFile(%s): Strict Mode Enabled', self.name)
+        global_scope = {
+          '__builtins__': {'None': None},
+          'Var': var.Lookup,
+          'deps_os': {},
+        }
+      else:
+        global_scope = {
+          'File': self.FileImpl,
+          'From': self.FromImpl,
+          'Var': var.Lookup,
+          'deps_os': {},
+        }
       # Eval the content.
       try:
         exec(deps_content, global_scope, local_scope)
       except SyntaxError, e:
         gclient_utils.SyntaxErrorToError(filepath, e)
+      if use_strict:
+        for key, val in local_scope.iteritems():
+          if not isinstance(val, (dict, list, tuple, str)):
+            raise gclient_utils.Error(
+              'ParseDepsFile(%s): Strict mode disallows %r -> %r' %
+              (self.name, key, val))
+
     deps = local_scope.get('deps', {})
+    if 'recursion' in local_scope:
+      self.recursion_override = local_scope.get('recursion')
+      logging.warning(
+          'Setting %s recursion to %d.', self.name, self.recursion_limit)
+    self.recursedeps = local_scope.get('recursedeps', None)
+    if 'recursedeps' in local_scope:
+      self.recursedeps = set(self.recursedeps)
+      logging.warning('Found recursedeps %r.', repr(self.recursedeps))
+    # If present, save 'target_os' in the local_target_os property.
+    if 'target_os' in local_scope:
+      self.local_target_os = local_scope['target_os']
     # load os specific dependencies if defined.  these dependencies may
     # override or extend the values defined by the 'deps' member.
-    if 'deps_os' in local_scope:
-      enforced_os = self.root.enforced_os
-      for deps_os_key in enforced_os:
-        os_deps = local_scope['deps_os'].get(deps_os_key, {})
-        if len(enforced_os) > 1:
-          # Ignore any conflict when including deps for more than one
-          # platform, so we collect the broadest set of dependencies
-          # available. We may end up with the wrong revision of something for
-          # our platform, but this is the best we can do.
-          deps.update([x for x in os_deps.items() if not x[0] in deps])
-        else:
-          deps.update(os_deps)
+    target_os_list = self.target_os
+    if 'deps_os' in local_scope and target_os_list:
+      deps = self.MergeWithOsDeps(deps, local_scope['deps_os'], target_os_list)
 
     # If a line is in custom_deps, but not in the solution, we want to append
     # this line to the solution.
@@ -451,25 +671,64 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
 
     # If use_relative_paths is set in the DEPS file, regenerate
     # the dictionary using paths relative to the directory containing
-    # the DEPS file.
+    # the DEPS file.  Also update recursedeps if use_relative_paths is
+    # enabled.
     use_relative_paths = local_scope.get('use_relative_paths', False)
     if use_relative_paths:
+      logging.warning('use_relative_paths enabled.')
       rel_deps = {}
       for d, url in deps.items():
         # normpath is required to allow DEPS to use .. in their
         # dependency local path.
         rel_deps[os.path.normpath(os.path.join(self.name, d))] = url
+      logging.warning('Updating deps by prepending %s.', self.name)
       deps = rel_deps
+
+      # Update recursedeps if it's set.
+      if self.recursedeps is not None:
+        logging.warning('Updating recursedeps by prepending %s.', self.name)
+        rel_deps = set()
+        for d in self.recursedeps:
+          rel_deps.add(os.path.normpath(os.path.join(self.name, d)))
+        self.recursedeps = rel_deps
+
+    if 'allowed_hosts' in local_scope:
+      try:
+        self._allowed_hosts = frozenset(local_scope.get('allowed_hosts'))
+      except TypeError:  # raised if non-iterable
+        pass
+      if not self._allowed_hosts:
+        logging.warning("allowed_hosts is specified but empty %s",
+                        self._allowed_hosts)
+        raise gclient_utils.Error(
+            'ParseDepsFile(%s): allowed_hosts must be absent '
+            'or a non-empty iterable' % self.name)
 
     # Convert the deps into real Dependency.
     deps_to_add = []
     for name, url in deps.iteritems():
       should_process = self.recursion_limit and self.should_process
       deps_to_add.append(Dependency(
-          self, name, url, None, None, None, None,
+          self, name, url, None, None, None, None, None,
           self.deps_file, should_process))
     deps_to_add.sort(key=lambda x: x.name)
-    self.add_dependencies_and_close(deps_to_add, local_scope.get('hooks', []))
+
+    # override named sets of hooks by the custom hooks
+    hooks_to_run = []
+    hook_names_to_suppress = [c.get('name', '') for c in self.custom_hooks]
+    for hook in local_scope.get('hooks', []):
+      if hook.get('name', '') not in hook_names_to_suppress:
+        hooks_to_run.append(hook)
+
+    # add the replacements and any additions
+    for hook in self.custom_hooks:
+      if 'action' in hook:
+        hooks_to_run.append(hook)
+
+    self._pre_deps_hooks = [self.GetHookAction(hook, []) for hook in
+                            local_scope.get('pre_deps_hooks', [])]
+
+    self.add_dependencies_and_close(deps_to_add, hooks_to_run)
     logging.info('ParseDepsFile(%s) done' % self.name)
 
   def add_dependencies_and_close(self, deps_to_add, hooks):
@@ -479,42 +738,58 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
         self.add_dependency(dep)
     self._mark_as_parsed(hooks)
 
-  @staticmethod
-  def maybeGetParentRevision(
-      command, options, parsed_url, parent_name, revision_overrides):
-    """If we are performing an update and --transitive is set, set the
-    revision to the parent's revision. If we have an explicit revision
-    do nothing."""
+  def maybeGetParentRevision(self, command, options, parsed_url, parent):
+    """Uses revision/timestamp of parent if no explicit revision was specified.
+
+    If we are performing an update and --transitive is set, use
+    - the parent's revision if 'self.url' is in the same repository
+    - the parent's timestamp otherwise
+    to update 'self.url'. The used revision/timestamp will be set in
+    'options.revision'.
+    If we have an explicit revision do nothing.
+    """
     if command == 'update' and options.transitive and not options.revision:
       _, revision = gclient_utils.SplitUrlRevision(parsed_url)
       if not revision:
-        options.revision = revision_overrides.get(parent_name)
-        if options.verbose and options.revision:
-          print("Using parent's revision date: %s" % options.revision)
-        # If the parent has a revision override, then it must have been
-        # converted to date format.
-        assert (not options.revision or
-                gclient_utils.IsDateRevision(options.revision))
+        options.revision = getattr(parent, '_used_revision', None)
+        if (options.revision and
+            not gclient_utils.IsDateRevision(options.revision)):
+          assert self.parent and self.parent.used_scm
+          # If this dependency is in the same repository as parent it's url will
+          # start with a slash. If so we take the parent revision instead of
+          # it's timestamp.
+          # (The timestamps of commits in google code are broken -- which can
+          # result in dependencies to be checked out at the wrong revision)
+          if self.url.startswith('/'):
+            if options.verbose:
+              print('Using parent\'s revision %s since we are in the same '
+                    'repository.' % options.revision)
+          else:
+            parent_revision_date = self.parent.used_scm.GetRevisionDate(
+                options.revision)
+            options.revision = gclient_utils.MakeDateRevision(
+                parent_revision_date)
+            if options.verbose:
+              print('Using parent\'s revision date %s since we are in a '
+                    'different repository.' % options.revision)
 
-  @staticmethod
-  def maybeConvertToDateRevision(
-      command, options, name, scm, revision_overrides):
-    """If we are performing an update and --transitive is set, convert the
-    revision to a date-revision (if necessary). Instead of having
-    -r 101 replace the revision with the time stamp of 101 (e.g.
-    "{2011-18-04}").
-    This way dependencies are upgraded to the revision they had at the
-    check-in of revision 101."""
-    if (command == 'update' and
-        options.transitive and
-        options.revision and
-        not gclient_utils.IsDateRevision(options.revision)):
-      revision_date = scm.GetRevisionDate(options.revision)
-      revision = gclient_utils.MakeDateRevision(revision_date)
-      if options.verbose:
-        print("Updating revision override from %s to %s." %
-              (options.revision, revision))
-      revision_overrides[name] = revision
+  def findDepsFromNotAllowedHosts(self):
+    """Returns a list of depenecies from not allowed hosts.
+
+    If allowed_hosts is not set, allows all hosts and returns empty list.
+    """
+    if not self._allowed_hosts:
+      return []
+    bad_deps = []
+    for dep in self._dependencies:
+      # Don't enforce this for custom_deps.
+      if dep.name in self._custom_deps:
+        continue
+      if isinstance(dep.url, basestring):
+        parsed_url = urlparse.urlparse(dep.url)
+        if parsed_url.netloc and parsed_url.netloc not in self._allowed_hosts:
+          bad_deps.append(dep)
+    return bad_deps
 
   # Arguments number differs from overridden method
   # pylint: disable=W0221
@@ -527,9 +802,10 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
     # When running runhooks, there's no need to consult the SCM.
     # All known hooks are expected to run unconditionally regardless of working
     # copy state, so skip the SCM status check.
-    run_scm = command not in ('runhooks', None)
+    run_scm = command not in ('runhooks', 'recurse', None)
     parsed_url = self.LateOverride(self.url)
-    file_list = []
+    file_list = [] if not options.nohooks else None
+    revision_override = revision_overrides.pop(self.name, None)
     if run_scm and parsed_url:
       if isinstance(parsed_url, self.FileImpl):
         # Special support for single-file checkout.
@@ -537,27 +813,29 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
           # Sadly, pylint doesn't realize that parsed_url is of FileImpl.
           # pylint: disable=E1103
           options.revision = parsed_url.GetRevision()
-          scm = gclient_scm.SVNWrapper(parsed_url.GetPath(),
-                                       self.root.root_dir,
-                                       self.name)
-          scm.RunCommand('updatesingle', options,
-                         args + [parsed_url.GetFilename()],
-                         file_list)
+          self._used_scm = gclient_scm.SVNWrapper(
+              parsed_url.GetPath(), self.root.root_dir, self.name,
+              out_cb=work_queue.out_cb)
+          self._used_scm.RunCommand('updatesingle',
+              options, args + [parsed_url.GetFilename()], file_list)
       else:
         # Create a shallow copy to mutate revision.
         options = copy.copy(options)
-        options.revision = revision_overrides.get(self.name)
+        options.revision = revision_override
         self.maybeGetParentRevision(
-            command, options, parsed_url, self.parent.name, revision_overrides)
-        scm = gclient_scm.CreateSCM(parsed_url, self.root.root_dir, self.name)
-        scm.RunCommand(command, options, args, file_list)
-        self.maybeConvertToDateRevision(
-            command, options, self.name, scm, revision_overrides)
-        file_list = [os.path.join(self.name, f.strip()) for f in file_list]
+            command, options, parsed_url, self.parent)
+        self._used_revision = options.revision
+        self._used_scm = gclient_scm.CreateSCM(
+            parsed_url, self.root.root_dir, self.name, self.outbuf,
+            out_cb=work_queue.out_cb)
+        self._got_revision = self._used_scm.RunCommand(command, options, args,
+                                                       file_list)
+        if file_list:
+          file_list = [os.path.join(self.name, f.strip()) for f in file_list]
 
       # TODO(phajdan.jr): We should know exactly when the paths are absolute.
       # Convert all absolute paths to relative.
-      for i in range(len(file_list)):
+      for i in range(len(file_list or [])):
         # It depends on the command being executed (like runhooks vs sync).
         if not os.path.isabs(file_list[i]):
           continue
@@ -570,13 +848,72 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
 
     # Always parse the DEPS file.
     self.ParseDepsFile()
-
-    self._run_is_done(file_list, parsed_url)
+    self._run_is_done(file_list or [], parsed_url)
+    if command in ('update', 'revert') and not options.noprehooks:
+      self.RunPreDepsHooks()
 
     if self.recursion_limit:
       # Parse the dependencies of this dependency.
       for s in self.dependencies:
         work_queue.enqueue(s)
+
+    if command == 'recurse':
+      if not isinstance(parsed_url, self.FileImpl):
+        # Skip file only checkout.
+        scm = gclient_scm.GetScmName(parsed_url)
+        if not options.scm or scm in options.scm:
+          cwd = os.path.normpath(os.path.join(self.root.root_dir, self.name))
+          # Pass in the SCM type as an env variable.  Make sure we don't put
+          # unicode strings in the environment.
+          env = os.environ.copy()
+          if scm:
+            env['GCLIENT_SCM'] = str(scm)
+          if parsed_url:
+            env['GCLIENT_URL'] = str(parsed_url)
+          env['GCLIENT_DEP_PATH'] = str(self.name)
+          if options.prepend_dir and scm == 'git':
+            print_stdout = False
+            def filter_fn(line):
+              """Git-specific path marshaling. It is optimized for git-grep."""
+
+              def mod_path(git_pathspec):
+                match = re.match('^(\\S+?:)?([^\0]+)$', git_pathspec)
+                modified_path = os.path.join(self.name, match.group(2))
+                branch = match.group(1) or ''
+                return '%s%s' % (branch, modified_path)
+
+              match = re.match('^Binary file ([^\0]+) matches$', line)
+              if match:
+                print 'Binary file %s matches\n' % mod_path(match.group(1))
+                return
+
+              items = line.split('\0')
+              if len(items) == 2 and items[1]:
+                print '%s : %s' % (mod_path(items[0]), items[1])
+              elif len(items) >= 2:
+                # Multiple null bytes or a single trailing null byte indicate
+                # git is likely displaying filenames only (such as with -l)
+                print '\n'.join(mod_path(path) for path in items if path)
+              else:
+                print line
+          else:
+            print_stdout = True
+            filter_fn = None
+
+          if parsed_url is None:
+            print >> sys.stderr, 'Skipped omitted dependency %s' % cwd
+          elif os.path.isdir(cwd):
+            try:
+              gclient_utils.CheckCallAndFilter(
+                  args, cwd=cwd, env=env, print_stdout=print_stdout,
+                  filter_fn=filter_fn,
+                  )
+            except subprocess2.CalledProcessError:
+              if not options.ignore:
+                raise
+          else:
+            print >> sys.stderr, 'Skipped missing %s' % cwd
+
 
   @gclient_utils.lockedmethod
   def _run_is_done(self, file_list, parsed_url):
@@ -585,13 +922,31 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
     self._parsed_url = parsed_url
     self._processed = True
 
-  def RunHooksRecursively(self, options):
-    """Evaluates all hooks, running actions as needed. run()
-    must have been called before to load the DEPS."""
-    assert self.hooks_ran == False
+  @staticmethod
+  def GetHookAction(hook_dict, matching_file_list):
+    """Turns a parsed 'hook' dict into an executable command."""
+    logging.debug(hook_dict)
+    logging.debug(matching_file_list)
+    command = hook_dict['action'][:]
+    if command[0] == 'python':
+      # If the hook specified "python" as the first item, the action is a
+      # Python script.  Run it by starting a new copy of the same
+      # interpreter.
+      command[0] = sys.executable
+    if '$matching_files' in command:
+      splice_index = command.index('$matching_files')
+      command[splice_index:splice_index + 1] = matching_file_list
+    return command
+
+  def GetHooks(self, options):
+    """Evaluates all hooks, and return them in a flat list.
+
+    RunOnDeps() must have been called before to load the DEPS.
+    """
+    result = []
     if not self.should_process or not self.recursion_limit:
       # Don't run the hook when it is above recursion_limit.
-      return
+      return result
     # If "--force" was specified, run all hooks regardless of what files have
     # changed.
     if self.deps_hooks:
@@ -603,7 +958,7 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
           gclient_scm.GetScmName(self.parsed_url) in ('git', None) or
           os.path.isdir(os.path.join(self.root.root_dir, self.name, '.git'))):
         for hook_dict in self.deps_hooks:
-          self._RunHookAction(hook_dict, [])
+          result.append(self.GetHookAction(hook_dict, []))
       else:
         # Run hooks on the basis of whether the files from the gclient operation
         # match each hook's pattern.
@@ -613,38 +968,56 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
               f for f in self.file_list_and_children if pattern.search(f)
           ]
           if matching_file_list:
-            self._RunHookAction(hook_dict, matching_file_list)
+            result.append(self.GetHookAction(hook_dict, matching_file_list))
     for s in self.dependencies:
-      s.RunHooksRecursively(options)
+      result.extend(s.GetHooks(options))
+    return result
 
-  def _RunHookAction(self, hook_dict, matching_file_list):
-    """Runs the action from a single hook."""
-    # A single DEPS file can specify multiple hooks so this function can be
-    # called multiple times on a single Dependency.
-    #assert self.hooks_ran == False
+  def RunHooksRecursively(self, options):
+    assert self.hooks_ran == False
     self._hooks_ran = True
-    logging.debug(hook_dict)
-    logging.debug(matching_file_list)
-    command = hook_dict['action'][:]
-    if command[0] == 'python':
-      # If the hook specified "python" as the first item, the action is a
-      # Python script.  Run it by starting a new copy of the same
-      # interpreter.
-      command[0] = sys.executable
+    for hook in self.GetHooks(options):
+      try:
+        start_time = time.time()
+        gclient_utils.CheckCallAndFilterAndHeader(
+            hook, cwd=self.root.root_dir, always=True)
+      except (gclient_utils.Error, subprocess2.CalledProcessError), e:
+        # Use a discrete exit status code of 2 to indicate that a hook action
+        # failed.  Users of this script may wish to treat hook action failures
+        # differently from VC failures.
+        print >> sys.stderr, 'Error: %s' % str(e)
+        sys.exit(2)
+      finally:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > 10:
+          print "Hook '%s' took %.2f secs" % (
+              gclient_utils.CommandToStr(hook), elapsed_time)
 
-    if '$matching_files' in command:
-      splice_index = command.index('$matching_files')
-      command[splice_index:splice_index + 1] = matching_file_list
+  def RunPreDepsHooks(self):
+    assert self.processed
+    assert self.deps_parsed
+    assert not self.pre_deps_hooks_ran
+    assert not self.hooks_ran
+    for s in self.dependencies:
+      assert not s.processed
+    self._pre_deps_hooks_ran = True
+    for hook in self.pre_deps_hooks:
+      try:
+        start_time = time.time()
+        gclient_utils.CheckCallAndFilterAndHeader(
+            hook, cwd=self.root.root_dir, always=True)
+      except (gclient_utils.Error, subprocess2.CalledProcessError), e:
+        # Use a discrete exit status code of 2 to indicate that a hook action
+        # failed.  Users of this script may wish to treat hook action failures
+        # differently from VC failures.
+        print >> sys.stderr, 'Error: %s' % str(e)
+        sys.exit(2)
+      finally:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > 10:
+          print "Hook '%s' took %.2f secs" % (
+              gclient_utils.CommandToStr(hook), elapsed_time)
 
-    try:
-      gclient_utils.CheckCallAndFilterAndHeader(
-          command, cwd=self.root.root_dir, always=True)
-    except (gclient_utils.Error, subprocess2.CalledProcessError), e:
-      # Use a discrete exit status code of 2 to indicate that a hook action
-      # failed.  Users of this script may wish to treat hook action failures
-      # differently from VC failures.
-      print >> sys.stderr, 'Error: %s' % str(e)
-      sys.exit(2)
 
   def subtree(self, include_all):
     """Breadth first recursion excluding root node."""
@@ -685,6 +1058,11 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
 
   @property
   @gclient_utils.lockedmethod
+  def pre_deps_hooks(self):
+    return tuple(self._pre_deps_hooks)
+
+  @property
+  @gclient_utils.lockedmethod
   def parsed_url(self):
     return self._parsed_url
 
@@ -701,13 +1079,33 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
 
   @property
   @gclient_utils.lockedmethod
+  def pre_deps_hooks_ran(self):
+    return self._pre_deps_hooks_ran
+
+  @property
+  @gclient_utils.lockedmethod
   def hooks_ran(self):
     return self._hooks_ran
 
   @property
   @gclient_utils.lockedmethod
+  def allowed_hosts(self):
+    return self._allowed_hosts
+
+  @property
+  @gclient_utils.lockedmethod
   def file_list(self):
     return tuple(self._file_list)
+
+  @property
+  def used_scm(self):
+    """SCMWrapper instance for this dependency or None if not processed yet."""
+    return self._used_scm
+
+  @property
+  @gclient_utils.lockedmethod
+  def got_revision(self):
+    return self._got_revision
 
   @property
   def file_list_and_children(self):
@@ -720,7 +1118,8 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
     out = []
     for i in ('name', 'url', 'parsed_url', 'safesync_url', 'custom_deps',
               'custom_vars', 'deps_hooks', 'file_list', 'should_process',
-              'processed', 'hooks_ran', 'deps_parsed', 'requirements'):
+              'processed', 'hooks_ran', 'deps_parsed', 'requirements',
+              'allowed_hosts'):
       # First try the native property if it exists.
       if hasattr(self, '_' + i):
         value = getattr(self, '_' + i, False)
@@ -761,6 +1160,7 @@ class GClient(Dependency):
     "linux": "unix",
     "linux2": "unix",
     "linux3": "unix",
+    "android": "android",
   }
 
   DEFAULT_CLIENT_FILE_TEXT = ("""\
@@ -774,6 +1174,7 @@ solutions = [
     "safesync_url": "%(safesync_url)s",
   },
 ]
+cache_dir = %(cache_dir)r
 """)
 
   DEFAULT_SNAPSHOT_SOLUTION_TEXT = ("""\
@@ -797,7 +1198,7 @@ solutions = [
     # Do not change previous behavior. Only solution level and immediate DEPS
     # are processed.
     self._recursion_limit = 2
-    Dependency.__init__(self, None, None, None, None, True, None, None,
+    Dependency.__init__(self, None, None, None, None, True, None, None, None,
                         'unused', True)
     self._options = options
     if options.deps_os:
@@ -810,6 +1211,35 @@ solutions = [
     self._root_dir = root_dir
     self.config_content = None
 
+  def _CheckConfig(self):
+    """Verify that the config matches the state of the existing checked-out
+    solutions."""
+    for dep in self.dependencies:
+      if dep.managed and dep.url:
+        scm = gclient_scm.CreateSCM(
+            dep.url, self.root_dir, dep.name, self.outbuf)
+        actual_url = scm.GetActualRemoteURL(self._options)
+        if actual_url and not scm.DoesRemoteURLMatch(self._options):
+          raise gclient_utils.Error('''
+Your .gclient file seems to be broken. The requested URL is different from what
+is actually checked out in %(checkout_path)s.
+
+The .gclient file contains:
+%(expected_url)s (%(expected_scm)s)
+
+The local checkout in %(checkout_path)s reports:
+%(actual_url)s (%(actual_scm)s)
+
+You should ensure that the URL listed in .gclient is correct and either change
+it or fix the checkout. If you're managing your own git checkout in
+%(checkout_path)s but the URL in .gclient is for an svn repository, you probably
+want to set 'managed': False in .gclient.
+'''  % {'checkout_path': os.path.join(self.root_dir, dep.name),
+        'expected_url': dep.url,
+        'expected_scm': gclient_scm.GetScmName(dep.url),
+        'actual_url': actual_url,
+        'actual_scm': gclient_scm.GetScmName(actual_url)})
+
   def SetConfig(self, content):
     assert not self.dependencies
     config_dict = {}
@@ -818,6 +1248,28 @@ solutions = [
       exec(content, config_dict)
     except SyntaxError, e:
       gclient_utils.SyntaxErrorToError('.gclient', e)
+
+    # Append any target OS that is not already being enforced to the tuple.
+    target_os = config_dict.get('target_os', [])
+    if config_dict.get('target_os_only', False):
+      self._enforced_os = tuple(set(target_os))
+    else:
+      self._enforced_os = tuple(set(self._enforced_os).union(target_os))
+
+    cache_dir = config_dict.get('cache_dir')
+    if cache_dir:
+      cache_dir = os.path.join(self.root_dir, cache_dir)
+      cache_dir = os.path.abspath(cache_dir)
+      # If running on a bot, force break any stale git cache locks.
+      if os.path.exists(cache_dir) and os.environ.get('CHROME_HEADLESS'):
+        subprocess2.check_call(['git', 'cache', 'unlock', '--cache-dir',
+                                cache_dir, '--force', '--all'])
+    gclient_scm.GitWrapper.cache_dir = cache_dir
+    git_cache.Mirror.SetCachePath(cache_dir)
+
+    if not target_os and config_dict.get('target_os_only', False):
+      raise gclient_utils.Error('Can\'t use target_os_only if target_os is '
+                                'not specified')
 
     deps_to_add = []
     for s in config_dict.get('solutions', []):
@@ -828,6 +1280,7 @@ solutions = [
             s.get('managed', True),
             s.get('custom_deps', {}),
             s.get('custom_vars', {}),
+            s.get('custom_hooks', []),
             s.get('deps_file', 'DEPS'),
             True))
       except KeyError:
@@ -841,16 +1294,97 @@ solutions = [
                                          self._options.config_filename),
                             self.config_content)
 
+  def MigrateConfigToGit(self, path, options):
+    svn_url_re = re.compile('^(https?://src\.chromium\.org/svn|'
+                            'svn://svn\.chromium\.org/chrome)/'
+                            '(trunk|branches/[^/]+)/src')
+    old_git_re = re.compile('^(https?://git\.chromium\.org|'
+                            'ssh://([a-zA-Z_][a-zA-Z0-9_-]*@)?'
+                            'gerrit\.chromium\.org(:2941[89])?)/'
+                            'chromium/src\.git')
+    # Scan existing .gclient file for obsolete settings.  It would be simpler
+    # to traverse self.dependencies, but working with the AST allows the code to
+    # dump an updated .gclient file that preserves the ordering of the original.
+    a = ast.parse(self.config_content, options.config_filename, 'exec')
+    modified = False
+    solutions = [elem for elem in a.body if 'solutions' in
+                 [target.id for target in elem.targets]]
+    if not solutions:
+      return self
+    solutions = solutions[-1]
+    for solution in solutions.value.elts:
+      # Check for obsolete URL's
+      url_idx = ast_dict_index(solution, 'url')
+      if url_idx == -1:
+        continue
+      url_val = solution.values[url_idx]
+      if type(url_val) is not ast.Str:
+        continue
+      if (svn_url_re.match(url_val.s.strip())):
+        raise gclient_utils.Error(
+"""
+The chromium code repository has migrated completely to git.
+Your SVN-based checkout is now obsolete; you need to create a brand-new
+git checkout by following these instructions:
+
+http://www.chromium.org/developers/how-tos/get-the-code
+""")
+      if (old_git_re.match(url_val.s.strip())):
+        url_val.s = CHROMIUM_SRC_URL
+        modified = True
+
+      # Ensure deps_file is set to .DEPS.git.  We enforce this here to smooth
+      # over switching between pre-git-migration and post-git-migration
+      # revisions.
+      #   - For pre-migration revisions, .DEPS.git must be explicitly set.
+      #   - For post-migration revisions, .DEPS.git is not present, so gclient
+      #     will correctly fall back to DEPS.
+      if url_val.s == CHROMIUM_SRC_URL:
+        deps_file_idx = ast_dict_index(solution, 'deps_file')
+        if deps_file_idx != -1:
+          continue
+        solution.keys.append(ast.Str('deps_file'))
+        solution.values.append(ast.Str('.DEPS.git'))
+        modified = True
+
+    if not modified:
+      return self
+
+    print(
+"""
+WARNING: gclient detected an obsolete setting in your %s file.  The file has
+been automagically updated.  The previous version is available at %s.old.
+""" % (options.config_filename, options.config_filename))
+
+    # Replace existing .gclient with the updated version.
+    # Return a new GClient instance based on the new content.
+    new_content = ast2str(a)
+    dot_gclient_fn = os.path.join(path, options.config_filename)
+    try:
+      os.rename(dot_gclient_fn, dot_gclient_fn + '.old')
+    except OSError:
+      pass
+    with open(dot_gclient_fn, 'w') as fh:
+      fh.write(new_content)
+    client = GClient(path, options)
+    client.SetConfig(new_content)
+    return client
+
   @staticmethod
   def LoadCurrentConfig(options):
     """Searches for and loads a .gclient file relative to the current working
     dir. Returns a GClient object."""
-    path = gclient_utils.FindGclientRoot(os.getcwd(), options.config_filename)
-    if not path:
-      return None
-    client = GClient(path, options)
-    client.SetConfig(gclient_utils.FileRead(
-        os.path.join(path, options.config_filename)))
+    if options.spec:
+      client = GClient('.', options)
+      client.SetConfig(options.spec)
+    else:
+      path = gclient_utils.FindGclientRoot(os.getcwd(), options.config_filename)
+      if not path:
+        return None
+      client = GClient(path, options)
+      client.SetConfig(gclient_utils.FileRead(
+          os.path.join(path, options.config_filename)))
+      client = client.MigrateConfigToGit(path, options)
 
     if (options.revisions and
         len(client.dependencies) > 1 and
@@ -865,13 +1399,14 @@ solutions = [
     return client
 
   def SetDefaultConfig(self, solution_name, deps_file, solution_url,
-                       safesync_url, managed=True):
+                       safesync_url, managed=True, cache_dir=None):
     self.SetConfig(self.DEFAULT_CLIENT_FILE_TEXT % {
       'solution_name': solution_name,
       'solution_url': solution_url,
       'deps_file': deps_file,
       'safesync_url' : safesync_url,
       'managed': managed,
+      'cache_dir': cache_dir,
     })
 
   def _SaveEntries(self):
@@ -929,13 +1464,8 @@ solutions = [
       if not '@' in revision:
         # Support for --revision 123
         revision = '%s@%s' % (solutions_names[index], revision)
-      sol, rev = revision.split('@', 1)
-      if not sol in solutions_names:
-        #raise gclient_utils.Error('%s is not a valid solution.' % sol)
-        print >> sys.stderr, ('Please fix your script, having invalid '
-                              '--revision flags will soon considered an error.')
-      else:
-        revision_overrides[sol] = rev
+      name, rev = revision.split('@', 1)
+      revision_overrides[name] = rev
       index += 1
     return revision_overrides
 
@@ -952,13 +1482,14 @@ solutions = [
           'It appears your safesync_url (%s) is not working properly\n'
           '(as it returned an empty response). Check your config.' %
           dep.safesync_url)
-    scm = gclient_scm.CreateSCM(dep.url, dep.root.root_dir, dep.name)
-    safe_rev = scm.GetUsableRev(rev=rev, options=self._options)
+    scm = gclient_scm.CreateSCM(
+        dep.url, dep.root.root_dir, dep.name, self.outbuf)
+    safe_rev = scm.GetUsableRev(rev, self._options)
     if self._options.verbose:
       print('Using safesync_url revision: %s.\n' % safe_rev)
     self._options.revisions.append('%s@%s' % (dep.name, safe_rev))
 
-  def RunOnDeps(self, command, args):
+  def RunOnDeps(self, command, args, ignore_requirements=False, progress=True):
     """Runs a command on each dependency in a client and its dependencies.
 
     Args:
@@ -967,16 +1498,29 @@ solutions = [
     """
     if not self.dependencies:
       raise gclient_utils.Error('No solution specified')
-    revision_overrides = self._EnforceRevisions()
+
+    revision_overrides = {}
+    # It's unnecessary to check for revision overrides for 'recurse'.
+    # Save a few seconds by not calling _EnforceRevisions() in that case.
+    if command not in ('diff', 'recurse', 'runhooks', 'status', 'revert'):
+      self._CheckConfig()
+      revision_overrides = self._EnforceRevisions()
     pm = None
     # Disable progress for non-tty stdout.
-    if (command in ('update', 'revert') and sys.stdout.isatty() and not
-        self._options.verbose):
-      pm = Progress('Syncing projects', 1)
-    work_queue = gclient_utils.ExecutionQueue(self._options.jobs, pm)
+    if (sys.stdout.isatty() and not self._options.verbose and progress):
+      if command in ('update', 'revert'):
+        pm = Progress('Syncing projects', 1)
+      elif command == 'recurse':
+        pm = Progress(' '.join(args), 1)
+    work_queue = gclient_utils.ExecutionQueue(
+        self._options.jobs, pm, ignore_requirements=ignore_requirements,
+        verbose=self._options.verbose)
     for s in self.dependencies:
       work_queue.enqueue(s)
     work_queue.flush(revision_overrides, command, args, options=self._options)
+    if revision_overrides:
+      print >> sys.stderr, ('Please fix your script, having invalid '
+                            '--revision flags will soon considered an error.')
 
     # Once all the dependencies have been processed, it's now safe to run the
     # hooks.
@@ -988,6 +1532,9 @@ solutions = [
       # Only delete the directory if there are no changes in it, and
       # delete_unversioned_trees is set to true.
       entries = [i.name for i in self.root.subtree(False) if i.url]
+      full_entries = [os.path.join(self.root_dir, e.replace('/', os.path.sep))
+                      for e in entries]
+
       for entry, prev_url in self._ReadEntries().iteritems():
         if not prev_url:
           # entry must have been overridden via .gclient custom_deps
@@ -996,9 +1543,71 @@ solutions = [
         entry_fixed = entry.replace('/', os.path.sep)
         e_dir = os.path.join(self.root_dir, entry_fixed)
         # Use entry and not entry_fixed there.
-        if entry not in entries and os.path.exists(e_dir):
+        if (entry not in entries and
+            (not any(path.startswith(entry + '/') for path in entries)) and
+            os.path.exists(e_dir)):
+          # The entry has been removed from DEPS.
+          scm = gclient_scm.CreateSCM(
+              prev_url, self.root_dir, entry_fixed, self.outbuf)
+
+          # Check to see if this directory is now part of a higher-up checkout.
+          # The directory might be part of a git OR svn checkout.
+          scm_root = None
+          scm_class = None
+          for scm_class in (gclient_scm.scm.GIT, gclient_scm.scm.SVN):
+            try:
+              scm_root = scm_class.GetCheckoutRoot(scm.checkout_path)
+            except subprocess2.CalledProcessError:
+              pass
+            if scm_root:
+              break
+          else:
+            logging.warning('Could not find checkout root for %s. Unable to '
+                            'determine whether it is part of a higher-level '
+                            'checkout, so not removing.' % entry)
+            continue
+
+          # This is to handle the case of third_party/WebKit migrating from
+          # being a DEPS entry to being part of the main project.
+          # If the subproject is a Git project, we need to remove its .git
+          # folder. Otherwise git operations on that folder will have different
+          # effects depending on the current working directory.
+          if scm_class == gclient_scm.scm.GIT and (
+              os.path.abspath(scm_root) == os.path.abspath(e_dir)):
+            e_par_dir = os.path.join(e_dir, os.pardir)
+            if scm_class.IsInsideWorkTree(e_par_dir):
+              par_scm_root = scm_class.GetCheckoutRoot(e_par_dir)
+              # rel_e_dir : relative path of entry w.r.t. its parent repo.
+              rel_e_dir = os.path.relpath(e_dir, par_scm_root)
+              if scm_class.IsDirectoryVersioned(par_scm_root, rel_e_dir):
+                save_dir = scm.GetGitBackupDirPath()
+                # Remove any eventual stale backup dir for the same project.
+                if os.path.exists(save_dir):
+                  gclient_utils.rmtree(save_dir)
+                os.rename(os.path.join(e_dir, '.git'), save_dir)
+                # When switching between the two states (entry/ is a subproject
+                # -> entry/ is part of the outer project), it is very likely
+                # that some files are changed in the checkout, unless we are
+                # jumping *exactly* across the commit which changed just DEPS.
+                # In such case we want to cleanup any eventual stale files
+                # (coming from the old subproject) in order to end up with a
+                # clean checkout.
+                scm_class.CleanupDir(par_scm_root, rel_e_dir)
+                assert not os.path.exists(os.path.join(e_dir, '.git'))
+                print(('\nWARNING: \'%s\' has been moved from DEPS to a higher '
+                       'level checkout. The git folder containing all the local'
+                       ' branches has been saved to %s.\n'
+                       'If you don\'t care about its state you can safely '
+                       'remove that folder to free up space.') %
+                      (entry, save_dir))
+                continue
+
+          if scm_root in full_entries:
+            logging.info('%s is part of a higher level checkout, not removing',
+                         scm.GetCheckoutRoot())
+            continue
+
           file_list = []
-          scm = gclient_scm.CreateSCM(prev_url, self.root_dir, entry_fixed)
           scm.status(self._options, [], file_list)
           modified_files = file_list != []
           if (not self._options.delete_unversioned_trees or
@@ -1012,7 +1621,7 @@ solutions = [
             # Delete the entry
             print('\n________ deleting \'%s\' in \'%s\'' % (
                 entry_fixed, self.root_dir))
-            gclient_utils.RemoveDirectory(e_dir)
+            gclient_utils.rmtree(e_dir)
       # record the current list of entries for next time
       self._SaveEntries()
     return 0
@@ -1021,7 +1630,8 @@ solutions = [
     if not self.dependencies:
       raise gclient_utils.Error('No solution specified')
     # Load all the settings.
-    work_queue = gclient_utils.ExecutionQueue(self._options.jobs, None)
+    work_queue = gclient_utils.ExecutionQueue(
+        self._options.jobs, None, False, verbose=self._options.verbose)
     for s in self.dependencies:
       work_queue.enqueue(s)
     work_queue.flush({}, None, [], options=self._options)
@@ -1035,7 +1645,8 @@ solutions = [
       else:
         original_url = dep.parsed_url
       url, _ = gclient_utils.SplitUrlRevision(original_url)
-      scm = gclient_scm.CreateSCM(original_url, self.root_dir, dep.name)
+      scm = gclient_scm.CreateSCM(
+          original_url, self.root_dir, dep.name, self.outbuf)
       if not os.path.isdir(scm.checkout_path):
         return None
       return '%s@%s' % (url, scm.revinfo(self._options, [], None))
@@ -1099,6 +1710,15 @@ solutions = [
     """How recursive can each dependencies in DEPS file can load DEPS file."""
     return self._recursion_limit
 
+  @property
+  def try_recursedeps(self):
+    """Whether to attempt using recursedeps-style recursion processing."""
+    return True
+
+  @property
+  def target_os(self):
+    return self._enforced_os
+
 
 #### gclient commands.
 
@@ -1106,8 +1726,8 @@ solutions = [
 def CMDcleanup(parser, args):
   """Cleans up all working copies.
 
-Mostly svn-specific. Simply runs 'svn cleanup' for each module.
-"""
+  Mostly svn-specific. Simply runs 'svn cleanup' for each module.
+  """
   parser.add_option('--deps', dest='deps_os', metavar='OS_LIST',
                     help='override deps for the specified (comma-separated) '
                          'platform(s); \'all\' will process all deps_os '
@@ -1123,17 +1743,24 @@ Mostly svn-specific. Simply runs 'svn cleanup' for each module.
   return client.RunOnDeps('cleanup', args)
 
 
-@attr('usage', '[command] [args ...]')
+@subcommand.usage('[command] [args ...]')
 def CMDrecurse(parser, args):
-  """Operates on all the entries.
+  """Operates [command args ...] on all the dependencies.
 
   Runs a shell command on all entries.
+  Sets GCLIENT_DEP_PATH enviroment variable as the dep's relative location to
+  root directory of the checkout.
   """
   # Stop parsing at the first non-arg so that these go through to the command
   parser.disable_interspersed_args()
   parser.add_option('-s', '--scm', action='append', default=[],
-                    help='choose scm types to operate upon')
-  parser.remove_option('--jobs')
+                    help='Choose scm types to operate upon.')
+  parser.add_option('-i', '--ignore', action='store_true',
+                    help='Ignore non-zero return codes from subcommands.')
+  parser.add_option('--prepend-dir', action='store_true',
+                    help='Prepend relative dir for use with git <cmd> --null.')
+  parser.add_option('--no-progress', action='store_true',
+                    help='Disable progress bar that shows sub-command updates')
   options, args = parser.parse_args(args)
   if not args:
     print >> sys.stderr, 'Need to supply a command!'
@@ -1144,44 +1771,87 @@ def CMDrecurse(parser, args):
         'You need to run gclient sync at least once to use \'recurse\'.\n'
         'This is because .gclient_entries needs to exist and be up to date.')
     return 1
-  root, entries = root_and_entries
+
+  # Normalize options.scm to a set()
   scm_set = set()
   for scm in options.scm:
     scm_set.update(scm.split(','))
+  options.scm = scm_set
 
-  # Pass in the SCM type as an env variable
-  env = os.environ.copy()
-
-  for path, url in entries.iteritems():
-    scm = gclient_scm.GetScmName(url)
-    if scm_set and scm not in scm_set:
-      continue
-    cwd = os.path.normpath(os.path.join(root, path))
-    if scm:
-      env['GCLIENT_SCM'] = scm
-    if url:
-      env['GCLIENT_URL'] = url
-    if os.path.isdir(cwd):
-      subprocess2.call(args, cwd=cwd, env=env)
-    else:
-      print >> sys.stderr, 'Skipped missing %s' % cwd
-  return 0
+  options.nohooks = True
+  client = GClient.LoadCurrentConfig(options)
+  return client.RunOnDeps('recurse', args, ignore_requirements=True,
+                          progress=not options.no_progress)
 
 
-@attr('usage', '[url] [safesync url]')
+@subcommand.usage('[args ...]')
+def CMDfetch(parser, args):
+  """Fetches upstream commits for all modules.
+
+  Completely git-specific. Simply runs 'git fetch [args ...]' for each module.
+  """
+  (options, args) = parser.parse_args(args)
+  return CMDrecurse(OptionParser(), [
+      '--jobs=%d' % options.jobs, '--scm=git', 'git', 'fetch'] + args)
+
+
+def CMDgrep(parser, args):
+  """Greps through git repos managed by gclient.
+
+  Runs 'git grep [args...]' for each module.
+  """
+  # We can't use optparse because it will try to parse arguments sent
+  # to git grep and throw an error. :-(
+  if not args or re.match('(-h|--help)$', args[0]):
+    print >> sys.stderr, (
+        'Usage: gclient grep [-j <N>] git-grep-args...\n\n'
+        'Example: "gclient grep -j10 -A2 RefCountedBase" runs\n"git grep '
+        '-A2 RefCountedBase" on each of gclient\'s git\nrepos with up to '
+        '10 jobs.\n\nBonus: page output by appending "|& less -FRSX" to the'
+        ' end of your query.'
+        )
+    return 1
+
+  jobs_arg = ['--jobs=1']
+  if re.match(r'(-j|--jobs=)\d+$', args[0]):
+    jobs_arg, args = args[:1], args[1:]
+  elif re.match(r'(-j|--jobs)$', args[0]):
+    jobs_arg, args = args[:2], args[2:]
+
+  return CMDrecurse(
+      parser,
+      jobs_arg + ['--ignore', '--prepend-dir', '--no-progress', '--scm=git',
+                  'git', 'grep', '--null', '--color=Always'] + args)
+
+
+def CMDroot(parser, args):
+  """Outputs the solution root (or current dir if there isn't one)."""
+  (options, args) = parser.parse_args(args)
+  client = GClient.LoadCurrentConfig(options)
+  if client:
+    print(os.path.abspath(client.root_dir))
+  else:
+    print(os.path.abspath('.'))
+
+
+@subcommand.usage('[url] [safesync url]')
 def CMDconfig(parser, args):
-  """Create a .gclient file in the current directory.
+  """Creates a .gclient file in the current directory.
 
-This specifies the configuration for further commands. After update/sync,
-top-level DEPS files in each module are read to determine dependent
-modules to operate on as well. If optional [url] parameter is
-provided, then configuration is read from a specified Subversion server
-URL.
-"""
-  parser.add_option('--spec',
-                    help='create a gclient file containing the provided '
-                         'string. Due to Cygwin/Python brokenness, it '
-                         'probably can\'t contain any newlines.')
+  This specifies the configuration for further commands. After update/sync,
+  top-level DEPS files in each module are read to determine dependent
+  modules to operate on as well. If optional [url] parameter is
+  provided, then configuration is read from a specified Subversion server
+  URL.
+  """
+  # We do a little dance with the --gclientfile option.  'gclient config' is the
+  # only command where it's acceptable to have both '--gclientfile' and '--spec'
+  # arguments.  So, we temporarily stash any --gclientfile parameter into
+  # options.output_config_file until after the (gclientfile xor spec) error
+  # check.
+  parser.remove_option('--gclientfile')
+  parser.add_option('--gclientfile', dest='output_config_file',
+                    help='Specify an alternate .gclient file')
   parser.add_option('--name',
                     help='overrides the default name for the solution')
   parser.add_option('--deps-file', default='DEPS',
@@ -1192,9 +1862,14 @@ URL.
                          'to have the main solution untouched by gclient '
                          '(gclient will check out unmanaged dependencies but '
                          'will never sync them)')
-  parser.add_option('--git-deps', action='store_true',
-                    help='sets the deps file to ".DEPS.git" instead of "DEPS"')
+  parser.add_option('--cache-dir',
+                    help='(git only) Cache all git repos into this dir and do '
+                         'shared clones from the cache, instead of cloning '
+                         'directly from the remote. (experimental)')
+  parser.set_defaults(config_filename=None)
   (options, args) = parser.parse_args(args)
+  if options.output_config_file:
+    setattr(options, 'config_filename', getattr(options, 'output_config_file'))
   if ((options.spec and args) or len(args) > 2 or
       (not options.spec and not args)):
     parser.error('Inconsistent arguments. Use either --spec or one or 2 args')
@@ -1211,35 +1886,43 @@ URL.
     else:
       # specify an alternate relpath for the given URL.
       name = options.name
+      if not os.path.abspath(os.path.join(os.getcwd(), name)).startswith(
+          os.getcwd()):
+        parser.error('Do not pass a relative path for --name.')
+      if any(x in ('..', '.', '/', '\\') for x in name.split(os.sep)):
+        parser.error('Do not include relative path components in --name.')
+
     deps_file = options.deps_file
-    if options.git_deps:
-      deps_file = '.DEPS.git'
     safesync_url = ''
     if len(args) > 1:
       safesync_url = args[1]
     client.SetDefaultConfig(name, deps_file, base_url, safesync_url,
-                            managed=not options.unmanaged)
+                            managed=not options.unmanaged,
+                            cache_dir=options.cache_dir)
   client.SaveConfig()
   return 0
 
 
-@attr('epilog', """Example:
+@subcommand.epilog("""Example:
   gclient pack > patch.txt
     generate simple patch for configured client and dependences
 """)
 def CMDpack(parser, args):
-  """Generate a patch which can be applied at the root of the tree.
+  """Generates a patch which can be applied at the root of the tree.
 
-Internally, runs 'svn diff'/'git diff' on each checked out module and
-dependencies, and performs minimal postprocessing of the output. The
-resulting patch is printed to stdout and can be applied to a freshly
-checked out tree via 'patch -p0 < patchfile'.
-"""
+  Internally, runs 'svn diff'/'git diff' on each checked out module and
+  dependencies, and performs minimal postprocessing of the output. The
+  resulting patch is printed to stdout and can be applied to a freshly
+  checked out tree via 'patch -p0 < patchfile'.
+  """
   parser.add_option('--deps', dest='deps_os', metavar='OS_LIST',
                     help='override deps for the specified (comma-separated) '
                          'platform(s); \'all\' will process all deps_os '
                          'references')
+  parser.remove_option('--jobs')
   (options, args) = parser.parse_args(args)
+  # Force jobs to 1 so the stdout is not annotated with the thread ids
+  options.jobs = 1
   client = GClient.LoadCurrentConfig(options)
   if not client:
     raise gclient_utils.Error('client not configured; see \'gclient config\'')
@@ -1251,7 +1934,7 @@ checked out tree via 'patch -p0 < patchfile'.
 
 
 def CMDstatus(parser, args):
-  """Show modification status for every dependencies."""
+  """Shows modification status for every dependencies."""
   parser.add_option('--deps', dest='deps_os', metavar='OS_LIST',
                     help='override deps for the specified (comma-separated) '
                          'platform(s); \'all\' will process all deps_os '
@@ -1267,7 +1950,7 @@ def CMDstatus(parser, args):
   return client.RunOnDeps('status', args)
 
 
-@attr('epilog', """Examples:
+@subcommand.epilog("""Examples:
   gclient sync
       update files from SCM according to current configuration,
       *for modules which have changed since last update or sync*
@@ -1276,6 +1959,21 @@ def CMDstatus(parser, args):
       all modules (useful for recovering files deleted from local copy)
   gclient sync --revision src@31000
       update src directory to r31000
+
+JSON output format:
+If the --output-json option is specified, the following document structure will
+be emitted to the provided file. 'null' entries may occur for subprojects which
+are present in the gclient solution, but were not processed (due to custom_deps,
+os_deps, etc.)
+
+{
+  "solutions" : {
+    "<name>": {  # <name> is the posix-normalized path to the solution.
+      "revision": [<svn rev int>|<git id hex string>|null],
+      "scm": ["svn"|"git"|null],
+    }
+  }
+}
 """)
 def CMDsync(parser, args):
   """Checkout/update all modules."""
@@ -1283,6 +1981,8 @@ def CMDsync(parser, args):
                     help='force update even for unchanged modules')
   parser.add_option('-n', '--nohooks', action='store_true',
                     help='don\'t run hooks after the update is complete')
+  parser.add_option('-p', '--noprehooks', action='store_true',
+                    help='don\'t run pre-DEPS hooks', default=False)
   parser.add_option('-r', '--revision', action='append',
                     dest='revisions', metavar='REV', default=[],
                     help='Enforces revision/hash for the solutions with the '
@@ -1291,6 +1991,12 @@ def CMDsync(parser, args):
                          'has multiple solutions configured and will work even '
                          'if the src@ part is skipped. Note that specifying '
                          '--revision means your safesync_url gets ignored.')
+  parser.add_option('--with_branch_heads', action='store_true',
+                    help='Clone git "branch_heads" refspecs in addition to '
+                         'the default refspecs. This adds about 1/2GB to a '
+                         'full checkout. (git only)')
+  parser.add_option('--with_tags', action='store_true',
+                    help='Clone git tags in addition to the default refspecs.')
   parser.add_option('-t', '--transitive', action='store_true',
                     help='When a revision is specified (in the DEPS file or '
                           'with the command-line flag), transitively update '
@@ -1300,15 +2006,22 @@ def CMDsync(parser, args):
                     help='skips any safesync_urls specified in '
                          'configured solutions and sync to head instead')
   parser.add_option('-D', '--delete_unversioned_trees', action='store_true',
-                    help='delete any dependency that have been removed from '
-                         'last sync as long as there is no local modification. '
-                         'Coupled with --force, it will remove them even with '
-                         'local modifications')
+                    help='Deletes from the working copy any dependencies that '
+                         'have been removed since the last sync, as long as '
+                         'there are no local modifications. When used with '
+                         '--force, such dependencies are removed even if they '
+                         'have local modifications. When used with --reset, '
+                         'all untracked directories are removed from the '
+                         'working copy, excluding those which are explicitly '
+                         'ignored in the repository.')
   parser.add_option('-R', '--reset', action='store_true',
                     help='resets any local changes before updating (git only)')
   parser.add_option('-M', '--merge', action='store_true',
                     help='merge upstream changes instead of trying to '
                          'fast-forward or rebase')
+  parser.add_option('-A', '--auto_rebase', action='store_true',
+                    help='Automatically rebase repositories against local '
+                         'checkout during update (git only).')
   parser.add_option('--deps', dest='deps_os', metavar='OS_LIST',
                     help='override deps for the specified (comma-separated) '
                          'platform(s); \'all\' will process all deps_os '
@@ -1316,6 +2029,22 @@ def CMDsync(parser, args):
   parser.add_option('-m', '--manually_grab_svn_rev', action='store_true',
                     help='Skip svn up whenever possible by requesting '
                          'actual HEAD revision from the repository')
+  parser.add_option('--upstream', action='store_true',
+                    help='Make repo state match upstream branch.')
+  parser.add_option('--output-json',
+                    help='Output a json document to this path containing '
+                         'summary information about the sync.')
+  parser.add_option('--no-history', action='store_true',
+                    help='GIT ONLY - Reduces the size/time of the checkout at '
+                    'the cost of no history. Requires Git 1.9+')
+  parser.add_option('--shallow', action='store_true',
+                    help='GIT ONLY - Do a shallow clone into the cache dir. '
+                         'Requires Git 1.9+')
+  parser.add_option('--no_bootstrap', '--no-bootstrap',
+                    action='store_true',
+                    help='Don\'t bootstrap from Google Storage.')
+  parser.add_option('--ignore_locks', action='store_true',
+                    help='GIT ONLY - Ignore cache locks.')
   (options, args) = parser.parse_args(args)
   client = GClient.LoadCurrentConfig(options)
 
@@ -1330,12 +2059,23 @@ def CMDsync(parser, args):
     # Print out the .gclient file.  This is longer than if we just printed the
     # client dict, but more legible, and it might contain helpful comments.
     print(client.config_content)
-  return client.RunOnDeps('update', args)
+  ret = client.RunOnDeps('update', args)
+  if options.output_json:
+    slns = {}
+    for d in client.subtree(True):
+      normed = d.name.replace('\\', '/').rstrip('/') + '/'
+      slns[normed] = {
+          'revision': d.got_revision,
+          'scm': d.used_scm.name if d.used_scm else None,
+          'url': str(d.url) if d.url else None,
+      }
+    with open(options.output_json, 'wb') as f:
+      json.dump({'solutions': slns}, f)
+  return ret
 
 
-def CMDupdate(parser, args):
-  """Alias for the sync command. Deprecated."""
-  return CMDsync(parser, args)
+CMDupdate = CMDsync
+
 
 def CMDdiff(parser, args):
   """Displays local diff for every dependencies."""
@@ -1355,7 +2095,7 @@ def CMDdiff(parser, args):
 
 
 def CMDrevert(parser, args):
-  """Revert all modifications in every dependencies.
+  """Reverts all modifications in every dependencies.
 
   That's the nuclear option to get back to a 'clean' state. It removes anything
   that shows up in svn status."""
@@ -1365,9 +2105,15 @@ def CMDrevert(parser, args):
                          'references')
   parser.add_option('-n', '--nohooks', action='store_true',
                     help='don\'t run hooks after the revert is complete')
+  parser.add_option('-p', '--noprehooks', action='store_true',
+                    help='don\'t run pre-DEPS hooks', default=False)
+  parser.add_option('--upstream', action='store_true',
+                    help='Make repo state match upstream branch.')
   (options, args) = parser.parse_args(args)
   # --force is implied.
   options.force = True
+  options.reset = False
+  options.delete_unversioned_trees = False
   client = GClient.LoadCurrentConfig(options)
   if not client:
     raise gclient_utils.Error('client not configured; see \'gclient config\'')
@@ -1396,7 +2142,7 @@ def CMDrunhooks(parser, args):
 
 
 def CMDrevinfo(parser, args):
-  """Output revision info mapping for the client and its dependencies.
+  """Outputs revision info mapping for the client and its dependencies.
 
   This allows the capture of an overall 'revision' for the source tree that
   can be used to reproduce the same tree in the future. It is only useful for
@@ -1423,56 +2169,94 @@ def CMDrevinfo(parser, args):
   return 0
 
 
-def Command(name):
-  return getattr(sys.modules[__name__], 'CMD' + name, None)
-
-
-def CMDhelp(parser, args):
-  """Prints list of commands or help for a specific command."""
-  (_, args) = parser.parse_args(args)
-  if len(args) == 1:
-    return Main(args + ['--help'])
-  parser.print_help()
+def CMDhookinfo(parser, args):
+  """Outputs the hooks that would be run by `gclient runhooks`."""
+  (options, args) = parser.parse_args(args)
+  options.force = True
+  client = GClient.LoadCurrentConfig(options)
+  if not client:
+    raise gclient_utils.Error('client not configured; see \'gclient config\'')
+  client.RunOnDeps(None, [])
+  print '; '.join(' '.join(hook) for hook in client.GetHooks(options))
   return 0
 
 
-def GenUsage(parser, command):
-  """Modify an OptParse object with the function's documentation."""
-  obj = Command(command)
-  if command == 'help':
-    command = '<command>'
-  # OptParser.description prefer nicely non-formatted strings.
-  parser.description = re.sub('[\r\n ]{2,}', ' ', obj.__doc__)
-  usage = getattr(obj, 'usage', '')
-  parser.set_usage('%%prog %s [options] %s' % (command, usage))
-  parser.epilog = getattr(obj, 'epilog', None)
+def CMDverify(parser, args):
+  """Verifies the DEPS file deps are only from allowed_hosts."""
+  (options, args) = parser.parse_args(args)
+  client = GClient.LoadCurrentConfig(options)
+  if not client:
+    raise gclient_utils.Error('client not configured; see \'gclient config\'')
+  client.RunOnDeps(None, [])
+  # Look at each first-level dependency of this gclient only.
+  for dep in client.dependencies:
+    bad_deps = dep.findDepsFromNotAllowedHosts()
+    if not bad_deps:
+      continue
+    print "There are deps from not allowed hosts in file %s" % dep.deps_file
+    for bad_dep in bad_deps:
+      print "\t%s at %s" % (bad_dep.name, bad_dep.url)
+    print "allowed_hosts:", ', '.join(dep.allowed_hosts)
+    sys.stdout.flush()
+    raise gclient_utils.Error(
+        'dependencies from disallowed hosts; check your DEPS file.')
+  return 0
 
+class OptionParser(optparse.OptionParser):
+  gclientfile_default = os.environ.get('GCLIENT_FILE', '.gclient')
 
-def Parser():
-  """Returns the default parser."""
-  parser = optparse.OptionParser(version='%prog ' + __version__)
-  # cygwin has issues with parallel sync
-  jobs = 1 if sys.platform == 'cygwin' else 8
-  parser.add_option('-j', '--jobs', default=jobs, type='int',
-                    help='Specify how many SCM commands can run in parallel; '
-                          'default=%default')
-  parser.add_option('-v', '--verbose', action='count', default=0,
-                    help='Produces additional output for diagnostics. Can be '
-                          'used up to three times for more logging info.')
-  parser.add_option('--gclientfile', dest='config_filename',
-                    default=os.environ.get('GCLIENT_FILE', '.gclient'),
-                    help='Specify an alternate %default file')
-  # Integrate standard options processing.
-  old_parser = parser.parse_args
-  def Parse(args):
-    (options, args) = old_parser(args)
-    level = [logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG][
-        min(options.verbose, 3)]
-    logging.basicConfig(level=level,
+  def __init__(self, **kwargs):
+    optparse.OptionParser.__init__(
+        self, version='%prog ' + __version__, **kwargs)
+
+    # Some arm boards have issues with parallel sync.
+    if platform.machine().startswith('arm'):
+      jobs = 1
+    else:
+      jobs = max(8, gclient_utils.NumLocalCpus())
+    # cmp: 2013/06/19
+    # Temporary workaround to lower bot-load on SVN server.
+    # Bypassed if a bot_update flag is detected.
+    if (os.environ.get('CHROME_HEADLESS') == '1' and
+        not os.path.exists('update.flag')):
+      jobs = 1
+
+    self.add_option(
+        '-j', '--jobs', default=jobs, type='int',
+        help='Specify how many SCM commands can run in parallel; defaults to '
+             '%default on this machine')
+    self.add_option(
+        '-v', '--verbose', action='count', default=0,
+        help='Produces additional output for diagnostics. Can be used up to '
+             'three times for more logging info.')
+    self.add_option(
+        '--gclientfile', dest='config_filename',
+        help='Specify an alternate %s file' % self.gclientfile_default)
+    self.add_option(
+        '--spec',
+        help='create a gclient file containing the provided string. Due to '
+            'Cygwin/Python brokenness, it can\'t contain any newlines.')
+    self.add_option(
+        '--no-nag-max', default=False, action='store_true',
+        help='Ignored for backwards compatibility.')
+
+  def parse_args(self, args=None, values=None):
+    """Integrates standard options processing."""
+    options, args = optparse.OptionParser.parse_args(self, args, values)
+    levels = [logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG]
+    logging.basicConfig(
+        level=levels[min(options.verbose, len(levels) - 1)],
         format='%(module)s(%(lineno)d) %(funcName)s:%(message)s')
+    if options.config_filename and options.spec:
+      self.error('Cannot specifiy both --gclientfile and --spec')
+    if (options.config_filename and
+        options.config_filename != os.path.basename(options.config_filename)):
+      self.error('--gclientfile target must be a filename, not a path')
+    if not options.config_filename:
+      options.config_filename = self.gclientfile_default
     options.entries_filename = options.config_filename + '_entries'
     if options.jobs < 1:
-      parser.error('--jobs must be 1 or higher')
+      self.error('--jobs must be 1 or higher')
 
     # These hacks need to die.
     if not hasattr(options, 'revisions'):
@@ -1482,6 +2266,8 @@ def Parser():
       options.head = None
     if not hasattr(options, 'nohooks'):
       options.nohooks = True
+    if not hasattr(options, 'noprehooks'):
+      options.noprehooks = True
     if not hasattr(options, 'deps_os'):
       options.deps_os = None
     if not hasattr(options, 'manually_grab_svn_rev'):
@@ -1489,53 +2275,50 @@ def Parser():
     if not hasattr(options, 'force'):
       options.force = None
     return (options, args)
-  parser.parse_args = Parse
-  # We don't want wordwrapping in epilog (usually examples)
-  parser.format_epilog = lambda _: parser.epilog or ''
-  return parser
 
 
-def Main(argv):
+def disable_buffering():
+  # Make stdout auto-flush so buildbot doesn't kill us during lengthy
+  # operations. Python as a strong tendency to buffer sys.stdout.
+  sys.stdout = gclient_utils.MakeFileAutoFlush(sys.stdout)
+  # Make stdout annotated with the thread ids.
+  sys.stdout = gclient_utils.MakeFileAnnotated(sys.stdout)
+
+
+def main(argv):
   """Doesn't parse the arguments here, just find the right subcommand to
   execute."""
-  if sys.hexversion < 0x02050000:
+  if sys.hexversion < 0x02060000:
     print >> sys.stderr, (
-        '\nYour python version is unsupported, please upgrade.\n')
+        '\nYour python version %s is unsupported, please upgrade.\n' %
+        sys.version.split(' ', 1)[0])
+    return 2
+  if not sys.executable:
+    print >> sys.stderr, (
+        '\nPython cannot find the location of it\'s own executable.\n')
+    return 2
+  fix_encoding.fix_encoding()
+  disable_buffering()
   colorama.init()
+  dispatcher = subcommand.CommandDispatcher(__name__)
   try:
-    # Make stdout auto-flush so buildbot doesn't kill us during lengthy
-    # operations. Python as a strong tendency to buffer sys.stdout.
-    sys.stdout = gclient_utils.MakeFileAutoFlush(sys.stdout)
-    # Make stdout annotated with the thread ids.
-    sys.stdout = gclient_utils.MakeFileAnnotated(sys.stdout)
-    # Do it late so all commands are listed.
-    # Unused variable 'usage'
-    # pylint: disable=W0612
-    def to_str(fn):
-      return (
-          '  %s%-10s%s' % (Fore.GREEN, fn[3:], Fore.RESET) +
-          ' %s' % Command(fn[3:]).__doc__.split('\n')[0].strip())
-    cmds = (
-        to_str(fn) for fn in dir(sys.modules[__name__]) if fn.startswith('CMD')
-    )
-    CMDhelp.usage = '\n\nCommands are:\n' + '\n'.join(cmds)
-    parser = Parser()
-    if argv:
-      command = Command(argv[0])
-      if command:
-        # 'fix' the usage and the description now that we know the subcommand.
-        GenUsage(parser, argv[0])
-        return command(parser, argv[1:])
-    # Not a known command. Default to help.
-    GenUsage(parser, 'help')
-    return CMDhelp(parser, argv)
+    return dispatcher.execute(OptionParser(), argv)
+  except KeyboardInterrupt:
+    gclient_utils.GClientChildren.KillAllRemainingChildren()
+    raise
   except (gclient_utils.Error, subprocess2.CalledProcessError), e:
     print >> sys.stderr, 'Error: %s' % str(e)
     return 1
+  finally:
+    gclient_utils.PrintWarnings()
+  return 0
 
 
 if '__main__' == __name__:
-  fix_encoding.fix_encoding()
-  sys.exit(Main(sys.argv[1:]))
+  try:
+    sys.exit(main(sys.argv[1:]))
+  except KeyboardInterrupt:
+    sys.stderr.write('interrupted\n')
+    sys.exit(1)
 
 # vim: ts=2:sw=2:tw=80:et:
