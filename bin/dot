@@ -8,4 +8,11 @@ fi
 COMMAND=$1
 shift
 
-dot-$COMMAND "$@"
+DOT_COMMAND=dot-$(which $COMMAND 2>/dev/null)
+
+if [ -x "$DOT_COMMAND" ]; then
+	$DOT_COMMAND "$@"
+else
+	echo "command: $COMMAND not found"
+	exit 64
+fi
