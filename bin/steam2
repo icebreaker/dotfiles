@@ -1,0 +1,9 @@
+#!/bin/bash
+
+version=$(zenity  --list  --text "Steam" --radiolist  --column "Pick" --column "Version" TRUE Linux FALSE Windows);
+
+if [ "$version" == "Windows" ]; then
+	wine $HOME/.wine/drive_c/Steam/Steam.exe
+elif [ "$version" == "Linux" ]; then
+	steam
+fi

@@ -312,7 +312,16 @@
         <command>x-www-browser</command>
       </action>
     </keybind>
-    <keybind key="W-s">
+   <keybind key="0xF8">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Steam</name>
+        </startupnotify>
+        <command>~/.dotfiles/bin/steam2</command>
+      </action>
+    </keybind>
+   <keybind key="W-s">
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
