@@ -1,10 +1,10 @@
 [Alsa]
-card=ASUS ROG Spitfire
-channel=Speaker
+card=default
+channel=Master
 
 [Notification]
 show_notification=true
-notification_type=1
+notification_type=0
 
 [StatusIcon]
 stepsize=2
