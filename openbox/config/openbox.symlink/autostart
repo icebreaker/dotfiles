@@ -11,6 +11,10 @@ if [ -f /sys/class/backlight/intel_backlight/brightness ]; then
 	echo 3300 > /sys/class/backlight/intel_backlight/brightness
 fi
 
+if [ -x /usr/bin/xbacklight ]; then
+	xbacklight -set 70
+fi
+
 ## Set desktop wallpaper
 nitrogen --restore &
 
