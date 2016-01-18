@@ -64,7 +64,7 @@
     scrollbar_position = hidden
     show_titlebar = False
     color_scheme = custom
-    font = Meslo LG M for Powerline 14
+    font = Meslo LG M for Powerline 15
     background_color = "#121212"
     cursor_blink = False
     scrollback_infinite = True
