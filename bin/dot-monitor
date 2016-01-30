@@ -1,13 +1,44 @@
 #!/bin/bash
 
-VGA1="VGA1 connected"
+if [ -z "$DOT_DPI" ] ; then
+	DPI=96
+else
+	DPI=$DOT_DPI
+fi
 
-if [ -z "$(xrandr | grep "$VGA1")" ]; then
+if [ -z "$DOT_VGA" ] ; then
+	VGA="VGA1"
+else
+	VGA=$DOT_VGA
+fi
+
+if [ -z "$DOT_VGA_RES" ] ; then
+	VGA_RES="1440x900"
+else
+	VGA_RES=$DOT_VGA_RES
+fi
+
+if [ -z "$DOT_LCD" ]; then
+	LCD="LVDS1"
+else
+	LCD=$DOT_LCD
+fi
+
+if [ -z "$DOT_LCD_RES" ]; then
+	LCD_RES="1366x768"
+else
+	LCD_RES=$DOT_LCD_RES
+fi
+
+VGA_CONN="$VGA connected"
+VGA_POS="$(echo $LCD_RES | cut -d x -f 1)x0"
+
+if [ -z "$(xrandr | grep "${VGA_CONN}")" ]; then
 	exit
 fi
 
 if [ -z "$1" ]; then
-	if [ -z "$(xrandr | grep "${VGA1} 1440x900")" ]; then
+	if [ -z "$(xrandr | grep "${VGA_CONN} ${VGA_RES}")" ]; then
 		MONITOR="on"
 	else
 		MONITOR="off"
@@ -17,9 +48,9 @@ else
 fi
 
 if [ "$MONITOR" == "on" ]; then
-	xrandr --output LVDS1 --mode 1366x768 --pos 0x0 --dpi 96 --output VGA1 --mode 1440x900 --pos 1366x0 --dpi 96
+	xrandr --output $LCD --primary --mode $LCD_RES --pos 0x0 --dpi $DPI --output $VGA --mode $VGA_RES --pos $VGA_POS --dpi $DPI
 elif [ "$MONITOR" == "off" ]; then
-	xrandr --output LVDS1 --mode 1366x768 --pos 0x0 --dpi 96 --output VGA1 --off
+	xrandr --output $LCD --primary --mode $LCD_RES --pos 0x0 --dpi $DPI --output $VGA --off
 fi
 
 NITROGEN=$(which nitrogen 2>/dev/null)
