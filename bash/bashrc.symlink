@@ -9,15 +9,26 @@ else
 	fi
 fi
 
+# ENV
+export DOT_ENV="generic"
+
 # atomic location of the dotfiles
 export DOT_HOME=$HOME/.dotfiles
 
-# atomic location of the dotfiles bin (provided for convenience!)
+# atomic location of the dotfiles bin directory
 export DOT_BIN=$DOT_HOME/bin
+
+# atomic location of .dotrc
+export DOT_RC=$HOME/.dotrc
 
 # source global definitions
 if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
+fi
+
+# source early definitions
+if [ -f $DOT_RC ]; then
+	. $DOT_RC
 fi
 
 # source every .bsh file
@@ -26,7 +37,7 @@ do
 	. $config_file
 done
 
-# source private (i.e ECHO_NEST_API_KEY)
+# source private definitions
 if [ -f ~/.localrc ]; then
     . ~/.localrc
 fi
