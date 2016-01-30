@@ -12,7 +12,7 @@ if [ -f /sys/class/backlight/intel_backlight/brightness ]; then
 fi
 
 if [ -x /usr/bin/xbacklight ]; then
-	xbacklight -set 70
+	xbacklight -set 50
 fi
 
 ## Set desktop wallpaper
