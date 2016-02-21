@@ -38,7 +38,7 @@ if [ -z "$(xrandr | grep "${VGA_CONN}")" ]; then
 fi
 
 if [ -z "$1" ]; then
-	if [ -z "$(xrandr | grep "${VGA_CONN} ${VGA_RES}")" ]; then
+	if [ -z "$(xrandr | grep "${VGA_CONN} ${LCD_RES}")" ]; then
 		MONITOR="on"
 	else
 		MONITOR="off"
