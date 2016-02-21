@@ -19,8 +19,11 @@ vmap <c-c> :w! ~/.vim/swap/.buffer<CR>
 nmap <c-p> :r ~/.vim/swap/.buffer<CR>
 
 " Next / Prev File (as in :args)
-:noremap <c-n> :n<CR>
-:noremap <c-m> :prev<CR>
+:noremap <Leader>] :n<CR>
+:noremap <Leader>[ :prev<CR>
+
+:noremap <Leader>n :n<CR>
+:noremap <Leader>p :prev<CR>
 
 " Highlight Last Searched Term
 :noremap <space> :set hlsearch!<CR>
@@ -60,8 +63,8 @@ set backspace=indent,eol,start
 set diffopt+=iwhite
 set hidden
 set nostartofline
-set shortmess=asI
-set showcmd
+set shortmess=at
+set noshowcmd
 set ignorecase
 "set mouse=a
 set columns=100
