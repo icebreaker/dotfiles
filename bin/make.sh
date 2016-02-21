@@ -5,11 +5,11 @@ PROJECT='.project'
 
 while test "${DIR}" != "/"; do
 	if [ -f "${DIR}/${PROJECT}" ]; then
-		echo "Trying to build in ${DIR} ..."
 		make -C "${DIR}" -f "${PROJECT}" $@
-		exit
+		exit 0
 	fi
 	DIR=`dirname "${DIR}"`
 done
 
 echo "No ${PROJECT} found!" > /dev/stderr
+exit 0
