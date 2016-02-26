@@ -3,6 +3,7 @@
 require 'yaml'
 require 'haml'
 require 'github/markup'
+require 'ostruct'
 
 class Template
 	attr_reader :context, :engine
