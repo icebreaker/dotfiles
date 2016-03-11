@@ -246,4 +246,5 @@ let g:delimitMate_expand_cr=1
 map <c-F12> :!yapvp '%' --expandsrc > /tmp/yapvp.html; xdg-open /tmp/yapvp.html<CR>
 
 " Append the src directory to the path
-execute "set path+=" . substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src'
+let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', ' ', '\\ ', 'g')
+execute 'set path+=' . src
