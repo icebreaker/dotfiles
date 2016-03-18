@@ -241,6 +241,9 @@ map <c-l> :call fastopen#show('argedit')<cr>
 let g:vimrubocop_keymap = 0
 nmap <Leader>r :RuboCop<CR>
 
+" CodeClimate
+nmap <Leader>ao :CodeClimateAnalyzeOpenFiles<CR>
+
 let g:delimitMate_expand_cr=1
 
 map <c-F12> :!yapvp '%' --expandsrc > /tmp/yapvp.html; xdg-open /tmp/yapvp.html<CR>
