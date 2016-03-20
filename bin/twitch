@@ -21,18 +21,26 @@ if [ -z "$TWITCH_CHAT_TITLE" ]; then
 	exit
 fi
 
-if [ -z "$TWITCH_KEY" ]; then
-	echo "TWITCH_KEY is not set"
-	exit
+if [ -z "$TWITCH_CHAT_SIZE" ]; then
+	TWITCH_CHAT_SIZE="334 905"
 fi
 
-TWITCH_STREAM_URL="rtmp://live.justin.tv/app/$TWITCH_KEY"
+if [ -z "$TWITCH_CHAT_POS" ]; then
+	TWITCH_CHAT_POS="1366 -60"
+fi
+
+if [ -z "$TWITCH_KEY" ]; then
+	TWITCH_STREAM_URL="$HOME/twitch.flv"
+	echo "WARNING: TWITCH_KEY not set, will stream to $TWITCH_STREAM_URL ..."
+else
+	TWITCH_STREAM_URL="rtmp://live.justin.tv/app/$TWITCH_KEY"
+fi
 
 # position chat to the right location
-xdotool search --name --onlyvisible "$TWITCH_CHAT_TITLE" windowsize 334 905 windowmove 1366 -60
+xdotool search --name --onlyvisible "$TWITCH_CHAT_TITLE" windowsize $TWITCH_CHAT_SIZE windowmove $TWITCH_CHAT_POS
 
-# open up brb image
-viewnior --fullscreen $DOT_HOME/twitch/intro.png &
+# show intro image
+showimage $DOT_HOME/twitch/intro.png 0 &
 
 # wait for confirmation that the layout has been setup correctly
 read -p "Press [Enter] to start the stream ..."

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+showimage $DOT_HOME/twitch/thanks.png 0 &
