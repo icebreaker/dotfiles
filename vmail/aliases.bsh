@@ -1,3 +1,0 @@
-if [ -x "$HOME/.rvm/bin/rvm" ]; then
-	alias vmail='rvm 1.9.2 exec vmail'
-fi
