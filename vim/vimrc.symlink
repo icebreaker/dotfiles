@@ -28,6 +28,9 @@ nmap <c-p> :r ~/.vim/swap/.buffer<CR>
 " Highlight Last Searched Term
 :noremap <space> :set hlsearch!<CR>
 
+" Shortcut for Redo
+:noremap r :redo<CR>
+
 set nospell
 set encoding=utf8
 set fileencoding=utf8
