@@ -57,7 +57,7 @@ class Powerline:
 		line += self.reset + self.fgcolor(s['separator_fg']) + s['separator'] + self.reset
 		return line
 
-def add_git_segment(powerline):
+def add_git_segment(p):
 	try:
 		cmd = "git branch 2> /dev/null | grep -e '\*'"
 		p1 = subprocess.Popen(['git', 'branch'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -70,14 +70,8 @@ def add_git_segment(powerline):
 	except subprocess.CalledProcessError:
 		pass
 
-# Show user @ host with fancy separators
-def add_user_host_segment(powerline):
-	powerline.append(' \u ', 250, 240)
-	powerline.append(' \h ', 250, 238)
-
 # Show working directory with fancy separators
-def add_cwd_segment(powerline):
-	#p.append(' \w ', 15, 237)
+def add_cwd_segment(p):
 	home = os.getenv('HOME')
 	cwd = os.getenv('PWD')
 
@@ -89,14 +83,14 @@ def add_cwd_segment(powerline):
 
 	names = cwd.split('/')
 	for n in names[:-2]:
-		powerline.append(' ' + n + ' ', 247, 236, Powerline.separator_thin, 247)
+		p.append(' ' + n + ' ', 247, 236, Powerline.separator_thin, 247)
 
 	if len(names) > 1:
-		powerline.append(' ' + names[-2] + ' ', 247, 236)
+		p.append(' ' + names[-2] + ' ', 247, 236)
 
-	powerline.append(' ' + names[-1] + ' ', 231, 240)
+	p.append(' ' + names[-1] + ' ', 231, 240)
 
-def add_root_indicator(powerline, error):
+def add_root_indicator(p, error):
 	bg = 236
 	fg = 247
 	if int(error) != 0:
@@ -106,8 +100,7 @@ def add_root_indicator(powerline, error):
 
 if __name__ == '__main__':
 	p = Powerline()
-	#add_user_host_segment(p)
 	add_cwd_segment(p)
 	add_git_segment(p)
 	add_root_indicator(p, sys.argv[1] if len(sys.argv) > 1 else 0)
-	print p.draw(),
+	print p.draw()
