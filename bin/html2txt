@@ -1,0 +1,3 @@
+#!/bin/bash
+
+lynx -force_html -dump "$@"
