@@ -1,0 +1,37 @@
+# Inherit background and foreground color
+color normal default default
+# Powerline colors for status-bars
+color status color231 color236
+
+auto_view text/html
+alternative_order text/enriched text/plain text text/html
+
+bind editor <space> noop
+macro index,pager a "<enter-command>unset trash\n <delete-message>" "Archive message" 
+
+set from				= "me@mihail.co"
+set realname			= 'Mihail Szabolcs'
+set alias_file			= '~/.mutt/aliases'
+set copy				= no
+set move				= no
+set recall				= no
+set display_filter		= '~/.mutt/aliases.sh'
+set edit_headers
+set editor				= 'vim +/^$ ++1'
+set folder				= 'imaps://imap.gmail.com/'
+set hostname			= 'gmail.com'
+set imap_check_subscribed
+set imap_user			= "$MUTT_USERNAME"
+set imap_pass			= "$MUTT_PASSWORD"
+set smtp_url			= "smtp://$imap_user:$imap_pass@smtp.gmail.com:587"
+set mail_check			= 60
+set postponed			= '+[Gmail]/Drafts'
+set spoolfile			= '+INBOX'
+set text_flowed			= yes
+set ssl_starttls		= yes
+set ssl_force_tls		= yes
+
+unset imap_passive
+unset record
+
+source $alias_file
