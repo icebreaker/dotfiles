@@ -339,6 +339,6 @@ statusbar = {
   };
 };
 settings = {
-  core = { real_name = "msz"; user_name = "c0d3rguy"; nick = "c0d3rguy"; };
+  core = { real_name = "msz"; user_name = "icebreaker"; nick = "icebreaker"; };
   "fe-text" = { actlist_sort = "refnum"; };
 };
