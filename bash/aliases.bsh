@@ -34,5 +34,4 @@ alias iotest='dd if=/dev/zero of=iotest bs=64k count=4k conv=fdatasync 2>&1 | ta
 alias netest='wget -O /dev/null http://cachefly.cachefly.net/100mb.test'
 alias clipboard='xclip -sel clip'
 alias v='vim'
-alias g='git'
 alias clvs='rm ~/.vim/swap/*.swp'
