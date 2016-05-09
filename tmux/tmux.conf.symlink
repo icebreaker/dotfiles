@@ -5,7 +5,7 @@ set -g status on
 set -g status-bg colour236
 set -g status-fg default
 set -g status-interval 4
-set -g status-utf8 on
+# set -g status-utf8 on
 set -g status-left-length 15
 set -g status-justify "centre"
 set -g status-left "#[fg=colour236,bg=colour252] ❐ #($DOT_HOME/tmux/powerline/uptime) #[fg=colour252,bg=colour236]⮀"
