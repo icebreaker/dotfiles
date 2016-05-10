@@ -184,7 +184,7 @@ au! BufRead,BufNewFile *.glsl set filetype=glsl
 au! BufRead,BufNewFile *.CPP set filetype=cpp
 au! BufRead,BufNewFile *.md,*.markdown,*.mkd call DistractionFreeWriting()
 au! BufRead,BufNewFile *.c,*.h,*.cpp,*.hpp,*.cxx,*.hxx,*.cc,*.hh call FoldLicense()
-au! BufRead,BufNewFile Gemfile set syntax=off
+au! BufRead,BufNewFile Gemfile set syntax=off tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile * set formatoptions=tcq
 
 " Credit: http://gslsrc.net/l02_license_folding.html
