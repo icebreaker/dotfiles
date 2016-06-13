@@ -3184,7 +3184,7 @@ row.activatable:selected:hover {
   background-color: #538dfb; }
 
 row.activatable:selected.has-open-popup, row.activatable:selected:hover {
-  background-color: #3a73e2; }
+  background-color: #3d3e3f; }
 
 .app-notification {
   padding: 10px;
@@ -3759,13 +3759,14 @@ textview text selection, flowbox flowboxchild:selected, entry selection, entry s
 treeview.view:selected, treeview.view:selected:focus, menu menuitem:hover,
 .menu menuitem:hover, .sidebar:selected, placessidebar row:selected {
   color: #ffffff;
-  border-width: 1px 0;
+  border: 0;
+/*  border-width: 1px 0;
   border-style: solid;
   border-top-color: #3f7cf1;
-  border-bottom-color: #3d73dc;
+  border-bottom-color: #3d73dc;*/
   text-shadow: 0 -1px rgba(0, 0, 0, 0.2);
   -gtk-icon-shadow: none;
-  background-image: linear-gradient(to top, #3e78e6, #3a67bd); }
+  background-color: #3d3e3f; }
 
 .overlay-bar {
   background-color: rgba(0, 0, 0, 0.8);
@@ -4478,7 +4479,7 @@ popover.budgie-menu row:selected button {
       .raven row.activatable:selected:active, .drop-shadow row.activatable:selected:active, .budgie-session-dialog.background row.activatable:selected:active, .background.budgie-polkit-dialog row.activatable:selected:active {
         color: #ffffff; }
       .raven row.activatable:selected:hover, .drop-shadow row.activatable:selected:hover, .budgie-session-dialog.background row.activatable:selected:hover, .background.budgie-polkit-dialog row.activatable:selected:hover {
-        background-color: #3a73e2; }
+        background-color: #3d3e3f; }
       .raven row.activatable:selected:disabled, .drop-shadow row.activatable:selected:disabled, .budgie-session-dialog.background row.activatable:selected:disabled, .background.budgie-polkit-dialog row.activatable:selected:disabled {
         color: rgba(255, 255, 255, 0.7);
         background-color: rgba(64, 128, 251, 0.7); }
