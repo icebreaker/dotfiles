@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]; then
+	echo "usage: `basename $0` pattern replacement"
+	exit 65
+fi
+
+grep -rl "$1" | xargs sed -i "s@$1@$2@g"
