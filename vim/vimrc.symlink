@@ -159,31 +159,31 @@ inoremap <C-@> <C-X><C-U>
 " File Types
 au! BufRead,BufNewFile *.json set filetype=json
 au! BufRead,BufNewFile *.as set filetype=actionscript
-au! BufRead,BufNewFile Rakefile,Gemfile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.ru set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile Rakefile,Gemfile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.ru set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.conf set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
-au! BufRead,BufNewFile .irbrc set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.erb set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.haml,*.hamlc set filetype=haml tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.sass set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.scss set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.yml,*.yaml,Doxterfile set filetype=yaml tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.rake,*.gemspec,*.js set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile .irbrc set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.erb set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.haml,*.hamlc set filetype=haml tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.sass set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.scss set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.yml,*.yaml,Doxterfile set filetype=yaml tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.rake,*.gemspec,*.js set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.install set filetype=php
 au! BufRead,BufNewFile *.inc set filetype=php
 au! BufRead,BufNewFile *.php set filetype=php
 au! BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
 au! BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc call SetFileTypeSH("bash")
 au! BufRead,BufNewFile *.py set filetype=python
-au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.coffee set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.coffee set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.lua set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.hx set filetype=haxe tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 au! BufRead,BufNewFile *.glsl set filetype=glsl
 au! BufRead,BufNewFile *.CPP set filetype=cpp
 au! BufRead,BufNewFile *.md,*.markdown,*.mkd call DistractionFreeWriting()
-au! BufRead,BufNewFile Gemfile set syntax=off tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+au! BufRead,BufNewFile Gemfile set syntax=off tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile * set formatoptions=tcq
 
 function! DistractionFreeWriting()
