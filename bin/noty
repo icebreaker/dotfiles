@@ -1,0 +1,198 @@
+#!/bin/bash
+
+# {{{ license
+#
+# MIT LICENSE
+# 
+# Copyright (c) 2016, Mihail Szabolcs
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the 'Software'), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# }}} license
+
+# {{{ globals
+NOTY_VERSION='1.0.0'
+
+if [[ -z "$NOTY_DB" ]]; then
+	NOTY_DB="$HOME/.noty"
+fi
+# }}}
+
+# {{{ utils
+function get_current_date()
+{
+	date +'%Y-%m-%d'
+}
+
+function preg_replace()
+{
+	sed -i -e "s/$1/$2/" $3
+}
+
+function preg_remove()
+{
+	sed -i -e "/$1/d" $2
+}
+
+# }}}
+
+# {{{ db
+function db_init()
+{
+	if [[ ! -f $NOTY_DB ]]; then
+		echo -e "Noty v$NOTY_VERSION\n===========" >> $NOTY_DB
+		echo -e "You have a total of 0 notes." >> $NOTY_DB
+		echo "Initialized '$NOTY_DB' ..."
+	fi
+}
+
+function db_get_id()
+{
+	local OLD_ID=$(grep -m 1 -P '^You have a total of \d+ notes.$' $NOTY_DB | cut -d ' ' -f 6)
+	local NEW_ID=$((OLD_ID + 1))
+
+	preg_replace "^You have a total of $OLD_ID notes.$" "You have a total of $NEW_ID notes." $NOTY_DB
+
+	echo $NEW_ID
+}
+
+function db_write_note()
+{
+	db_init
+
+	if [[ -z $(grep "^$(get_current_date)" $NOTY_DB) ]]; then
+		echo -e "\n$(get_current_date)\n----------" >> $NOTY_DB
+		echo "Initialized '$(get_current_date)' ..."
+	fi
+
+	echo "$(db_get_id). [ ] $@" >> $NOTY_DB
+	echo "Added note '$@' ..."
+}
+
+function db_delete_note()
+{
+	preg_remove "^$1. \[ \]" $NOTY_DB
+	echo "Deleted note '$1' ..."
+}
+
+function db_get_notes()
+{
+	if [[ "$1" == "all" ]]; then
+		cat ${NOTY_DB}
+	else
+		local LINE=$(grep -m 1 -n -P "^$1" $NOTY_DB | cut -d ':' -f 1)
+		tail -n +$LINE $NOTY_DB
+	fi
+}
+
+function db_mark_note()
+{
+	preg_replace "^$1. \[ \]" "$1. \[x\]" $NOTY_DB
+	echo "Marked note '$1' ..."
+}
+
+function db_unmark_note()
+{
+	preg_replace "^$1. \[x\]" "$1. \[ \]" $NOTY_DB
+	echo "Un-Marked note '$1' ..."
+}
+# }}}
+
+# {{{ commands
+function command_c()
+{
+	if [[ -z "$1" ]]; then
+		echo "You must provide a valid note."
+		exit -1
+	else
+		db_write_note "$@"
+	fi
+}
+
+function command_d()
+{
+	if [[ -z "$1" ]]; then
+		echo "You must provide a valid note id"
+		exit -1
+	else
+		db_delete_note "$1"
+	fi
+}
+
+function command_l()
+{
+	if [[ -z "$1" ]]; then
+		db_get_notes $(get_current_date)
+	else
+		db_get_notes "$1"
+	fi
+}
+
+function command_m()
+{
+	if [[ -z "$1" ]]; then
+		echo "You must provide a valid note id"
+		exit -1
+	else
+		db_mark_note "$1"
+	fi
+}
+
+function command_u()
+{
+	if [[ -z "$1" ]]; then
+		echo "You must provide a valid note id"
+		exit -1
+	else
+		db_unmark_note "$1"
+	fi
+}
+# }}}
+
+# {{{ help
+function help()
+{
+	echo "Noty v$NOTY_VERSION"
+	echo -e "\nusage: $(basename $0) command [arg] [note]"
+	echo -e "\ncommands:"
+	echo -e "\tc - create a new note"
+	echo -e "\tl - list notes"
+	echo -e "\tm - mark a note"
+	echo -e "\tu - unmark a note"
+	exit -1
+}
+# }}}
+
+# {{{ main
+function main()
+{
+	local CMD="$1"
+	shift
+
+	local FUNCTION_TYPE=$(type -t "command_${CMD}")
+
+	if [ "$FUNCTION_TYPE" == "function" ]; then
+		command_${CMD} "$@"
+	else
+		help
+	fi
+}
+
+main "$@"
+# }}}
