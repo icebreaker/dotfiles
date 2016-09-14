@@ -97,7 +97,9 @@ function db_get_notes()
 		cat ${NOTY_DB}
 	else
 		local LINE=$(grep -m 1 -n -P "^$1" $NOTY_DB | cut -d ':' -f 1)
-		tail -n +$LINE $NOTY_DB
+		if [[ -n "$LINE" ]] ; then
+			tail -n +$LINE $NOTY_DB
+		fi
 	fi
 }
 
