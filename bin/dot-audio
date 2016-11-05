@@ -1,0 +1,65 @@
+#!/bin/bash
+
+ASOUNDRC=~/.asoundrc
+
+function init_asoundrc()
+{
+	if [ ! -f $ASOUNDRC ]; then
+		cat > $ASOUNDRC <<- EOF
+		pcm.!default {
+		  type asym
+		  playback.pcm {
+		    type plug
+		    slave.pcm "hw:0,0"
+		  }
+		  capture.pcm {
+		    type plug
+		    slave.pcm "hw:0,0"
+		  }
+		}
+		EOF
+
+		echo "Initialized $ASOUNDRC ..."
+	fi
+}
+
+function update_asoundrc()
+{
+	if [ ! -z "$1" ]; then
+		local line=$(cat $ASOUNDRC | grep -n "slave.pcm" | cut -d ":" -f 1 | $2 -n 1)
+		if [ ! -z "$line" ]; then
+			sed -i "${line}s/\"hw:.*\"/\"$1\"/" $ASOUNDRC
+		fi
+	fi
+}
+
+function select_audio_configuration_type()
+{
+	zenity --list  --text "Configure Audio" --column "Type" Playback Recording
+}
+
+function select_audio()
+{
+	local hw=$($1 -l | grep '^card [0-9]' | awk -F ',' '{ split($1, a, ":"); split(a[1], b, " "); split($2, c, ":"); split(c[1], d, " "); sub(" ", "", c[2]); n=sprintf("%s - hw:%s,%s", c[2], b[2], d[2]); print(n); }' | zenity --list --text "Configure" --column "Name" | cut -d "-" -f 2 | awk '{ print $1 }')
+	update_asoundrc "$hw" "$2"
+}
+
+function select_audio_playback()
+{
+	select_audio "aplay" "head"
+}
+
+function select_audio_recording()
+{
+	select_audio "arecord" "tail"
+}
+
+configuration_type=$(select_audio_configuration_type)
+
+if [ "$configuration_type" == "Playback" ]; then
+	init_asoundrc
+	select_audio_playback
+elif [ "$configuration_type" == "Recording" ]; then
+	init_asoundrc
+	select_audio_recording
+fi
