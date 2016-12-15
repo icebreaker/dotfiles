@@ -42,14 +42,22 @@ function! s:initialize()
 	return
   endif
 
-  let g:fastopen_list_cmd = 'git ls-files -c -m -o --exclude-standard --full-name'
+  let git_cmd = 'git ls-files -c -m -o --full-name --exclude-standard'
+
+  let g:fastopen_list_cmd = git_cmd . ' ' . git_dir
   let g:fastopen_dir = git_dir
 endfunction
 
 function! fastopen#show(cmd)
 	call s:initialize()
 
-	let file = system(g:fastopen_list_cmd . ' | ' . g:fastopen_dmenu_cmd)
+	let cmd = g:fastopen_list_cmd
+
+	if exists('g:fastopen_filter_cmd')
+	  let cmd .= ' | ' . g:fastopen_filter_cmd
+	endif
+
+	let file = system(cmd . ' | ' . g:fastopen_dmenu_cmd)
 	let file = substitute(file, '\n$', '', '')
 	
 	if empty(file)

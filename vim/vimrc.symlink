@@ -228,6 +228,7 @@ vmap  <expr>  <C-UP>     DVB_Drag('up')
 
 nnoremap ; :
 
+let g:fastopen_filter_cmd = "exclude.sh"
 map <c-l> :call fastopen#show('argedit')<cr>
 
 " RuboCop
