@@ -1,9 +1,13 @@
 #!/bin/bash
 
-version=$(zenity  --list  --text "Steam" --column "Version" Linux Windows)
+VERSION=$(zenity  --list  --text "Steam" --column "Version" Linux Windows)
 
-if [ "$version" == "Windows" ]; then
-	wine $HOME/.wine/drive_c/Steam/Steam.exe -no-cef-sandbox "$@"
-elif [ "$version" == "Linux" ]; then
+if [ -z "$WINEPREFIX" ]; then
+	WINEPREFIX=$HOME/.wine
+fi
+
+if [ "$VERSION" == "Windows" ]; then
+	wine $WINEPREFIX/drive_c/Steam/Steam.exe -no-cef-sandbox "$@"
+elif [ "$VERSION" == "Linux" ]; then
 	steam "$@"
 fi
