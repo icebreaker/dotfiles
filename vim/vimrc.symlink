@@ -220,12 +220,6 @@ if has("autocmd")
   au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
 
-" VisualBlock plugin
-vmap  <expr>  <C-LEFT>   DVB_Drag('left')
-vmap  <expr>  <C-RIGHT>  DVB_Drag('right')
-vmap  <expr>  <C-DOWN>   DVB_Drag('down')
-vmap  <expr>  <C-UP>     DVB_Drag('up') 
-
 nnoremap ; :
 
 let g:fastopen_filter_cmd = "exclude.sh"
@@ -234,9 +228,6 @@ map <c-l> :call fastopen#show('argedit')<cr>
 " RuboCop
 let g:vimrubocop_keymap = 0
 nmap <Leader>r :RuboCop<CR>
-
-" CodeClimate
-nmap <Leader>ao :CodeClimateAnalyzeOpenFiles<CR>
 
 let g:delimitMate_expand_cr=1
 
