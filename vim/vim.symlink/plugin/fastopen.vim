@@ -1,6 +1,6 @@
 " Location:     plugin/fastopen.vim
 " Author:       Mihail Szabolcs <http://mihail.co>
-" Version:      1.1
+" Version:      1.2
 " License:      Same as Vim itself.  See :help license
 
 if exists('g:loaded_fastopen') || &cp
@@ -42,10 +42,14 @@ function! s:initialize()
 	return
   endif
 
-  let git_cmd = 'git ls-files -c -m -o --full-name --exclude-standard'
+  let git_cmd = 'git ls-files -c -o --full-name --exclude-standard'
 
   let g:fastopen_list_cmd = git_cmd . ' ' . git_dir
   let g:fastopen_dir = git_dir
+
+  if !exists('g:fastopen_filter_cmd')
+	let g:fastopen_filter_cmd = 'grep -Ev /$'
+  endif
 endfunction
 
 function! fastopen#show(cmd)
