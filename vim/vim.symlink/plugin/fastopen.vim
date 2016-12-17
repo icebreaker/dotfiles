@@ -46,10 +46,6 @@ function! s:initialize()
 
   let g:fastopen_list_cmd = git_cmd . ' ' . git_dir
   let g:fastopen_dir = git_dir
-
-  if !exists('g:fastopen_filter_cmd')
-	let g:fastopen_filter_cmd = 'grep -Ev /$'
-  endif
 endfunction
 
 function! fastopen#show(cmd)
