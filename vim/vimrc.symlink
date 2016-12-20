@@ -236,3 +236,5 @@ map <c-F12> :!yapvp '%' --expandsrc > /tmp/yapvp.html; xdg-open /tmp/yapvp.html<
 " Append the src directory to the path
 let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', ' ', '\\ ', 'g')
 execute 'set path+=' . src
+
+nmap <c-t> :. !template.sh '%:t'<CR>
