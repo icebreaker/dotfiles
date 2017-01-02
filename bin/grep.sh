@@ -6,7 +6,7 @@ GREP='.grep'
 while test "${DIR}" != "/"; do
 	if [ -f "${DIR}/${GREP}" ]; then
 		ARGS=$(cat "${DIR}/${GREP}" | tr '\n' ' ')
-		grep -n -R ${ARGS} ${@} "${DIR}"
+		grep ${@} -n -R ${ARGS} "${DIR}"
 		exit 0
 	fi
 
