@@ -1,5 +1,5 @@
 alias h='heroku'
-alias hrc='h run console -a'
+alias hrc='h run rails console -a'
 alias hc='h config -a'
 alias hp='h ps -a'
 alias hl='h logs --tail -a'
