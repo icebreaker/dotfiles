@@ -103,7 +103,7 @@ set term=xterm-256color
 let g:CSApprox_attr_map = { 'bold' : 'bold', 'italic' : '', 'sp' : ''  }
 
 if has("gui_running")
-	set guifont=Meslo\ LG\ M\ for\ Powerline\ 16
+	set guifont=Meslo\ LG\ M\ for\ Powerline\ 17
 	set guicursor+=a:blinkon0
 	set guioptions=i
 endif
