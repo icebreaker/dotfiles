@@ -74,7 +74,7 @@ set shortmess=atsI
 set noshowcmd
 set ignorecase
 "set mouse=a
-set columns=100
+set columns=120
 "set colorcolumn=100
 "set tw=99
 set ruler
