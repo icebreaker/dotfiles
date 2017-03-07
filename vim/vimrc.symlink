@@ -100,6 +100,13 @@ set t_Co=256
 "set term=gnome-256color
 set term=xterm-256color
 
+if $TMUX =~ 'tmux'
+	nmap  <Home>
+	imap  <Home>
+	nmap  <End>
+	imap  <End>
+endif
+
 let g:CSApprox_attr_map = { 'bold' : 'bold', 'italic' : '', 'sp' : ''  }
 
 if has("gui_running")

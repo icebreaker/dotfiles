@@ -8,4 +8,10 @@
 "\e[5D": backward-word
 "\e\e[C": forward-word
 "\e\e[D": backward-word
+"\eOH": beginning-of-line
+"\eOF": end-of-line
+"\e[H": beginning-of-line
+"\e[F": end-of-line
+"\e[A": beginning-of-line
+"\e[E": end-of-line
 set completion-ignore-case On

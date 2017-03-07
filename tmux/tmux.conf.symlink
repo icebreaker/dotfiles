@@ -52,6 +52,3 @@ set -g renumber-windows on
 #set -g mouse-resize-pane on
 #set -g mouse-select-pane on
 #set -g mouse-select-window on
-
-bind -n End send-key C-e
-bind -n Home send-key C-a
