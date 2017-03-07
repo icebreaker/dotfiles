@@ -103,8 +103,10 @@ set term=xterm-256color
 if $TMUX =~ 'tmux'
 	nmap  <Home>
 	imap  <Home>
+	vmap  <Home>
 	nmap  <End>
 	imap  <End>
+	vmap  <End>
 endif
 
 let g:CSApprox_attr_map = { 'bold' : 'bold', 'italic' : '', 'sp' : ''  }
