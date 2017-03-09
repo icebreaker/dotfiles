@@ -71,7 +71,7 @@ def add_git_segment(p):
             lines = output.splitlines()
             branch = lines[0].split(' ')[-1].strip()
             p.append(' ' + branch + ' ', 22, 148)
-            if len(lines) > 2:
+            if len(lines) > 3:
                 p.append(' ᛲ ', 15, 124)
     except subprocess.CalledProcessError:
         pass
