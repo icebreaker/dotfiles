@@ -51,22 +51,14 @@
 			</action>
 		</item>
 		<separator/>
-		<menu id="multimedia" label="Multimedia">
-			<item label="Volume Control">
-				<action name="Execute">
-					<execute>
-						xfce4-mixer
-					</execute>
-				</action>
-			</item>
-			<item label="DVD/CD Burner">
-				<action name="Execute">
-					<execute>
-						xfburn
-					</execute>
-				</action>
-			</item>
-		</menu>
+		<item label="DVD/CD Burner">
+			<action name="Execute">
+				<execute>
+					xfburn
+				</execute>
+			</action>
+		</item>
+		<separator/>
 		<menu id="network" label="Network">
 			<item label="Firefox">
 				<action name="Execute">
@@ -190,10 +182,17 @@
 			</item>
 		</menu>
 		<menu id="system" label="System">
-			<item label="Login Set-up">
+			<item label="Gnome Terminal">
 				<action name="Execute">
 					<execute>
-						xdg-su -c lxdm-config
+						gnome-terminal
+					</execute>
+				</action>
+			</item>
+			<item label="Xterm">
+				<action name="Execute">
+					<execute>
+						xterm
 					</execute>
 				</action>
 			</item>

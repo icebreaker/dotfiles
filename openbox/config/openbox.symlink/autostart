@@ -12,7 +12,7 @@ if [ -f /sys/class/backlight/intel_backlight/brightness ]; then
 fi
 
 if [ -x /usr/bin/xbacklight ]; then
-	xbacklight -set 50
+	xbacklight -set 70
 fi
 
 ## Set desktop wallpaper
@@ -47,9 +47,6 @@ xscreensaver -no-splash &
 
 ## Start Volumeicon
 (sleep 5s && volumeicon) &
-
-## Start Clipboard manager
-# (sleep 3s && parcellite) &
 
 ## Start Dropbox Daemon
 (sleep 10s && ~/.dropbox-dist/dropboxd) &
