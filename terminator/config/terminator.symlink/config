@@ -70,7 +70,6 @@
   [[default]]
     background_color = "#121212"
     background_darkness = 0.91
-    background_image = /home/szaby/Pictures/wallpapers/opensuse.jpg
     color_scheme = custom
     cursor_blink = False
     cursor_color = "#b6acac"
@@ -80,7 +79,6 @@
     login_shell = True
     palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
     scroll_background = False
-    scroll_on_output = False
     scrollback_infinite = True
     scrollback_lines = 2048
     scrollbar_position = hidden
