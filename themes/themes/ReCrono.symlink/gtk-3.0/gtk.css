@@ -3757,7 +3757,7 @@ textview text selection, flowbox flowboxchild:selected, entry selection, entry s
 treeview.view:selected, treeview.view:selected:focus, menu menuitem:hover,
 .menu menuitem:hover, .sidebar:selected, placessidebar row:selected {
   color: #ffffff;
-  border: 0;
+/*  border: 0; */
 /*  border-width: 1px 0;
   border-style: solid;
   border-top-color: #3f7cf1;
