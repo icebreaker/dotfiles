@@ -1,7 +1,12 @@
 [global_config]
-  always_split_with_profile = True
   borderless = True
+  broadcast_default = off
+  dbus = False
   enabled_plugins = ,
+  focus = mouse
+  homogeneous_tabbar = False
+  scroll_tabbar = False
+  smart_copy = False
   title_hide_sizetext = True
   title_inactive_bg_color = "#000000"
   title_transmit_bg_color = "#000000"
