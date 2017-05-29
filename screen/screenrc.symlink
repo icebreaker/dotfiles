@@ -4,7 +4,7 @@ startup_message off
 defutf8 on
 hardstatus alwayslastline '%{= B} %H  %= %{= k}%{ W}%-w%{+b G}%n*%t%{-b G}%{k}%{ W}%+w %= %{c}%d %D %{M}%c '
 defbce "on"
-term xterm-256color
+term screen-256color
 nonblock "on"
 attrcolor b ".I"
 termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'

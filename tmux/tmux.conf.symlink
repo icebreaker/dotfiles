@@ -1,5 +1,4 @@
-set -g default-terminal "xterm-256color"
-set-window-option -g xterm-keys on
+set -g default-terminal screen-256color
 
 set -g status on
 set -g status-bg colour236
