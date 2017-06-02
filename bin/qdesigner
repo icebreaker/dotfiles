@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -z "$QMAKE" ]; then
+	QMAKE=qmake
+fi
+
+`$QMAKE -query QT_INSTALL_BINS`/designer "$@"
