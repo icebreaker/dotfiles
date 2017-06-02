@@ -133,10 +133,6 @@ let g:Powerline_mode_i	= 'I'
 let g:Powerline_mode_R	= 'R'
 let g:Powerline_mode_n	= 'N'
 
-let g:clang_c_options = '-ansi'
-let g:clang_cpp_options = '-ansi'
-let g:clang_diagsopt = ''
-
 let g:solarized_italic=0
 let g:solarized_termcolors=256
 "let g:solarized_termtrans = 1
