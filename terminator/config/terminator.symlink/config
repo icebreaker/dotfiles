@@ -5,7 +5,7 @@
   enabled_plugins = ,
   focus = mouse
   homogeneous_tabbar = False
-  scroll_tabbar = False
+  scroll_tabbar = True
   smart_copy = False
   title_hide_sizetext = True
   title_inactive_bg_color = "#000000"
