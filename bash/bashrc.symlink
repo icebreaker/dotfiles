@@ -48,3 +48,10 @@ export NVM_DIR="$HOME/.nvm"
 
 # add DOT_BIN and RVM
 export PATH=$HOME/.rvm/bin:$DOT_BIN:$PATH
+
+# direnv
+if [ -x /opt/bin/direnv ]; then
+	# silence is golden ...
+	export DIRENV_LOG_FORMAT=
+	eval "$(direnv hook bash)"
+fi
