@@ -78,7 +78,7 @@
     color_scheme = custom
     cursor_blink = False
     cursor_color = "#b6acac"
-    font = Meslo LG M for Powerline 19
+    font = Meslo LG M for Powerline 17
     foreground_color = "#c6c6c6"
     icon_bell = False
     login_shell = True
