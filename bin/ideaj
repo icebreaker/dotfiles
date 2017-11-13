@@ -1,0 +1,3 @@
+#!/bin/bash
+
+$HOME/ideaj/bin/idea.sh $@
