@@ -207,9 +207,9 @@ function! DistractionFreeWriting()
 	set linebreak
 	set nonumber
 "	set foldcolumn=10
-	set columns=80
+""	set columns=80
 "	set colorcolumn=80
-	set tw=79
+""	set tw=79
 	set noshowmode 
 	set wrap
 	
@@ -223,7 +223,7 @@ function! DistractionFreeWriting()
 	hi clear SpellRare
 	hi SpellRare term=standout ctermfg=4 term=none cterm=none
 	
-	call matchadd('ColorColumn', '\%80v', 80)
+	" call matchadd('ColorColumn', '\%80v', 80)
 endfunction
 
 " Swap Directory
