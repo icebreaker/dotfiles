@@ -159,7 +159,18 @@ call matchadd('ColorColumn', '\%120v', 120)
 
 " Highlight any trailing whitespaces
 hi WEOL ctermbg=red guibg=red
-match WEOL /\s\+$/
+let s:weol = 1
+
+function! ToggleWhitespaceHighlight()
+	if s:weol
+		match WEOL /\s\+$/
+		let s:weol = 0
+	else
+		match none
+		let s:weol = 1
+	endif
+endfunction
+map <F3> :call ToggleWhitespaceHighlight()<CR>
 
 " Word Completion
 function! Tab_Or_Complete()
