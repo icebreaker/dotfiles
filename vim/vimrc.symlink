@@ -157,6 +157,10 @@ hi ColorColumn ctermbg=107 ctermfg=1
 
 call matchadd('ColorColumn', '\%120v', 120)
 
+" Highlight any trailing whitespaces
+hi WEOL ctermbg=red guibg=red
+match WEOL /\s\+$/
+
 " Word Completion
 function! Tab_Or_Complete()
 	if col('.') > 1 && strpart(getline('.'), col('.')-2, 3) =~ '^\w'
