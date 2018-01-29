@@ -19,7 +19,7 @@ else
 	SKYPE_BIN=skype
 fi
 
-if [ "$SKYPE_BIN" != "skypeforlinux" ] && [ -x "`which apulse 2>/dev/null`"  ]; then
+if [ -x "`which apulse 2>/dev/null`"  ]; then
 	echo "Emulating Pulse Audio ..."
 	apulse $SKYPE_BIN "@$"
 else
