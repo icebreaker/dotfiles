@@ -189,6 +189,7 @@ au! BufRead,BufNewFile *.as set filetype=actionscript
 au! BufRead,BufNewFile Rakefile,Gemfile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.ru set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.cr set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.conf set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
 au! BufRead,BufNewFile .irbrc set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.erb set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
