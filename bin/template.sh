@@ -13,7 +13,7 @@ function extract_filepath()
 	local FILEPATH=""
 	local SRCFOUND=0
 
-	for s in $(dirname $1 | tr '/' '\n'); do
+	for s in $(echo "$1" | tr '/' '\n'); do
 		if [ $SRCFOUND -eq 1 ]; then
 			if [ -z "$FILEPATH" ]; then
 				FILEPATH=$s
@@ -35,7 +35,9 @@ if [ -n "$1" ]; then
 	FILENAME=$(basename "$1" ".${EXTENSION}")
 	FILENAME_UP=$(echo "$FILENAME" | tr '[a-z]' '[A-Z]')
 
-	FILEPATH=$(extract_filepath "$1")
+	if [ -n "$2" ]; then
+		FILEPATH=$(extract_filepath "$2")
+	fi
 
 	if [ -n "$EXTENSION" ]; then
 		TEMPLATE=".template.${EXTENSION}"

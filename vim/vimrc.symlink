@@ -267,4 +267,4 @@ map <c-F12> :!yapvp '%' --expandsrc > /tmp/yapvp.html; xdg-open /tmp/yapvp.html<
 let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', ' ', '\\ ', 'g')
 execute 'set path+=' . src
 
-nmap <Leader>t :. !template.sh '%:t'<CR>
+nmap <Leader>t :. !template.sh '%:t' '%:p:h'<CR>
