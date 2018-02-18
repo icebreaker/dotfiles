@@ -266,5 +266,7 @@ map <Leader>p :!pandoc -f markdown+tex_math_single_backslash -t beamer --latex-e
 " Append the src directory to the path
 let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', ' ', '\\ ', 'g')
 execute 'set path+=' . src
+execute 'set path+=/usr/include/SDL2'
+execute 'set path+=/usr/include'
 
 nmap <Leader>t :. !template.sh '%:t' '%:p:h'<CR>
