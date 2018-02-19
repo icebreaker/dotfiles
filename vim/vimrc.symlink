@@ -41,7 +41,6 @@ set fileencoding=utf8
 set selectmode=key
 set nowrap
 set complete-=i
-set wildmenu
 set fileformats=unix,mac,dos
 set nocp
 set keymodel=startsel
@@ -268,5 +267,9 @@ let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', '
 execute 'set path+=' . src
 execute 'set path+=/usr/include/SDL2'
 execute 'set path+=/usr/include'
+
+" Exclude commonly undesirable directories from the wild menu
+set wildmenu
+set wildignore+=.svn/*,.git/*,bin/*,build/*,data/*,resources/*,src/vendor/*
 
 nmap <Leader>t :. !template.sh '%:t' '%:p:h'<CR>
