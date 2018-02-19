@@ -273,3 +273,5 @@ set wildmenu
 set wildignore+=.svn/*,.git/*,bin/*,build/*,data/*,resources/*,src/vendor/*
 
 nmap <Leader>t :. !template.sh '%:t' '%:p:h'<CR>
+
+set cryptmethod=blowfish2
