@@ -19,5 +19,11 @@ if [ "$DOT_OS" == "opensuse" ]; then
 		export LD_PRELOAD=/usr/lib64/libudev.so.0:$LD_PRELOAD
 	fi
 fi
-	
-exec -a "$0" "google-chrome" --high-dpi-support=1 --force-device-scale-factor=1 --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=4096 "$@"
+
+BIN="google-chrome"
+
+if [ -x "/usr/bin/${BIN}-unstable" ]; then
+	BIN="${BIN}-unstable"
+fi
+
+exec -a "$0" "$BIN" --high-dpi-support=1 --force-device-scale-factor=1 --disable-gpu-sandbox --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=4096 --no-default-browser-check "$@"
