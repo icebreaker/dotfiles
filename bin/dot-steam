@@ -3,7 +3,11 @@
 VERSION=$(zenity  --list  --text "Steam" --column "Version" Linux Windows)
 
 if [ -z "$WINEPREFIX" ]; then
-	WINEPREFIX=$HOME/.wine
+	if [ -d "/extra" ]; then
+		WINEPREFIX=/extra/wine
+	else
+		WINEPREFIX=$HOME/.wine
+	fi
 fi
 
 if [ "$VERSION" == "Windows" ]; then
