@@ -3,7 +3,7 @@
 if [ -x "/usr/bin/xdg-su" ]; then
 	xgd-su -c "$@"
 elif [ -x "/usr/bin/gksudo" ]; then
-	gksu "$@"
+	gksudo "$@"
 else
 	echo "No GUI sudo found."
 fi
