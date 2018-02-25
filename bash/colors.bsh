@@ -1,4 +1,6 @@
-export TERM=xterm-256color
+if [ "$DOT_OS" != "arch" ]; then
+	export TERM=xterm-256color
+fi
 
 if [ -x /usr/bin/dircolors ]; then
 	eval "`dircolors -b`"
