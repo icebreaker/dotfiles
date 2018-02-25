@@ -8,8 +8,8 @@ import subprocess
 import sys
 
 class Powerline:
-    separator = '⮀'
-    separator_thin="⮁"
+    separator = ''
+    separator_thin="|"
     ESC = '\e'
     LSQ = '\['
     RSQ = '\]'
@@ -89,18 +89,22 @@ def add_cwd_segment(p):
     if cwd[0] == '/':
         cwd = cwd[1:]
 
+    fg = 231
+    bg = 240
+
     names = cwd.split('/')
-    for n in names[:-2]:
-        p.append(' ' + n + ' ', 247, 236, Powerline.separator_thin, 247)
+    for n in names:
+        p.append(' ' + n + ' ', fg, bg)
+        if bg == 236:
+            fg = 231
+            bg = 240
+        else:
+            fg = 247
+            bg = 236
 
-    if len(names) > 1:
-        p.append(' ' + names[-2] + ' ', 247, 236)
+    return fg, bg
 
-    p.append(' ' + names[-1] + ' ', 231, 240)
-
-def add_root_indicator(p, error):
-    bg = 236
-    fg = 247
+def add_root_indicator(p, error, fg, bg):
     if int(error) != 0:
         fg = 15
         bg = 161
@@ -108,7 +112,7 @@ def add_root_indicator(p, error):
 
 if __name__ == '__main__':
     p = Powerline()
-    add_cwd_segment(p)
+    fg, bg = add_cwd_segment(p)
     add_git_segment(p)
-    add_root_indicator(p, sys.argv[1] if len(sys.argv) > 1 else 0)
+    add_root_indicator(p, sys.argv[1] if len(sys.argv) > 1 else 0, fg, bg)
     print p.draw()
