@@ -263,7 +263,7 @@ nmap <Leader>r :RuboCop<CR>
 
 let g:delimitMate_expand_cr=1
 
-map <Leader>p :!pandoc -f markdown+tex_math_single_backslash -t beamer --latex-engine=xelatex -o /tmp/vim_pandoc_tmp.pdf '%' && mupdf /tmp/vim_pandoc_tmp.pdf && rm /tmp/vim_pandoc_tmp.pdf <CR>
+map <Leader>p :!pandoc -f markdown+tex_math_single_backslash -t beamer --pdf-engine=xelatex -o /tmp/vim_pandoc_tmp.pdf '%' && mupdf /tmp/vim_pandoc_tmp.pdf && rm /tmp/vim_pandoc_tmp.pdf <CR>
 
 " Append the src directory to the path
 let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', ' ', '\\ ', 'g')
