@@ -1,3 +1,3 @@
 #!/bin/bash
 
-dmenu_path | ~/.dotfiles/bin/dmenu "$@" 
+dmenu_path | ~/.dotfiles/bin/dmenu "$@" | /bin/bash &
