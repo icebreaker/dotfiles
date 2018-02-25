@@ -15,11 +15,13 @@ if [ -x /usr/bin/xbacklight ]; then
 	xbacklight -set 70
 fi
 
+## Start keyring daemon
+if [ -x /usr/bin/gnome-keyring-daemon ]; then
+	gnome-keyring-daemon &
+fi
+
 ## Set desktop wallpaper
 nitrogen --restore &
-
-## Start session manager
-# lxsession &
 
 ## Enable power management
 xfce4-power-manager &

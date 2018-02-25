@@ -4,5 +4,4 @@ if [ -n "$DOT_OPENBOX" ]; then
 	export XCURSOR_THEME=ComixCursors-Red-Huge
 	xrdb ~/.Xresources &
 	exec dbus-launch openbox-session
-	exec gnome-keyring-daemon
 fi
