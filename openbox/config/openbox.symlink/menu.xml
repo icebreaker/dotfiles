@@ -1,230 +1,230 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openbox_menu xmlns="http://openbox.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://openbox.org/                 file:///usr/share/openbox/menu.xsd">
-	<menu id="root-menu" label="Openbox 3">
-		<item label="Terminal">
-			<action name="Execute">
-				<execute>
-					terminator
-				</execute>
-			</action>
-		</item>
-		<item label="Web Browser">
-			<action name="Execute">
-				<execute>
-					x-www-browser
-				</execute>
-			</action>
-		</item>
-		<item label="Skype">
-			<action name="Execute">
-				<execute>
-					skype2
-				</execute>
-			</action>
-		</item>
-		<item label="Pidgin">
-			<action name="Execute">
-				<execute>
-					pidgin
-				</execute>
-			</action>
-		</item>
-		<item label="File Manager">
-			<action name="Execute">
-				<execute>
-					thunar
-				</execute>
-			</action>
-		</item>
-		<item label="Text Editor">
-			<action name="Execute">
-				<execute>
-					gvim
-				</execute>
-			</action>
-		</item>
-		<item label="Media Player">
-			<action name="Execute">
-				<execute>
-					vlc
-				</execute>
-			</action>
-		</item>
-		<separator/>
-		<item label="DVD/CD Burner">
-			<action name="Execute">
-				<execute>
-					xfburn
-				</execute>
-			</action>
-		</item>
-		<separator/>
-		<menu id="network" label="Network">
-			<item label="Firefox">
-				<action name="Execute">
-					<execute>
-						firefox
-					</execute>
-				</action>
-			</item>
-			<item label="Filezilla">
-				<action name="Execute">
-					<execute>
-						filezilla
-					</execute>
-				</action>
-			</item>
-			<item label="Transmission">
-				<action name="Execute">
-					<execute>
-						transmission
-					</execute>
-				</action>
-			</item>
-		</menu>
-		<separator/>
-		<menu id="settings" label="Settings">
-			<menu id="obConfig" label="Openbox Config">
-				<item label="Edit menu.xml">
-					<action name="Execute">
-						<execute>
-							gvim ~/.config/openbox/menu.xml
-						</execute>
-					</action>
-				</item>
-				<item label="Edit rc.xml">
-					<action name="Execute">
-						<execute>
-							gvim ~/.config/openbox/rc.xml
-						</execute>
-					</action>
-				</item>
-				<item label="Edit autostart">
-					<action name="Execute">
-						<execute>
-							gvim ~/.config/openbox/autostart
-						</execute>
-					</action>
-				</item>
-				<item label="GUI Config Tool">
-					<action name="Execute">
-						<execute>
-							obconf
-						</execute>
-					</action>
-				</item>
-				<item label="Reconfigure">
-					<action name="Reconfigure"/>
-				</item>
-				<item label="Restart">
-					<action name="Restart"/>
-				</item>
-			</menu>
-			<menu id="tint2config" label="tint2 Panel Config">
-				<item label="Edit config file">
-					<action name="Execute">
-						<execute>
-							gvim ~/.config/tint2/tint2rc
-						</execute>
-					</action>
-				</item>
-				<item label="GUI Config Tool">
-					<action name="Execute">
-						<execute>
-							tint2conf
-						</execute>
-					</action>
-				</item>
-			</menu>
-			<menu id="NotificationsSettings" label="Notifications">
-			    <item label="Edit config file">
-				    <action name="Execute">
-					    <execute>
-						    gvim ~/.notify-osd
-					    </execute>
-				    </action>
-			    </item>
-			    <item label="Send test notification">
-				    <action name="Execute">
-					    <execute>
-							notify-send "Test Notification"
-					    </execute>
-				    </action>
-			    </item>
-			</menu>
-			<item label="User Interface Settings">
-				<action name="Execute">
-					<execute>
-						lxappearance
-					</execute>
-				</action>
-			</item>
-			<item label="Power Management">
-				<action name="Execute">
-					<execute>
-						xfce4-power-manager-settings
-					</execute>
-				</action>
-			</item>
-			<item label="Screensaver">
-				<action name="Execute">
-					<execute>
-						xscreensaver-demo
-					</execute>
-				</action>
-			</item>
-			<item label="Choose Wallpaper">
-				<action name="Execute">
-					<execute>
-						nitrogen
-					</execute>
-				</action>
-			</item>
-		</menu>
-		<menu id="system" label="System">
-			<item label="Gnome Terminal">
-				<action name="Execute">
-					<execute>
-						gnome-terminal
-					</execute>
-				</action>
-			</item>
-			<item label="Xterm">
-				<action name="Execute">
-					<execute>
-						xterm
-					</execute>
-				</action>
-			</item>
-			<item label="Yast 2">
-				<action name="Execute">
-					<execute>
-						xdg-su -c yast2
-					</execute>
-				</action>
-			</item>
-		</menu>
-		<separator/>
-		<item label="Lock Screen">
-			<action name="Execute">
-				<execute>
-					dot-lock
-				</execute>
-			</action>
-		</item>
-		<item label="Restart">
-			<action name="Execute">
-				<execute>
-					xdg-su -c /sbin/reboot
-				</execute>
-			</action>
-		</item>
-		<item label="Shutdown">
-			<action name="Execute">
-				<execute>
-					xdg-su -c '/sbin/shutdown -h now'
-				</execute>
-			</action>
-		</item>
-	</menu>
+  <menu id="root-menu" label="Openbox 3">
+    <item label="Terminal">
+      <action name="Execute">
+        <execute>
+          terminator
+        </execute>
+      </action>
+    </item>
+    <item label="Web Browser">
+      <action name="Execute">
+        <execute>
+          ~/.dotfiles/bin/google-chrome-launcher
+        </execute>
+      </action>
+    </item>
+    <item label="Skype">
+      <action name="Execute">
+        <execute>
+          ~/.dotfiles/bin/dot-skype
+        </execute>
+      </action>
+    </item>
+    <item label="Pidgin">
+      <action name="Execute">
+        <execute>
+          pidgin
+        </execute>
+      </action>
+    </item>
+    <item label="File Manager">
+      <action name="Execute">
+        <execute>
+          thunar
+        </execute>
+      </action>
+    </item>
+    <item label="Text Editor">
+      <action name="Execute">
+        <execute>
+          gvim
+        </execute>
+      </action>
+    </item>
+    <item label="Media Player">
+      <action name="Execute">
+        <execute>
+          vlc
+        </execute>
+      </action>
+    </item>
+    <separator/>
+    <item label="DVD/CD Burner">
+      <action name="Execute">
+        <execute>
+          xfburn
+        </execute>
+      </action>
+    </item>
+    <separator/>
+    <menu id="network" label="Network">
+      <item label="Firefox">
+        <action name="Execute">
+          <execute>
+            firefox
+          </execute>
+        </action>
+      </item>
+      <item label="Filezilla">
+        <action name="Execute">
+          <execute>
+            filezilla
+          </execute>
+        </action>
+      </item>
+      <item label="Transmission">
+        <action name="Execute">
+          <execute>
+            transmission
+          </execute>
+        </action>
+      </item>
+    </menu>
+    <separator/>
+    <menu id="settings" label="Settings">
+      <menu id="obConfig" label="Openbox Config">
+        <item label="Edit menu.xml">
+          <action name="Execute">
+            <execute>
+              gvim ~/.config/openbox/menu.xml
+            </execute>
+          </action>
+        </item>
+        <item label="Edit rc.xml">
+          <action name="Execute">
+            <execute>
+              gvim ~/.config/openbox/rc.xml
+            </execute>
+          </action>
+        </item>
+        <item label="Edit autostart">
+          <action name="Execute">
+            <execute>
+              gvim ~/.config/openbox/autostart
+            </execute>
+          </action>
+        </item>
+        <item label="GUI Config Tool">
+          <action name="Execute">
+            <execute>
+              obconf
+            </execute>
+          </action>
+        </item>
+        <item label="Reconfigure">
+          <action name="Reconfigure"/>
+        </item>
+        <item label="Restart">
+          <action name="Restart"/>
+        </item>
+      </menu>
+      <menu id="tint2config" label="tint2 Panel Config">
+        <item label="Edit config file">
+          <action name="Execute">
+            <execute>
+              gvim ~/.config/tint2/tint2rc
+            </execute>
+          </action>
+        </item>
+        <item label="GUI Config Tool">
+          <action name="Execute">
+            <execute>
+              tint2conf
+            </execute>
+          </action>
+        </item>
+      </menu>
+      <menu id="NotificationsSettings" label="Notifications">
+        <item label="Edit config file">
+          <action name="Execute">
+            <execute>
+              gvim ~/.notify-osd
+            </execute>
+          </action>
+        </item>
+        <item label="Send test notification">
+          <action name="Execute">
+            <execute>
+              notify-send "Test Notification"
+            </execute>
+          </action>
+        </item>
+      </menu>
+      <item label="User Interface Settings">
+        <action name="Execute">
+          <execute>
+            lxappearance
+          </execute>
+        </action>
+      </item>
+      <item label="Power Management">
+        <action name="Execute">
+          <execute>
+            xfce4-power-manager-settings
+          </execute>
+        </action>
+      </item>
+      <item label="Screensaver">
+        <action name="Execute">
+          <execute>
+            xscreensaver-demo
+          </execute>
+        </action>
+      </item>
+      <item label="Choose Wallpaper">
+        <action name="Execute">
+          <execute>
+            nitrogen
+          </execute>
+        </action>
+      </item>
+    </menu>
+    <menu id="system" label="System">
+      <item label="Gnome Terminal">
+        <action name="Execute">
+          <execute>
+            gnome-terminal
+          </execute>
+        </action>
+      </item>
+      <item label="Xterm">
+        <action name="Execute">
+          <execute>
+            xterm
+          </execute>
+        </action>
+      </item>
+      <item label="Yast 2">
+        <action name="Execute">
+          <execute>
+            xdg-su -c yast2
+          </execute>
+        </action>
+      </item>
+    </menu>
+    <separator/>
+    <item label="Lock Screen">
+      <action name="Execute">
+        <execute>
+          dot-lock
+        </execute>
+      </action>
+    </item>
+    <item label="Restart">
+      <action name="Execute">
+        <execute>
+          ~/.dotfiles/bin/dot-su /sbin/reboot
+        </execute>
+      </action>
+    </item>
+    <item label="Shutdown">
+      <action name="Execute">
+        <execute>
+          ~/.dotfiles/bin/dot-su '/sbin/shutdown -h now'
+        </execute>
+      </action>
+    </item>
+  </menu>
 </openbox_menu>

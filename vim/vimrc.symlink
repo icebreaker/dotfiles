@@ -196,12 +196,12 @@ au! BufRead,BufNewFile *.haml,*.hamlc set filetype=haml tabstop=2 shiftwidth=2 s
 au! BufRead,BufNewFile *.sass set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.scss set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.yml,*.yaml,Doxterfile set filetype=yaml tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.rake,*.gemspec,*.js,*.jsx,*.feature set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.rake,*.gemspec,*.js,*.jsx,*.feature,*.xml set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.install set filetype=php
 au! BufRead,BufNewFile *.inc set filetype=php
 au! BufRead,BufNewFile *.php set filetype=php
 au! BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
-au! BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc call SetFileTypeSH("bash")
+au! BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc set filetype=sh
 au! BufRead,BufNewFile *.py set filetype=python
 au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.coffee,*.feature,*.jsx set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol

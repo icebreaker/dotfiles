@@ -254,12 +254,12 @@
     </keybind>
     <keybind key="Print">
       <action name="Execute">
-        <execute>dot-screenshot</execute>
+        <execute>~/.dotfiles/bin/dot-screenshot</execute>
       </action>
     </keybind>
     <keybind key="A-Print">
       <action name="Execute">
-        <execute>dot-screenshot -b -s</execute>
+        <execute>~/.dotfiles/bin/dot-screenshot -b -s</execute>
       </action>
     </keybind>
     <!-- Keybindings for window switching -->
@@ -282,7 +282,7 @@
           <enabled>true</enabled>
           <name>dmenu_run</name>
         </startupnotify>
-        <command>dmenu_run</command>
+        <command>~/.dotfiles/bin/dmenu_run</command>
       </action>
     </keybind>
     <keybind key="W-f">
@@ -309,7 +309,7 @@
           <enabled>true</enabled>
           <name>Web Browser</name>
         </startupnotify>
-        <command>x-www-browser</command>
+        <command>~/.dotfiles/bin/google-chrome-launcher</command>
       </action>
     </keybind>
    <keybind key="0xF8">
@@ -318,7 +318,7 @@
           <enabled>true</enabled>
           <name>Steam</name>
         </startupnotify>
-        <command>~/.dotfiles/bin/steam2</command>
+        <command>~/.dotfiles/bin/dot-steam</command>
       </action>
     </keybind>
    <keybind key="W-s">
@@ -327,7 +327,7 @@
           <enabled>true</enabled>
           <name>Skype</name>
         </startupnotify>
-        <command>~/.dotfiles/bin/skype2</command>
+        <command>~/.dotfiles/bin/dot-skype</command>
       </action>
     </keybind>
     <keybind key="W-p">
@@ -345,7 +345,7 @@
           <enabled>true</enabled>
           <name>BRB</name>
         </startupnotify>
-        <command>viewnior --fullscreen ~/.dotfiles/twitch/brb.png</command>
+        <command>~/.dotfiles/bin/brb</command>
       </action>
     </keybind>
     <keybind key="W-F8">
@@ -354,7 +354,7 @@
           <enabled>true</enabled>
           <name>Dual Monitor</name>
         </startupnotify>
-        <command>dot-monitor</command>
+        <command>~/.dotfiles/bin/dot-monitor</command>
       </action>
     </keybind>
     <keybind key="W-l">
@@ -363,7 +363,7 @@
           <enabled>true</enabled>
           <name>Lock screen</name>
         </startupnotify>
-        <command>dot-lock</command>
+        <command>~/.dotfiles/bin/dot-lock</command>
       </action>
     </keybind>
     <keybind key="XF86Calculator">

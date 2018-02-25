@@ -1,4 +1,12 @@
-if [ "$DOT_OS" == "fedora" ]; then
+if [ "$DOT_OS" == "arch" ]; then
+
+alias qs='sudo pacman -S -s'
+alias qi='sudo pacman -S'
+alias qr='sudo pacman -Rs'
+alias qu='sudo pacman -Syy'
+alias qd='sudo pacman -Syu'
+
+elif [ "$DOT_OS" == "fedora" ]; then
 
 alias qs='sudo yum search'
 alias qi='sudo yum install'

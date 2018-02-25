@@ -26,4 +26,6 @@ if [ -x "/usr/bin/${BIN}-unstable" ]; then
 	BIN="${BIN}-unstable"
 fi
 
-exec -a "$0" "$BIN" --high-dpi-support=1 --force-device-scale-factor=1 --disable-gpu-sandbox --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=4096 --no-default-browser-check "$@"
+echo $BIN
+
+exec -a "$0" "$BIN" --high-dpi-support=1 --force-device-scale-factor=1 --disable-gpu-sandbox --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=2048 --no-default-browser-check "$@"
