@@ -7,25 +7,25 @@ else
 fi
 
 if [ -z "$DOT_VGA" ] ; then
-	VGA="VGA1"
+	VGA="HDMI-0"
 else
 	VGA=$DOT_VGA
 fi
 
 if [ -z "$DOT_VGA_RES" ] ; then
-	VGA_RES="1440x900"
+	VGA_RES="1920x1080"
 else
 	VGA_RES=$DOT_VGA_RES
 fi
 
 if [ -z "$DOT_LCD" ]; then
-	LCD="LVDS1"
+	LCD="DP-2"
 else
 	LCD=$DOT_LCD
 fi
 
 if [ -z "$DOT_LCD_RES" ]; then
-	LCD_RES="1366x768"
+	LCD_RES="1920x1080"
 else
 	LCD_RES=$DOT_LCD_RES
 fi
