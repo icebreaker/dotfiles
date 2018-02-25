@@ -89,10 +89,15 @@ def add_cwd_segment(p):
     if cwd[0] == '/':
         cwd = cwd[1:]
 
-    fg = 231
-    bg = 240
-
     names = cwd.split('/')
+
+    if len(names) % 2:
+        fg = 231
+        bg = 240
+    else:
+        fg = 247
+        bg = 236
+
     for n in names:
         p.append(' ' + n + ' ', fg, bg)
         if bg == 236:
