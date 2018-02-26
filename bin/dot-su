@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -x "/usr/bin/xdg-su" ]; then
-	xgd-su -c "$@"
+	xdg-su -c "$@"
 elif [ -x "/usr/bin/gksudo" ]; then
 	gksudo "$@"
 else
