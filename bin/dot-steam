@@ -10,6 +10,8 @@ if [ -z "$WINEPREFIX" ]; then
 	fi
 fi
 
+export WINEPREFIX
+
 if [ "$VERSION" == "Windows" ]; then
 	wine $WINEPREFIX/drive_c/Steam/Steam.exe -no-cef-sandbox "$@"
 elif [ "$VERSION" == "Linux" ]; then
