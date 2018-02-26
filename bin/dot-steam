@@ -8,9 +8,9 @@ if [ -z "$WINEPREFIX" ]; then
 	else
 		WINEPREFIX=$HOME/.wine
 	fi
-fi
 
-export WINEPREFIX
+	export WINEPREFIX
+fi
 
 if [ "$VERSION" == "Windows" ]; then
 	wine $WINEPREFIX/drive_c/Steam/Steam.exe -no-cef-sandbox "$@"
