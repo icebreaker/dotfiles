@@ -1,6 +1,7 @@
 [global_config]
   borderless = True
   broadcast_default = off
+  custom_url_handler = /home/msz/.dotfiles/bin/google-chrome-launcher
   dbus = False
   enabled_plugins = ,
   focus = mouse
@@ -10,6 +11,7 @@
   title_hide_sizetext = True
   title_inactive_bg_color = "#000000"
   title_transmit_bg_color = "#000000"
+  use_custom_url_handler = True
   window_state = maximise
 [keybindings]
   broadcast_all = <Primary><Shift><Alt>exclam
