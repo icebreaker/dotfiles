@@ -4,7 +4,7 @@
     <item label="Terminal">
       <action name="Execute">
         <execute>
-          terminator
+          ~/.dotfiles/bin/dot-term
         </execute>
       </action>
     </item>
