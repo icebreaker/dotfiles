@@ -28,4 +28,4 @@ fi
 
 echo "Launching $BIN ..."
 
-exec -a "$0" "$BIN" --single-process --high-dpi-support=1 --force-device-scale-factor=1 --disable-gpu-sandbox --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=2048 --no-default-browser-check "$@"
+exec -a "$0" "$BIN" --single-process --process-per-site --high-dpi-support=1 --force-device-scale-factor=1 --disable-gpu-sandbox --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=2048 --no-default-browser-check "$@"
