@@ -9,5 +9,10 @@ Xft.hintstyle: hintslight
 Xft.lcdfilter: lcddefault
 Xft.dpi: 96
 XTerm.vt100.faceName: IBM Plex Mono Medium:size=18:antialias=true
+XTerm.vt100.TrueTintingType: true
 XTerm.vt100.foreground: rgb:c6/c6/c6
 XTerm.vt100.background: rgb:12/12/12
+XTerm.vt100.ScrollBar: false
+XTerm.vt100.RightScrollBar: false
+XTerm.vt100.VisualBell: false
+XTerm.vt100.LoginShell: true
