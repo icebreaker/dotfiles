@@ -11,4 +11,6 @@ else
 	RESIZE_MODE=$3
 fi
 
+export TERM=xterm
+
 image_resizer /load $1 /resize $RESIZE_MODE "XBR 4x(2,thresholds=0,vbounds=wrap)" /save $2
