@@ -29,3 +29,5 @@
 	browser = webrowser
 [browser "webrowser"]
 	cmd = xdg-open
+[core]
+	pager = less -+X
