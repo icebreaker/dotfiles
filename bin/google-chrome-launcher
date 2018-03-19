@@ -28,4 +28,12 @@ fi
 
 echo "Launching $BIN ..."
 
-exec -a "$0" "$BIN" --process-per-site --high-dpi-support=1 --force-device-scale-factor=1 --disable-gpu-sandbox --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=2048 --no-default-browser-check "$@"
+if [ -f $HOME/.googlechromelauncherflags ]; then
+	# i.e: --disable-gpu-sandbox
+	FLAGS=$(cat $HOME/.googlechromelauncherflags)
+	echo "Flags: $FLAGS"
+else
+	FLAGS=""
+fi
+
+exec -a "$0" "$BIN" --process-per-site --high-dpi-support=1 --force-device-scale-factor=1 --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=2048 --no-default-browser-check $FLAGS "$@"
