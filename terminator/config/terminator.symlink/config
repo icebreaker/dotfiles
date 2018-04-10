@@ -82,7 +82,7 @@
     cursor_color = "#b6acac"
     cursor_color_fg = False
     custom_command = /bin/bash
-    font = IBM Plex Mono Semi-Bold 18
+    font = IBM Plex Mono Semi-Bold 17
     foreground_color = "#c6c6c6"
     icon_bell = False
     login_shell = True
