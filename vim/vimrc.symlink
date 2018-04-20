@@ -278,3 +278,5 @@ set wildignore+=.svn/*,.git/*,bin/*,build/*,data/*,resources/*,src/vendor/*
 nmap <Leader>t :. !template.sh '%:t' '%:p:h'<CR>
 
 set cryptmethod=blowfish2
+
+let coffee_no_reserved_words_error = 1
