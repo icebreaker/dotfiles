@@ -221,7 +221,7 @@ abstracts = {
 
   prompt = ":";
 
-  sb = " $* ⮁";
+  sb = " $* |";
   sbmode = "(%9%W+$*%9%n)";
   sbaway = " (%Zafd700zZzZ%n)";
   sbservertag = "$0";
