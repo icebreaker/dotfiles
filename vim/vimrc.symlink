@@ -106,7 +106,7 @@ endif
 let g:CSApprox_attr_map = { 'bold' : 'bold', 'italic' : '', 'sp' : ''  }
 
 if has("gui_running")
-	set guifont=IBM\ Plex\ Mono\ Medium\ 18
+	set guifont=IBM\ Plex\ Mono\ Medium\ 19
 	set guicursor+=a:blinkon0
 	set guioptions=i
 endif
