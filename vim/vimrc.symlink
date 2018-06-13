@@ -22,18 +22,11 @@ map <F2> :set nonumber!<CR>
 vmap <c-c> :w! ~/.vim/swap/.buffer<CR>
 nmap <c-p> :r ~/.vim/swap/.buffer<CR>
 
-" Next / Prev File (as in :args)
-:noremap <Leader>] :n<CR>
-:noremap <Leader>[ :prev<CR>
-
-:noremap <Leader>n :n<CR>
-:noremap <Leader>p :prev<CR>
-
 " Highlight Last Searched Term
-:noremap <space> :set hlsearch!<CR>
+noremap <space> :set hlsearch!<CR>
 
 " Shortcut for Redo
-:noremap r :redo<CR>
+noremap r :redo<CR>
 
 set nospell
 set encoding=utf8
@@ -280,3 +273,27 @@ nmap <Leader>t :. !template.sh '%:t' '%:p:h'<CR>
 set cryptmethod=blowfish2
 
 let coffee_no_reserved_words_error = 1
+
+function! NextFile()
+	try
+		execute 'try | n | catch | rew | endtry'
+	catch
+		echo ''
+	endtry
+endfunction
+
+function! PrevFile()
+	try
+		execute 'try | prev | catch | la | endtry'
+	catch
+		echo ''
+	endtry
+endfunction
+
+noremap <Tab> :call NextFile()<CR>
+
+noremap <Leader>] :call NextFile()<CR>
+noremap <Leader>[ :call PrevFile()<CR>
+
+noremap <Leader>n :call NextFile()<CR>
+noremap <Leader>p :call PrevFile()<CR>
