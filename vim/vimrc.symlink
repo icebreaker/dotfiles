@@ -275,25 +275,14 @@ set cryptmethod=blowfish2
 let coffee_no_reserved_words_error = 1
 
 function! NextFile()
-	try
-		execute 'try | n | catch | rew | endtry'
-	catch
-		echo ''
-	endtry
+	execute 'try | n | catch | try | rew | catch | | endtry | endtry'
 endfunction
 
 function! PrevFile()
-	try
-		execute 'try | prev | catch | la | endtry'
-	catch
-		echo ''
-	endtry
+	execute 'try | prev | catch | try | la | catch | | endtry | endtry'
 endfunction
 
 noremap <Tab> :call NextFile()<CR>
 
 noremap <Leader>] :call NextFile()<CR>
 noremap <Leader>[ :call PrevFile()<CR>
-
-noremap <Leader>n :call NextFile()<CR>
-noremap <Leader>p :call PrevFile()<CR>
