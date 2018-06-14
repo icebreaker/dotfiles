@@ -282,7 +282,14 @@ function! PrevFile()
 	execute 'try | prev | catch | try | la | catch | | endtry | endtry'
 endfunction
 
+function! CloseFile()
+	execute 'argdel %'
+	execute 'try | n | catch | try | rew | catch | q | endtry | endtry'
+endfunction
+
 noremap <Tab> :call NextFile()<CR>
 
 noremap <Leader>] :call NextFile()<CR>
 noremap <Leader>[ :call PrevFile()<CR>
+
+noremap <Leader>q :call CloseFile()<CR>
