@@ -1,6 +1,6 @@
 [Alsa]
 card=default
-channel=PCM
+channel=Master
 
 [Notification]
 show_notification=true
@@ -8,7 +8,7 @@ notification_type=0
 
 [StatusIcon]
 stepsize=2
-onclick=xfce4-mixer
+onclick=gnome-alsamixer
 theme=Default
 use_panel_specific_icons=true
 lmb_slider=true
