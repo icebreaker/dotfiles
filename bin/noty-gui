@@ -1,0 +1,3 @@
+#!/bin/bash
+
+noty c "$(zenity --entry --entry-text "$(xsel -o)")"
