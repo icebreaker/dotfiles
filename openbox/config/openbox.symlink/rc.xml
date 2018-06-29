@@ -330,6 +330,15 @@
         <command>~/.dotfiles/bin/dot-skype</command>
       </action>
     </keybind>
+   <keybind key="W-n">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Noty</name>
+        </startupnotify>
+        <command>~/.dotfiles/bin/noty-gui</command>
+      </action>
+    </keybind>
     <keybind key="W-p">
       <action name="Execute">
         <startupnotify>
