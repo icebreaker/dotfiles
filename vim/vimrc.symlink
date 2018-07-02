@@ -287,8 +287,6 @@ function! CloseFile()
 	execute 'try | n | catch | try | rew | catch | q | endtry | endtry'
 endfunction
 
-noremap <Tab> :call NextFile()<CR>
-
 noremap <Leader>] :call NextFile()<CR>
 noremap <Leader>[ :call PrevFile()<CR>
 
