@@ -15,6 +15,10 @@ if [ -x /usr/bin/xbacklight ]; then
 	xbacklight -set 70
 fi
 
+if [ -x /bin/xset ]; then
+	xset r rate 200 25
+fi
+
 ## Start keyring daemon
 if [ -x /usr/bin/gnome-keyring-daemon ]; then
 	gnome-keyring-daemon &
