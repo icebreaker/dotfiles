@@ -45,3 +45,4 @@ alias netest='wget -O /dev/null http://cachefly.cachefly.net/100mb.test'
 alias clipboard='xclip -sel clip'
 alias v='vim'
 alias clvs='rm ~/.vim/swap/*.swp'
+alias notes="vim -x +'normal Go' +'r!date' ~/Dropbox/.notes"
