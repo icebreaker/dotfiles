@@ -65,7 +65,7 @@ class Powerline:
 
 def add_git_segment(p):
     try:
-        p1 = subprocess.Popen(['git', 'status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p1 = subprocess.Popen(['git', 'status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         output = p1.communicate()[0].strip()
         if len(output) > 0:
             lines = output.splitlines()
@@ -120,4 +120,4 @@ if __name__ == '__main__':
     fg, bg = add_cwd_segment(p)
     add_git_segment(p)
     add_root_indicator(p, sys.argv[1] if len(sys.argv) > 1 else 0, fg, bg)
-    print p.draw()
+    print(p.draw())
