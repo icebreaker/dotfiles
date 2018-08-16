@@ -193,7 +193,7 @@ au! BufRead,BufNewFile *.sass set filetype=sass tabstop=2 shiftwidth=2 softtabst
 au! BufRead,BufNewFile *.scss set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.yml,*.yaml,Doxterfile set filetype=yaml tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.rake,*.gemspec,*.js,*.jsx,*.feature,*.xml set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.install,*.inc,*.php set filetype=php tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+au! BufRead,BufNewFile *.install,*.inc,*.php set filetype=php tabstop=4 shiftwidth=4 softtabstop=4 noexpandtab noeol
 au! BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
 au! BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc set filetype=sh
 au! BufRead,BufNewFile *.py set filetype=python
