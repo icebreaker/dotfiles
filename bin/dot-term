@@ -1,9 +1,13 @@
 #!/bin/bash
 
-TERMINATOR=$(which terminator 2>/dev/null)
-
-if [ -n "$TERMINATOR" ]; then
-	terminator "$@"
+if [ -x "/opt/bin/sakura" ]; then
+	/opt/bin/sakura "$@"
 else
-	xterm "$@"
+	TERMINATOR=$(which terminator 2>/dev/null)
+
+	if [ -n "$TERMINATOR" ]; then
+		terminator "$@"
+	else
+		xterm "$@"
+	fi
 fi
