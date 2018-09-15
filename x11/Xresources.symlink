@@ -8,11 +8,27 @@ Xft.hinting: true
 Xft.hintstyle: hintslight
 Xft.lcdfilter: lcddefault
 Xft.dpi: 96
-XTerm.vt100.faceName: IBM Plex Mono Medium:size=18:antialias=true
-XTerm.vt100.TrueTintingType: true
-XTerm.vt100.foreground: rgb:c6/c6/c6
-XTerm.vt100.background: rgb:12/12/12
-XTerm.vt100.ScrollBar: false
-XTerm.vt100.RightScrollBar: false
-XTerm.vt100.VisualBell: false
-XTerm.vt100.LoginShell: true
+XTerm*faceName: IBM Plex Mono Medium:size=18:antialias=true
+XTerm*TrueTintingType: true
+XTerm*ScrollBar: false
+XTerm*RightScrollBar: false
+XTerm*VisualBell: false
+XTerm*LoginShell: true
+XTerm*foreground: rgb:c6/c6/c6
+XTerm*background: rgb:12/12/12
+XTerm*color0: rgb:00/00/00
+XTerm*color1: rgb:cc/00/00
+XTerm*color2: rgb:4e/9a/06
+XTerm*color3: rgb:c4/a0/00
+XTerm*color4: rgb:34/65/a4
+XTerm*color5: rgb:75/50/7b
+XTerm*color6: rgb:06/98/9a
+XTerm*color7: rgb:d3/d7/cf
+XTerm*color8: rgb:55/57/53
+XTerm*color9: rgb:ef/29/29
+XTerm*color10: rgb:8a/e2/34
+XTerm*color11: rgb:fc/e9/4f
+XTerm*color12: rgb:72/9f/cf
+XTerm*color13: rgb:ad/7f/a8
+XTerm*color14: rgb:34/e2/e2
+XTerm*color15: rgb:ee/ee/ec
