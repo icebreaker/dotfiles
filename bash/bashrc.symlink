@@ -44,17 +44,5 @@ if [ -f ~/.localrc ]; then
     . ~/.localrc
 fi
 
-# add NVM
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-# add DOT_BIN, RVM, Miniconda2 and Cargo
-export PATH=$HOME/.rvm/bin:$HOME/.miniconda2/bin:$HOME/.miniconda3/bin:$HOME/.cargo/bin:$DOT_BIN:$PATH
-
-# direnv
-if [ -x /opt/bin/direnv ] || [ -x /bin/direnv ]; then
-	# silence is golden ...
-	export DIRENV_LOG_FORMAT=
-	eval "$(direnv hook bash)"
-fi
+# add DOT_BIN, Miniconda and Cargo
+export PATH=$HOME/.miniconda2/bin:$HOME/.miniconda3/bin:$HOME/.cargo/bin:$DOT_BIN:$PATH

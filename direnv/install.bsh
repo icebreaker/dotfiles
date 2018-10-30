@@ -1,0 +1,5 @@
+if [ -x /opt/bin/direnv ] || [ -x /bin/direnv ]; then
+	# silence is golden ...
+	export DIRENV_LOG_FORMAT=
+	eval "$(direnv hook bash)"
+fi
