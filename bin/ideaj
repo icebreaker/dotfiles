@@ -1,3 +1,13 @@
 #!/bin/bash
 
-$HOME/ideaj/bin/idea.sh $@
+if [ -x /bin/idea ]; then
+	/bin/idea $@
+else
+	IDEA=$HOME/ideaj/bin/idea.sh
+	if [ -x $IDEA ]; then
+		$IDEA $@
+	else
+		echo "IdeaJ doesn't appear to be installed!"
+		exit -1
+	fi
+fi
