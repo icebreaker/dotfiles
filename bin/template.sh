@@ -31,9 +31,11 @@ function extract_filepath()
 if [ -n "$1" ]; then
 	EXTENSION=$(basename "$1" | cut -d '.' -f 2)
 	EXTENSION_UP=$(echo "$EXTENSION" | tr '[a-z]' '[A-Z]')
+	EXTENSION_DOWN=$(echo "$EXTENSION" | tr '[A-Z]' '[a-z]')
 
 	FILENAME=$(basename "$1" ".${EXTENSION}")
 	FILENAME_UP=$(echo "$FILENAME" | tr '[a-z]' '[A-Z]')
+	FILENAME_DOWN=$(echo "$FILENAME" | tr '[A-Z]' '[a-z]')
 
 	if [ -n "$2" ]; then
 		FILEPATH=$(extract_filepath "$2")
@@ -41,6 +43,11 @@ if [ -n "$1" ]; then
 
 	if [ -n "$EXTENSION" ]; then
 		TEMPLATE=".template.${EXTENSION}"
+	fi
+
+	if [ -n "$2" ] && [ -f "$2/$TEMPLATE" ]; then
+		process_template "$2/$TEMPLATE"
+		exit 0
 	fi
 fi
 
