@@ -20,7 +20,7 @@ function extract_filepath()
 			else
 				FILEPATH="$FILEPATH/$s"
 			fi
-		elif [ "$s" == "src" ]; then
+		elif [ "$s" == "src" ] || [ "$s" == "data" ]; then
 			SRCFOUND=1
 		fi
 	done
