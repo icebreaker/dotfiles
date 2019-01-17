@@ -45,6 +45,11 @@ if [ -n "$1" ]; then
 		TEMPLATE=".template.${EXTENSION}"
 	fi
 
+	if [ -n "$FILEPATH" ]; then
+		IMPORTPATH=$(echo "$FILEPATH" | tr '/' '.')
+		IMPORTPATH="${IMPORTPATH}."
+	fi
+
 	if [ -n "$2" ] && [ -f "$2/$TEMPLATE" ]; then
 		process_template "$2/$TEMPLATE"
 		exit 0
