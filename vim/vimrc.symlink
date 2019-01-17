@@ -265,7 +265,7 @@ execute 'set path+=/usr/include'
 
 " Exclude commonly undesirable directories from the wild menu
 set wildmenu
-set wildignore+=.svn/*,.git/*,bin/*,build/*,src_data/*,data/assets/*,resources/*,src/vendor/*
+set wildignore+=.svn/*,.git/*,.hg/*,bin/*,build/*,src_data/*,data/assets/*,resources/*,src/vendor/*
 
 nmap <Leader>t :. !template.sh '%:t' '%:p:h'<CR>
 
