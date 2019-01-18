@@ -55,4 +55,6 @@ xscreensaver -no-splash &
 (sleep 5s && volumeicon) &
 
 ## Start Dropbox Daemon
-(sleep 10s && ~/.dropbox-dist/dropboxd) &
+if [ -x ~/.dropbox-dist/dropboxd ]; then
+	(sleep 10s && ~/.dropbox-dist/dropboxd) &
+fi
