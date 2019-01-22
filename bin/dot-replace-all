@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ $# -lt 3 ]; then
+	echo `basename $0`: pattern replacement wildcard
+	exit -1
+fi
+
+FILES=$(find . -name "$3" -print)
+
+perl -pi -e "s/$1/$2/g" $FILES
