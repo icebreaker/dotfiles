@@ -9,6 +9,8 @@ SIZES=256,128,64,48,32,16
 
 if [ "$3" == "--favicon" ]; then
 	SIZES=64,48,32,16
+elif [ "$3" == "--simple" ]; then
+	SIZES=256,128,64,48,32
 fi
 
 convert "$1" -define icon:auto-resize=$SIZES "$2"
