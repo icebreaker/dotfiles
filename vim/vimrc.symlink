@@ -251,7 +251,7 @@ map <c-l> :call fastopen#show('argedit')<cr>
 
 " RuboCop
 let g:vimrubocop_keymap = 0
-nmap <Leader>r :RuboCop<CR>
+nmap <Leader>c :RuboCop<CR>
 
 let g:delimitMate_expand_cr=1
 
@@ -262,6 +262,10 @@ let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', '
 execute 'set path+=' . src
 execute 'set path+=/usr/include/SDL2'
 execute 'set path+=/usr/include'
+
+" Append the data directory to the path
+let src = substitute(substitute(expand('%:p:h'), '\/data.*$', '', '') . '/data', ' ', '\\ ', 'g')
+execute 'set path+=' . src
 
 " Exclude commonly undesirable directories from the wild menu
 set wildmenu
@@ -282,7 +286,7 @@ function! PrevFile()
 endfunction
 
 function! CloseFile()
-	execute 'argdel %'
+	execute 'try | argdel % | catch | endtry'
 	execute 'try | n | catch | try | rew | catch | q | endtry | endtry'
 endfunction
 
@@ -292,3 +296,10 @@ noremap <Leader>] :call NextFile()<CR>
 noremap <Leader>[ :call PrevFile()<CR>
 
 noremap <Leader>q :call CloseFile()<CR>
+
+noremap <Leader>w <C-w>w
+
+noremap <Leader>e :make build<CR>
+noremap <Leader>r :make execute<CR>
+noremap <Leader>k :make clean<CR>
+noremap <Leader>g :make generate<CR>
