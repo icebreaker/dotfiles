@@ -117,10 +117,11 @@ set pumheight=10
 let g:lightline =
 	  \	{
 	  \   'active': {
-	  \     'left': [['mode', 'paste'], ['gitbranch'], ['readonly', 'filename', 'modified']]
+	  \     'left': [['mode', 'paste'], ['gitbranch'], ['asynctotem', 'readonly', 'filename', 'modified']]
 	  \   },
 	  \   'component_function': {
-	  \		'gitbranch': 'fugitive#head'
+	  \		'gitbranch': 'fugitive#head',
+	  \		'asynctotem': 'asynctotem#status'
 	  \	  },
 	  \   'mode_map': {
 	  \     'n': 'N', 'i': 'I', 'R': 'R', 'v': 'V', 'V': 'VL', "\<C-v>": 'VB',
@@ -148,6 +149,7 @@ hi Normal ctermfg=251
 hi NonText ctermbg=none
 hi Search cterm=none ctermfg=1 ctermbg=172
 hi Todo ctermbg=none ctermfg=107
+hi QuickFixLine cterm=none ctermbg=none
 hi ColorColumn ctermbg=107 ctermfg=1
 
 call matchadd('ColorColumn', '\%120v', 120)
@@ -299,7 +301,18 @@ noremap <Leader>q :call CloseFile()<CR>
 
 noremap <Leader>w <C-w>w
 
-noremap <Leader>e :make build<CR>
-noremap <Leader>r :make execute<CR>
-noremap <Leader>k :make clean<CR>
-noremap <Leader>g :make generate<CR>
+au BufReadPost quickfix silent exec 'nnoremap q :cclose<CR>'
+
+let g:asynctotem_cclose_delay=500
+let g:asynctotem_cclose_on_kill=1
+let g:asynctotem_cclose_on_no_errors=1
+
+noremap <Leader>e :call asynctotem#run(&makeprg, 'build')<CR>
+noremap <Leader>r :call asynctotem#run(&makeprg, 'execute')<CR>
+noremap <Leader>k :call asynctotem#run(&makeprg, 'clean')<CR>
+noremap <Leader>g :call asynctotem#run(&makeprg, 'generate')<CR>
+
+noremap q <nop>
+
+command! -nargs=+ -complete=shellcmd Arun call asynctotem#run(<q-args>)
+command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run(&grepprg, <q-args>)
