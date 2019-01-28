@@ -62,6 +62,7 @@ function! asynctotem#job_start(cmd)
   let options.out_io = 'buffer'
   let options.out_name = 'asynctotem_buffer'
 
+  let g:asynctotem_cmd = a:cmd
   let g:asynctotem_job_id = job_start(a:cmd, options)
 endfunction
 
@@ -90,10 +91,14 @@ function! asynctotem#on_callback(_channel, message)
 endfunction
 
 function! asynctotem#status()
+  if !exists('g:asynctotem_cmd')
+	return ''
+  endif
+
   if exists('g:asynctotem_job_id')
-	return 'running'
+	return g:asynctotem_cmd . ' [running]'
   else
-	return 'done'
+	return g:asynctotem_cmd . ' [done]'
   endif
 endfunction
 

@@ -311,6 +311,7 @@ noremap <Leader>e :call asynctotem#run(&makeprg, 'build')<CR>
 noremap <Leader>r :call asynctotem#run(&makeprg, 'execute')<CR>
 noremap <Leader>k :call asynctotem#run(&makeprg, 'clean')<CR>
 noremap <Leader>g :call asynctotem#run(&makeprg, 'generate')<CR>
+noremap <Leader>f :copen<CR>
 
 noremap q <nop>
 
