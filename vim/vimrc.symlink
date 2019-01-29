@@ -303,7 +303,7 @@ noremap <Leader>w <C-w>w
 
 au BufReadPost quickfix silent exec 'nnoremap q :cclose<CR>'
 
-let g:asynctotem_cclose_delay=100
+let g:asynctotem_cclose_delay=0
 let g:asynctotem_cclose_on_kill=1
 let g:asynctotem_cclose_on_no_errors=1
 
