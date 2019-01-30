@@ -1,0 +1,2 @@
+alias configure.mingw='../configure --target=x86_64-w64-mingw32 --host=x86_64-w64-mingw32'
+alias configure.osxcc='CC=x86_64-apple-darwin15-clang CXX=x86_64-apple-darwin15-clang++ ../configure --host=x86_64-apple-darwin15 --disable-video-x11 --enable-video-vulkan'
