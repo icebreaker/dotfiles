@@ -32,6 +32,11 @@ servers = (
     address = "irc.undernet.org";
     chatnet = "Undernet";
     port = "6667";
+  },
+  { 
+    address = "irc.afternet.org";
+    chatnet = "Afternet";
+    port = "6667";
   }
 );
 
@@ -104,6 +109,7 @@ chatnets = {
     max_msgs = "1";
     max_whois = "1";
   };
+  Afternet = { type = "IRC"; };
 };
 
 channels = (
@@ -339,6 +345,10 @@ statusbar = {
   };
 };
 settings = {
-  core = { real_name = "msz"; user_name = "icebreaker"; nick = "icebreaker"; };
+  core = {
+    real_name = "msz";
+    user_name = "icebreaker";
+    nick = "icebreaker";
+  };
   "fe-text" = { actlist_sort = "refnum"; };
 };
