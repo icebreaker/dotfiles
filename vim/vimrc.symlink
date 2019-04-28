@@ -43,7 +43,7 @@ set number
 set report=0
 set nolazyredraw
 set ttyfast
-set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$ 
+set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$
 set autoindent
 set cindent
 set smartindent
@@ -129,20 +129,8 @@ let g:lightline =
 	  \   }
 	  \ }
 
-let g:solarized_italic=0
-let g:solarized_termcolors=256
-"let g:solarized_termtrans = 1
-
-"set background=dark
-"colorscheme base16-default
+" set background=dark
 colorscheme gummybears
-
-"let g:hybrid_use_Xresources = 1
-"colorscheme hybrid
-"colorscheme iceberg
-"colorscheme candyVirus
-"colorscheme mango
-"colorscheme obsidian2
 
 hi Normal ctermbg=none
 hi Normal ctermfg=251
@@ -222,9 +210,9 @@ function! DistractionFreeWriting()
 ""	set columns=80
 "	set colorcolumn=80
 ""	set tw=79
-	set noshowmode 
+	set noshowmode
 	set wrap
-	
+
 	hi FoldColumn ctermbg=none
 	hi clear SpellBad
 	hi SpellBad term=standout ctermfg=1 term=none cterm=none
@@ -234,7 +222,7 @@ function! DistractionFreeWriting()
 	hi SpellLocal term=standout ctermfg=3 term=none cterm=none
 	hi clear SpellRare
 	hi SpellRare term=standout ctermfg=4 term=none cterm=none
-	
+
 	" call matchadd('ColorColumn', '\%80v', 80)
 endfunction
 
