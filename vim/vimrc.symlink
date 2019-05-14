@@ -129,7 +129,7 @@ let g:lightline =
 	  \   }
 	  \ }
 
-let g:html_font='IBM Plex Mono Medium, Droid Sans Mono, monospace'
+let g:html_font='IBM Plex Mono Medium'
 
 set background=dark
 colorscheme gummybears
