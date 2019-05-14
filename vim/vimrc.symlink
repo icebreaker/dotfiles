@@ -129,7 +129,9 @@ let g:lightline =
 	  \   }
 	  \ }
 
-" set background=dark
+let g:html_font='IBM Plex Mono Medium, Droid Sans Mono, monospace'
+
+set background=dark
 colorscheme gummybears
 
 hi Normal ctermbg=none
