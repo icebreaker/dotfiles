@@ -292,15 +292,30 @@ noremap <Leader>w <C-w>w
 
 au BufReadPost quickfix silent exec 'nnoremap q :cclose<CR>'
 
+let g:asynctotem_copen = 0
 let g:asynctotem_cclose_delay=0
 let g:asynctotem_cclose_on_kill=1
 let g:asynctotem_cclose_on_no_errors=1
+
+function! Acopen()
+	if g:asynctotem_copen == 0
+		let g:asynctotem_cclose_on_kill=0
+		let g:asynctotem_cclose_on_no_errors=0
+		let g:asynctotem_copen = 1
+		copen
+	else
+		let g:asynctotem_cclose_on_kill=1
+		let g:asynctotem_cclose_on_no_errors=1
+		let g:asynctotem_copen = 0
+		cclose
+	endif
+endfunction
 
 noremap <Leader>e :call asynctotem#run(&makeprg, 'build')<CR>
 noremap <Leader>r :call asynctotem#run(&makeprg, 'execute')<CR>
 noremap <Leader>k :call asynctotem#run(&makeprg, 'clean')<CR>
 noremap <Leader>g :call asynctotem#run(&makeprg, 'generate')<CR>
-noremap <Leader>f :copen<CR>
+noremap <Leader>f :call Acopen()<CR>
 
 noremap q <nop>
 
