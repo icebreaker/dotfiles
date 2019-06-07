@@ -1,5 +1,6 @@
 #!/bin/bash
 
+USER_AGENT='Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5'
 WEATHER_CACHE='/tmp/tmux-accuweather-cache'
 
 if [ -z $WEATHER_CACHE_EXPIRE ]; then
@@ -7,15 +8,15 @@ if [ -z $WEATHER_CACHE_EXPIRE ]; then
 fi
 
 if [ -z $WEATHER_URL ]; then
-	WEATHER_URL='http://www.accuweather.com/en/ro/targu-mures/289415/weather-forecast/289415'
+	WEATHER_URL='https://www.accuweather.com/en/ro/targu-mures/289415/weather-forecast/289415'
 fi
 
-function fetch 
+function fetch()
 {
-	wget -q $WEATHER_URL -O $WEATHER_CACHE
+	curl -s -A "$USER_AGENT" $WEATHER_URL | grep '<span class="large-temp">' | head -n 1 | grep -PZo '[0-9]+' > $WEATHER_CACHE
 }
 
-function is_cache_expired
+function is_cache_expired()
 {
 	if [ ! -f $WEATHER_CACHE ]; then
 		return 1
@@ -30,17 +31,10 @@ function is_cache_expired
 	fi
 }
 
-function extract_temp
-{
-	return $(cat $WEATHER_CACHE | grep '<strong class="temp">' | head -n 1 | grep -PZo '[0-9]+')
-}
-
 is_cache_expired
 if [ $? -eq 1 ]; then
 	fetch
 fi
 
-extract_temp
-echo $?
-
+cat $WEATHER_CACHE
 exit 0
