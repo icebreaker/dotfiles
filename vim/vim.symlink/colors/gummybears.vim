@@ -83,7 +83,7 @@ hi  Normal       guifg=#c6c6c6 guibg=#121212 gui=NONE      ctermfg=251   ctermbg
 hi  NonText      guifg=#c6c6c6 guibg=#121212 gui=NONE      ctermfg=251	 ctermbg=233  cterm=NONE
 
 hi  Cursor       guifg=#000000 guibg=#ffff00 gui=NONE      ctermfg=0     ctermbg=11   cterm=reverse
-hi  LineNr       guifg=#3a3a3a guibg=#000000 gui=NONE      ctermfg=237   ctermbg=0    cterm=NONE
+hi  LineNr       guifg=#3a3a3a guibg=#121212 gui=NONE      ctermfg=237   ctermbg=233  cterm=NONE
 
 hi  VertSplit    guifg=#303030 guibg=#303030 gui=NONE      ctermfg=236   ctermbg=236  cterm=NONE
 hi  StatusLine   guifg=#9cffd3 guibg=#202020 gui=NONE      ctermfg=85    ctermbg=234  cterm=NONE
@@ -115,7 +115,7 @@ hi ModeMsg       guifg=#000000  guibg=#8787ff gui=BOLD     ctermfg=0 ctermbg=105
 if version >= 700
   hi CursorLine   guifg=NONE    guibg=#000000 gui=NONE      ctermfg=NONE ctermbg=16  cterm=NONE
   hi CursorColumn guifg=NONE    guibg=#121212 gui=NONE      ctermfg=NONE ctermbg=233 cterm=BOLD
-  hi MatchParen   guifg=#afff00 guibg=#af00ff gui=BOLD      ctermfg=154  ctermbg=129 cterm=BOLD
+  hi MatchParen   guifg=#afff00 guibg=#af00ff gui=BOLD      ctermfg=172   ctermbg=NONE cterm=BOLD
   hi Pmenu        guifg=#e5e5e5 guibg=#444444 gui=NONE      ctermfg=7    ctermbg=238 cterm=NONE
   hi PmenuSel     guifg=#000000 guibg=#d7d787 gui=NONE      ctermfg=0    ctermbg=186 cterm=NONE
   hi Search       guifg=#d787d7 guibg=#5f005f gui=UNDERLINE ctermfg=176  ctermbg=53  cterm=underline
