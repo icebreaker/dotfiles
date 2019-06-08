@@ -233,10 +233,9 @@ endfunction
 set directory=~/.vim/swap
 
 " Restore / Jump to last position
-if has("autocmd")
-	au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-	au BufWritePre * :%s/\s\+$//e
-endif
+au! BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+" Strip trailing spaces on write
+au! BufWritePre * :%s/\s\+$//e
 
 nnoremap ; :
 
