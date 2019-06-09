@@ -131,18 +131,9 @@ let g:lightline =
 
 let g:html_font='IBM Plex Mono Medium'
 
-"set background=dark
-"set background=light
 colorscheme gummybears
 
-hi Normal ctermbg=none
-hi Normal ctermfg=251
-hi NonText ctermbg=none
-hi Search cterm=none ctermfg=1 ctermbg=172
-hi Todo ctermbg=none ctermfg=107
-hi QuickFixLine cterm=none ctermbg=none
 hi ColorColumn ctermbg=107 ctermfg=1
-
 call matchadd('ColorColumn', '\%120v', 120)
 
 " Highlight any trailing whitespaces

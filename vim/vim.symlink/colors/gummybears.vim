@@ -79,11 +79,11 @@ if !has("gui_running") && &t_Co != 88 && &t_Co != 256
 endif
 "}}}
 " General colors"{{{
-hi  Normal       guifg=#c6c6c6 guibg=#121212 gui=NONE      ctermfg=251   ctermbg=233  cterm=NONE
-hi  NonText      guifg=#c6c6c6 guibg=#121212 gui=NONE      ctermfg=251	 ctermbg=233  cterm=NONE
+hi  Normal       guifg=#c6c6c6 guibg=#121212 gui=NONE      ctermfg=251   ctermbg=NONE  cterm=NONE
+hi  NonText      guifg=#c6c6c6 guibg=#121212 gui=NONE      ctermfg=251	 ctermbg=NONE cterm=NONE
 
-hi  Cursor       guifg=#000000 guibg=#ffff00 gui=NONE      ctermfg=0     ctermbg=11   cterm=reverse
-hi  LineNr       guifg=#3a3a3a guibg=#121212 gui=NONE      ctermfg=237   ctermbg=233  cterm=NONE
+hi  Cursor       guifg=#000000 guibg=#ffff00 gui=NONE      ctermfg=0     ctermbg=10   cterm=reverse
+hi  LineNr       guifg=#3a3a3a guibg=#121212 gui=NONE      ctermfg=238   ctermbg=NONE  cterm=NONE
 
 hi  VertSplit    guifg=#303030 guibg=#303030 gui=NONE      ctermfg=236   ctermbg=236  cterm=NONE
 hi  StatusLine   guifg=#9cffd3 guibg=#202020 gui=NONE      ctermfg=85    ctermbg=234  cterm=NONE
@@ -115,24 +115,25 @@ hi ModeMsg       guifg=#000000  guibg=#8787ff gui=BOLD     ctermfg=0 ctermbg=105
 if version >= 700
   hi CursorLine   guifg=NONE    guibg=#000000 gui=NONE      ctermfg=NONE ctermbg=16  cterm=NONE
   hi CursorColumn guifg=NONE    guibg=#121212 gui=NONE      ctermfg=NONE ctermbg=233 cterm=BOLD
-  hi MatchParen   guifg=#afff00 guibg=#af00ff gui=BOLD      ctermfg=172   ctermbg=NONE cterm=BOLD
+  hi MatchParen   guifg=#afff00 guibg=#af00ff gui=BOLD      ctermfg=130  ctermbg=NONE cterm=BOLD
   hi Pmenu        guifg=#e5e5e5 guibg=#444444 gui=NONE      ctermfg=7    ctermbg=238 cterm=NONE
   hi PmenuSel     guifg=#000000 guibg=#d7d787 gui=NONE      ctermfg=0    ctermbg=186 cterm=NONE
-  hi Search       guifg=#d787d7 guibg=#5f005f gui=UNDERLINE ctermfg=176  ctermbg=53  cterm=underline
+  hi Search       guifg=#d787d7 guibg=#5f005f gui=UNDERLINE ctermfg=1    ctermbg=172 cterm=NONE
+  hi QuickFixLine guibg=NONE ctermbg=NONE cterm=NONE
 endif
 
 hi IncSearch      guifg=#1c1c1c guibg=#00d7ff gui=NONE   ctermfg=234 ctermbg=45 cterm=NONE
 "}}}
 " Syntax highlighting"{{{
-hi Comment     guifg=#585858 guibg=NONE    gui=NONE ctermfg=240 ctermbg=NONE cterm=NONE
-hi String      guifg=#afaf5f guibg=NONE    gui=NONE   ctermfg=143 ctermbg=NONE cterm=NONE
+hi Comment     guifg=#585858 guibg=NONE    gui=NONE ctermfg=239 ctermbg=NONE cterm=NONE
+hi String      guifg=#afaf5f guibg=NONE    gui=NONE   ctermfg=137 ctermbg=NONE cterm=NONE
 hi Number      guifg=#af5f00 guibg=NONE    gui=NONE   ctermfg=130 ctermbg=NONE cterm=NONE
 
 hi Keyword     guifg=#ffaf00 guibg=NONE    gui=NONE ctermfg=214 ctermbg=NONE cterm=BOLD
 hi PreProc     guifg=#00afd7 guibg=NONE    gui=BOLD   ctermfg=38  ctermbg=NONE cterm=BOLD
 hi Conditional guifg=#ffd75f guibg=NONE    gui=NONE   ctermfg=222 ctermbg=NONE cterm=NONE
 
-hi Todo        guifg=#87005f guibg=#ffff5f gui=BOLD,UNDERLINE   ctermfg=89  ctermbg=227  cterm=BOLD
+hi Todo        guifg=#87005f guibg=#ffff5f gui=BOLD,UNDERLINE   ctermfg=102  ctermbg=NONE  cterm=BOLD
 hi Constant    guifg=#d75f5f guibg=NONE    gui=BOLD ctermfg=167 ctermbg=NONE cterm=BOLD
 
 hi Identifier  guifg=#8787d7 guibg=NONE    gui=NONE   ctermfg=104 ctermbg=NONE cterm=NONE
@@ -142,15 +143,15 @@ hi Statement   guifg=#87af5f guibg=NONE    gui=NONE   ctermfg=107 ctermbg=NONE c
 
 hi Special     guifg=#5faf00 guibg=NONE    gui=NONE   ctermfg=70 ctermbg=NONE cterm=NONE
 hi Delimiter   guifg=#5fafd7 guibg=NONE    gui=NONE   ctermfg=74  ctermbg=NONE cterm=NONE
-hi Operator    guifg=#87d7d7 guibg=NONE    gui=NONE   ctermfg=116 ctermbg=NONE cterm=NONE
+hi Operator    guifg=#87d7d7 guibg=NONE    gui=NONE   ctermfg=110 ctermbg=NONE cterm=NONE
 
-hi Character   guifg=#ff875f guibg=NONE    gui=NONE   ctermfg=209 ctermbg=NONE cterm=NONE
+hi Character   guifg=#ff875f guibg=NONE    gui=NONE   ctermfg=142 ctermbg=NONE cterm=NONE
 hi Boolean     guifg=#5fafd7 guibg=NONE    gui=NONE   ctermfg=74  ctermbg=NONE cterm=NONE
 hi Repeat      guifg=#ffaf87 guibg=NONE    gui=NONE   ctermfg=216 ctermbg=NONE cterm=NONE
 hi Exception   guifg=#d75f87 guibg=NONE    gui=NONE   ctermfg=168 ctermbg=NONE cterm=NONE
-hi Include     guifg=#00afaf guibg=NONE    gui=NONE   ctermfg=37  ctermbg=NONE cterm=NONE
+hi Include     guifg=#00afaf guibg=NONE    gui=NONE   ctermfg=38  ctermbg=NONE cterm=NONE
 hi StorageClass guifg=#c59f6f guibg=NONE   gui=NONE   ctermfg=173 ctermbg=NONE cterm=NONE
-hi Tag         guifg=#5fdf87 guibg=NONE    gui=NONE   ctermfg=78  ctermbg=NONE cterm=NONE
+hi Tag         guifg=#5fdf87 guibg=NONE    gui=NONE   ctermfg=142 ctermbg=NONE cterm=NONE
 hi Ignore      guifg=#bcbcbc guibg=NONE    gui=NONE   ctermfg=250 ctermbg=NONE cterm=NONE
 
 hi link Float           Number
@@ -159,7 +160,7 @@ hi link Typedef         Repeat
 hi link Define          Include
 hi link Macro           Include
 hi link PreCondit       Include
-hi link Structure       Include
+hi link Structure       Type
 hi link SpecialChar     Tag
 hi link SpecialComment  Tag
 hi link Debug           Tag
@@ -177,10 +178,10 @@ hi DiffDelete  guifg=#d7afff guibg=#870000    gui=NONE   ctermfg=183 ctermbg=88 
 hi DiffText    guifg=#080808 guibg=#ff5fff    gui=BOLD   ctermfg=232 ctermbg=207 cterm=BOLD
 "}}}
 " Spelling"{{{
-hi SpellBad     guisp=#d70000       ctermfg=bg     ctermbg=160       gui=undercurl cterm=REVERSE
-hi SpellCap     guisp=#00afd7       ctermfg=bg     ctermbg=38        gui=undercurl cterm=REVERSE
-hi SpellRare    guisp=#5faf00       ctermfg=bg     ctermbg=70        gui=undercurl cterm=REVERSE
-hi SpellLocal   guisp=#d7af00       ctermfg=bg     ctermbg=178       gui=undercurl cterm=REVERSE
+hi SpellBad     guisp=#d70000       ctermfg=230     ctermbg=160       gui=undercurl cterm=REVERSE
+hi SpellCap     guisp=#00afd7       ctermfg=230     ctermbg=38        gui=undercurl cterm=REVERSE
+hi SpellRare    guisp=#5faf00       ctermfg=230     ctermbg=70        gui=undercurl cterm=REVERSE
+hi SpellLocal   guisp=#d7af00       ctermfg=230     ctermbg=178       gui=undercurl cterm=REVERSE
 "}}}
 " Ctags"{{{
 hi link CTagsClass            htmlString
