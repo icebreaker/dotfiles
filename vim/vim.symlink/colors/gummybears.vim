@@ -113,8 +113,8 @@ hi ModeMsg       guifg=#000000  guibg=#8787ff gui=BOLD     ctermfg=0 ctermbg=105
 "}}}
 " Vim 7.x specific colors"{{{
 if version >= 700
-  hi CursorLine   guifg=NONE    guibg=#000000 gui=NONE      ctermfg=NONE ctermbg=16  cterm=NONE
-  hi CursorColumn guifg=NONE    guibg=#121212 gui=NONE      ctermfg=NONE ctermbg=233 cterm=BOLD
+  hi CursorLine   guifg=NONE    guibg=#000000 gui=NONE      ctermfg=NONE ctermbg=234  cterm=NONE
+  hi CursorColumn guifg=NONE    guibg=#121212 gui=NONE      ctermfg=NONE ctermbg=234 cterm=BOLD
   hi MatchParen   guifg=#afff00 guibg=#af00ff gui=BOLD      ctermfg=130  ctermbg=NONE cterm=BOLD
   hi Pmenu        guifg=#e5e5e5 guibg=#444444 gui=NONE      ctermfg=7    ctermbg=238 cterm=NONE
   hi PmenuSel     guifg=#000000 guibg=#d7d787 gui=NONE      ctermfg=0    ctermbg=186 cterm=NONE
