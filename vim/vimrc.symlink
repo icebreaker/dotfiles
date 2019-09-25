@@ -282,26 +282,34 @@ noremap <Leader>q :call CloseFile()<CR>
 
 noremap <Leader>w <C-w>w
 
-au BufReadPost quickfix silent exec 'nnoremap q :cclose<CR>'
-
 let g:asynctotem_copen = 0
-let g:asynctotem_cclose_delay=0
-let g:asynctotem_cclose_on_kill=1
-let g:asynctotem_cclose_on_no_errors=1
+let g:asynctotem_cclose_delay = 0
+let g:asynctotem_cclose_on_kill = 1
+let g:asynctotem_cclose_on_no_errors = 1
 
 function! Acopen()
 	if g:asynctotem_copen == 0
-		let g:asynctotem_cclose_on_kill=0
-		let g:asynctotem_cclose_on_no_errors=0
+		let g:asynctotem_cclose_on_kill = 0
+		let g:asynctotem_cclose_on_no_errors = 0
 		let g:asynctotem_copen = 1
 		copen
 	else
-		let g:asynctotem_cclose_on_kill=1
-		let g:asynctotem_cclose_on_no_errors=1
+		let g:asynctotem_cclose_on_kill = 1
+		let g:asynctotem_cclose_on_no_errors = 1
 		let g:asynctotem_copen = 0
 		cclose
 	endif
 endfunction
+
+function! Acclose()
+	let g:asynctotem_copen = 1
+	call Acopen()
+endfunction
+
+augroup asynctotem
+	autocmd!
+	autocmd BufReadPost quickfix silent exec 'nnoremap q :call Acclose()<CR>'
+augroup end
 
 noremap <Leader>e :call asynctotem#run(&makeprg, 'build')<CR>
 noremap <Leader>r :call asynctotem#run(&makeprg, 'execute')<CR>
