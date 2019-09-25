@@ -1,6 +1,6 @@
 " Location:     plugin/fastopen.vim
 " Author:       Mihail Szabolcs <http://mihail.co>
-" Version:      1.2
+" Version:      1.3
 " License:      Same as Vim itself.  See :help license
 
 if exists('g:loaded_fastopen') || &cp
@@ -37,7 +37,7 @@ function! s:initialize()
   endif
 
   let git_dir = substitute(fugitive#extract_git_dir(expand('%:p')), '\.git$', '', '')
-  
+
   if empty(git_dir)
 	return
   endif
@@ -53,13 +53,24 @@ function! fastopen#show(cmd)
 
 	let cmd = g:fastopen_list_cmd
 
+	if cmd =~ '^find ' && fnamemodify('~', ':p') =~ getcwd()
+	  let cmd .= ' -maxdepth 1'
+	endif
+
 	if exists('g:fastopen_filter_cmd')
 	  let cmd .= ' | ' . g:fastopen_filter_cmd
 	endif
 
 	let file = system(cmd . ' | ' . g:fastopen_dmenu_cmd)
+	if v:shell_error != 0
+	  echohl ErrorMsg
+	  echon file
+	  echohl None
+	  return
+	endif
+
 	let file = substitute(file, '\n$', '', '')
-	
+
 	if empty(file)
 		return
 	endif
