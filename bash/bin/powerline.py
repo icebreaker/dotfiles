@@ -70,8 +70,8 @@ def add_git_segment(p):
         if len(output) > 0:
             lines = output.splitlines()
             branch = lines[0].split(' ')[-1].strip()
-            fg = 22
-            bg = 148
+            fg = 15
+            bg = 235
             if len(lines) > 3 and lines[-1] != 'nothing to commit, working tree clean':
                 fg = 15
                 bg = 124
@@ -92,19 +92,19 @@ def add_cwd_segment(p):
     names = cwd.split('/')
 
     if len(names) % 2:
-        fg = 231
+        fg = 253
         bg = 240
     else:
-        fg = 247
+        fg = 253
         bg = 236
 
     for n in names:
         p.append(' ' + n + ' ', fg, bg)
         if bg == 236:
-            fg = 231
+            fg = 253
             bg = 240
         else:
-            fg = 247
+            fg = 253
             bg = 236
 
     return fg, bg
@@ -112,7 +112,7 @@ def add_cwd_segment(p):
 def add_root_indicator(p, error, fg, bg):
     if int(error) != 0:
         fg = 15
-        bg = 161
+        bg = 125
     p.append(' \$ ', fg, bg)
 
 if __name__ == '__main__':
