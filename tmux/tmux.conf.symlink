@@ -1,22 +1,22 @@
 set -g default-terminal screen-256color
 
 set -g status on
-set -g status-style bg=colour236,fg=default
-set -g status-interval 4
-# set -g status-utf8 on
+set -g status-style bg=colour235,fg=default,bold
+set -g status-interval 60
 set -g status-left-length 15
 set -g status-justify "centre"
-set -g status-left "#[fg=colour236,bg=colour252] #($DOT_HOME/tmux/powerline/uptime) #[fg=colour252,bg=colour236]"
-set -g status-right "#[fg=colour136,bg=colour236] | #($DOT_HOME/tmux/powerline/date_day) | #($DOT_HOME/tmux/powerline/date_full) | #($DOT_HOME/tmux/powerline/time) "
+set -g status-left "#[fg=default,bg=default] #($DOT_HOME/tmux/powerline/uptime) #[fg=default,bg=default]"
+set -g status-right "#[fg=default,bg=default] #($DOT_HOME/tmux/powerline/date_day) | #($DOT_HOME/tmux/powerline/date_full) | #($DOT_HOME/tmux/powerline/time) #[fg=default,bg=default]"
 
-set -g window-status-format "#[fg=default,bg=colour236] #I #W"
-set -g window-status-current-format "#[fg=colour236,bg=colour148]#[fg=colour22,bg=colour148,noreverse] #I #W #[fg=colour148,bg=colour236,nobold]"
+set -g window-status-format "#[fg=default,bg=default] #I #W "
+set -g window-status-current-format "#[fg=colour235,bg=colour251]#[fg=colour235,bg=colour251,noreverse] #I #W #[fg=default,bg=default]"
 set -g window-status-activity-style bold
 
-set -g pane-border-style fg=colour236
-set -g pane-active-border-style fg=colour236
+set -g pane-border-style fg=colour235
+set -g pane-active-border-style fg=colour235
 
-set -g message-style fg=colour117,bg=colour24,bold
+set -g clock-mode-colour colour251
+set -g message-style fg=default,bg=colour235,bold
 
 set -g display-time 2000
 
@@ -26,8 +26,6 @@ setw -g automatic-rename on
 
 unbind C-b
 set -g prefix C-a
-
-# bind r source-file $HOME/.tmux.conf; display-message "Configuration reloaded."
 
 bind -n M-Left select-pane -L
 bind -n M-Right select-pane -R
@@ -44,7 +42,3 @@ set -g history-limit 5000
 set -s escape-time 0
 
 set -g renumber-windows on
-#set -g mode-mouse on
-#set -g mouse-resize-pane on
-#set -g mouse-select-pane on
-#set -g mouse-select-window on
