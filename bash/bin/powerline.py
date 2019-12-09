@@ -1,38 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# TODO: rewrite this in Bash script
-
 import os
 import subprocess
 import sys
 
 class Powerline:
-    separator = ''
-    separator_thin="|"
-    ESC = '\e'
-    LSQ = '\['
-    RSQ = '\]'
-    clear_fg = LSQ + ESC + '[38;0m' + RSQ
-    clear_bg = LSQ + ESC + '[48;0m' + RSQ
-    reset = LSQ + ESC + '[0m' + RSQ
+    ESC   = '\e'
+    LSQ   = '\['
+    RSQ   = '\]'
+    RESET = LSQ + ESC + '[0m' + RSQ
+    BG0   = '236'
+    BG1   = '237'
+    FG    = '251'
+    RED   = '124'
+    PINK  = '126'
 
     def __init__(self):
         self.segments = []
 
-    def append(self, content, fg, bg, separator=None, separator_fg=None):
-        if separator == None:
-            separator = self.separator
-
-        if separator_fg == None:
-            separator_fg = bg
-
+    def append(self, text, fg = None, bg = None):
         segment = {
-            'content': str(content),
-            'fg': str(fg),
-            'bg': str(bg),
-            'separator': str(separator),
-            'separator_fg': str(separator_fg)
+            'text': str(text),
+            'fg': fg,
+            'bg': bg
         }
 
         self.segments.append(segment)
@@ -47,77 +38,74 @@ class Powerline:
         return self.color('48', code)
 
     def draw(self):
-        i=0
-        line=''
+        line = ''
 
-        while i < len(self.segments)-1:
-            s = self.segments[i]
-            ns = self.segments[i+1]
-            line += self.fgcolor(s['fg']) + self.bgcolor(s['bg']) + s['content']
-            line += self.fgcolor(s['separator_fg']) + self.bgcolor(ns['bg']) + s['separator']
-            i += 1
+        fg = self.FG
+        bg = self.BG0
 
-        s = self.segments[i]
-        line += self.fgcolor(s['fg']) + self.bgcolor(s['bg']) + s['content']
-        line += self.reset + self.fgcolor(s['separator_fg']) + s['separator'] + self.reset
+        if len(self.segments) % 2:
+            bg = self.BG1
+
+        for s in self.segments:
+            line += self.fgcolor(s['fg'] or fg) + self.bgcolor(s['bg'] or bg) + s['text']
+
+            if bg == self.BG0:
+                bg = self.BG1
+            else:
+                bg = self.BG0
+
+        line += self.RESET
 
         return line
 
-def add_git_segment(p):
-    try:
-        p1 = subprocess.Popen(['git', 'status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-        output = p1.communicate()[0].strip()
-        if len(output) > 0:
+    def add_git_segment(self):
+        try:
+            p1 = subprocess.Popen(['git', 'status'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            output = p1.communicate()[0].strip()
+            if len(output) == 0:
+                return
+
             lines = output.splitlines()
             branch = lines[0].split(' ')[-1].strip()
-            fg = 15
-            bg = 235
+
+            bg = None
+
             if len(lines) > 3 and lines[-1] != 'nothing to commit, working tree clean':
-                fg = 15
-                bg = 124
-            p.append(' ' + branch + ' ', fg, bg)
-    except subprocess.CalledProcessError:
-        pass
+                bg = self.RED
 
-def add_cwd_segment(p):
-    home = os.getenv('HOME')
-    cwd = os.getenv('PWD')
+            self.append(' ' + branch + ' ', None, bg)
+        except subprocess.CalledProcessError:
+            pass
 
-    if cwd.find(home) == 0:
-        cwd = cwd.replace(home, '~', 1)
+    def add_cwd_segment(self):
+        home = os.getenv('HOME')
+        cwd = os.getenv('PWD')
 
-    if cwd[0] == '/':
-        cwd = cwd[1:]
+        if cwd.find(home) == 0:
+            cwd = cwd.replace(home, '~', 1)
 
-    names = cwd.split('/')
+        if cwd[0] == '/':
+            cwd = cwd[1:]
 
-    if len(names) % 2:
-        fg = 253
-        bg = 240
-    else:
-        fg = 253
-        bg = 236
+        if len(cwd) == 0:
+            return
 
-    for n in names:
-        p.append(' ' + n + ' ', fg, bg)
-        if bg == 236:
-            fg = 253
-            bg = 240
-        else:
-            fg = 253
-            bg = 236
+        names = cwd.split('/')
 
-    return fg, bg
+        for name in names:
+            self.append(' ' + name + ' ')
 
-def add_root_indicator(p, error, fg, bg):
-    if int(error) != 0:
-        fg = 15
-        bg = 125
-    p.append(' \$ ', fg, bg)
+    def add_root_indicator_segment(self, error):
+        bg = None
+
+        if int(error) != 0:
+            bg = self.PINK
+
+        self.append(' \$ ', None, bg)
 
 if __name__ == '__main__':
     p = Powerline()
-    fg, bg = add_cwd_segment(p)
-    add_git_segment(p)
-    add_root_indicator(p, sys.argv[1] if len(sys.argv) > 1 else 0, fg, bg)
+    p.add_cwd_segment()
+    p.add_git_segment()
+    p.add_root_indicator_segment(sys.argv[1] if len(sys.argv) > 1 else 0)
     print(p.draw())
