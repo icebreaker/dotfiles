@@ -37,7 +37,6 @@ set complete-=i
 set fileformats=unix,mac,dos
 set nocp
 set keymodel=startsel
-set laststatus=2
 set novisualbell
 set number
 set report=0
@@ -66,11 +65,9 @@ set shortmess=atsI
 set noshowcmd
 set ignorecase
 set mouse-=a
-"set columns=120
-"set colorcolumn=100
-"set tw=99
 set ruler
-set undolevels=500
+set undofile
+set undolevels=1000
 set history=1000
 set nofsync
 set clipboard+=unnamed
@@ -90,7 +87,6 @@ set t_AB=^[[48;5;%dm
 set t_AF=^[[38;5;%dm
 set t_Co=256
 set term=gnome-256color
-"set term=xterm-256color
 
 if $TMUX =~ 'tmux'
 	set term=screen-256color
@@ -105,7 +101,7 @@ endif
 
 let g:CSApprox_attr_map = { 'bold' : 'bold', 'italic' : '', 'sp' : ''  }
 
-if has("gui_running")
+if has('gui_running')
 	set guifont=IBM\ Plex\ Mono\ SemiBold\ 19
 	set guicursor+=a:blinkon0
 	set guioptions=i
@@ -114,30 +110,41 @@ endif
 set completeopt=menu,menuone
 set pumheight=10
 
-let g:lightline =
-	  \	{
-	  \   'active': {
-	  \     'left': [['mode', 'paste'], ['gitbranch'], ['asynctotem', 'readonly', 'filename', 'modified']]
-	  \   },
-	  \   'component_function': {
-	  \		'gitbranch': 'fugitive#head',
-	  \		'asynctotem': 'asynctotem#status'
-	  \	  },
-	  \   'mode_map': {
-	  \     'n': 'N', 'i': 'I', 'R': 'R', 'v': 'V', 'V': 'VL', "\<C-v>": 'VB',
-	  \     'c': 'C', 's': 'S', 'S': 'SL', "\<C-s>": 'SB', 't': 'T'
-	  \   }
-	  \ }
+function! GitStatus()
+	let s = fugitive#head()
+
+	if empty(s)
+		return s
+	else
+		return '  ' . s . ' |'
+	endif
+endfunction
+
+set laststatus=2
+set statusline =%{GitStatus()}
+set statusline+=\ %F
+set statusline+=%=
+set statusline+=%{''.(&fenc!=''?&fenc:&enc).''}
+set statusline+=\ \|
+set statusline+=\ %{&ff}
+set statusline+=\ \|
+set statusline+=\ %04v:%04l\ \|\ %04L
+set statusline+=%{'\ '}
 
 let g:html_font='IBM Plex Mono Medium'
 
-colorscheme gummybears
+if has('gui_running')
+	colorscheme gummybears
+else
+	set background=dark
+	colorscheme monoplex
+endif
 
-hi ColorColumn ctermbg=107 ctermfg=1
+hi ColorColumn ctermbg=29 ctermfg=NONE
 call matchadd('ColorColumn', '\%120v', 120)
 
 " Highlight any trailing whitespaces
-hi WEOL ctermbg=red guibg=red
+hi WEOL ctermbg=124 ctermfg=NONE
 let s:weol = 0
 
 function! ToggleWhitespaceHighlight()
@@ -202,10 +209,6 @@ function! DistractionFreeWriting()
 	set noruler
 	set linebreak
 	set nonumber
-"	set foldcolumn=10
-""	set columns=80
-"	set colorcolumn=80
-""	set tw=79
 	set noshowmode
 	set wrap
 
@@ -218,12 +221,12 @@ function! DistractionFreeWriting()
 	hi SpellLocal term=standout ctermfg=3 term=none cterm=none
 	hi clear SpellRare
 	hi SpellRare term=standout ctermfg=4 term=none cterm=none
-
-	" call matchadd('ColorColumn', '\%80v', 80)
 endfunction
 
 " Swap Directory
 set directory=~/.vim/swap
+" Undo Directory
+set undodir=~/.vim/undo
 
 " Restore / Jump to last position
 au! BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
