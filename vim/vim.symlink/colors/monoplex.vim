@@ -36,6 +36,8 @@ hi FoldColumn ctermfg=NONE ctermbg=NONE cterm=BOLD,INVERSE
 hi Visual ctermfg=0 ctermbg=251 cterm=NONE
 hi StatusLine ctermfg=251 ctermbg=235 cterm=BOLD
 hi StatusLineNC ctermfg=251 ctermbg=235 cterm=BOLD,INVERSE
+hi StatusLineTerm ctermfg=251 ctermbg=235 cterm=BOLD
+hi StatusLineTermNC ctermfg=251 ctermbg=235 cterm=BOLD,INVERSE
 hi WildMenu ctermbg=NONE ctermfg=NONE cterm=BOLD,REVERSE
 "}}}
 "syntax {{{
