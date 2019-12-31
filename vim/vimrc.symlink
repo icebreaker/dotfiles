@@ -198,30 +198,9 @@ au! BufRead,BufNewFile *.glsl,*.shader,*.shd set filetype=glsl
 au! BufRead,BufNewFile *.CPP set filetype=cpp
 au! BufRead,BufNewFile *.ASM set filetype=asm
 au! BufRead,BufNewFile *.mm,*.m set filetype=objc
-au! BufRead,BufNewFile *.md,*.markdown,*.mkd call DistractionFreeWriting()
 au! BufRead,BufNewFile Gemfile set syntax=off tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *cms-plugins*/*joomla*/*.php set filetype=php tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile * set formatoptions=tcq
-
-function! DistractionFreeWriting()
-	set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-	set laststatus=0
-	set noruler
-	set linebreak
-	set nonumber
-	set noshowmode
-	set wrap
-
-	hi FoldColumn ctermbg=none
-	hi clear SpellBad
-	hi SpellBad term=standout ctermfg=1 term=none cterm=none
-	hi clear SpellCap
-	hi SpellCap term=standout ctermfg=2 term=none cterm=none
-	hi clear SpellLocal
-	hi SpellLocal term=standout ctermfg=3 term=none cterm=none
-	hi clear SpellRare
-	hi SpellRare term=standout ctermfg=4 term=none cterm=none
-endfunction
 
 " Swap Directory
 set directory=~/.vim/swap
