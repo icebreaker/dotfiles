@@ -15,6 +15,7 @@ class Powerline:
     FG    = '251'
     RED   = '124'
     PINK  = '126'
+    GREEN = '23'
 
     def __init__(self):
         self.segments = []
@@ -68,7 +69,7 @@ class Powerline:
             lines = output.splitlines()
             branch = lines[0].split(' ')[-1].strip()
 
-            bg = None
+            bg = self.GREEN
 
             if len(lines) > 3 and lines[-1] != 'nothing to commit, working tree clean':
                 bg = self.RED
