@@ -1,3 +1,3 @@
-alias s='bundle exec rails server'
-alias c='bundle exec rails console'
+alias rs='bundle exec rails server'
+alias rc='bundle exec rails console'
 alias be='bundle exec'
