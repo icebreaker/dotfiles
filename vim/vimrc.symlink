@@ -201,7 +201,7 @@ au! BufRead,BufNewFile *.ASM set filetype=asm
 au! BufRead,BufNewFile *.mm,*.m set filetype=objc
 au! BufRead,BufNewFile Gemfile set syntax=off tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *cms-plugins*/*joomla*/*.php set filetype=php tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile Trollfile,Buildfile,*.lud set filetype=lua
+au! BufRead,BufNewFile Trollfile,Buildfile set filetype=lua
 au! BufRead,BufNewFile * set formatoptions=tcq
 
 " Swap Directory
