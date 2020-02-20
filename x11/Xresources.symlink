@@ -15,7 +15,7 @@ XTerm*RightScrollBar: false
 XTerm*VisualBell: false
 XTerm*LoginShell: true
 XTerm*foreground: rgb:c6/c6/c6
-XTerm*background: rgb:12/12/12
+XTerm*background: rgb:00/00/00
 XTerm*color0: rgb:00/00/00
 XTerm*color1: rgb:cc/00/00
 XTerm*color2: rgb:4e/9a/06
