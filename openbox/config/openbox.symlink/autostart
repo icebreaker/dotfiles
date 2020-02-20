@@ -40,6 +40,11 @@ if egrep -iq 'touchpad' /proc/bus/input/devices; then
     synclient TapButton1=1 &
 fi
 
+TOUCHPAD_ID=$(xinput --list | grep 'ETPS/2 Elantech Touchpad' | cut -d '=' -f 2 | awk '{ print $1 }')
+if [ ! -z "$TOUCHPAD_ID" ]; then
+	xinput --disable $TOUCHPAD_ID
+fi
+
 xscreensaver -no-splash &
 
 (sleep 5s && volumeicon) &
