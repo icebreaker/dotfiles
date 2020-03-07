@@ -4,5 +4,5 @@ endif
 
 let b:current_syntax = 'lud'
 
-syn keyword luaFunc title subtitle subsubtitle text quote list
+syn keyword luaFunc title subtitle subsubtitle text quote list link
 syn keyword luaFunc media date code raw table pre config js css
