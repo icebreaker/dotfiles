@@ -60,8 +60,8 @@ hi MoreMsg ctermbg=NONE ctermfg=NONE cterm=NONE
 hi WarningMsg ctermfg=NONE ctermbg=NONE cterm=BOLD
 hi Ignore ctermfg=NONE ctermbg=NONE cterm=BOLD
 hi Question ctermfg=NONE ctermbg=NONE cterm=BOLD
-hi Error ctermfg=NONE ctermbg=124 cterm=BOLD
-hi ErrorMsg ctermfg=NONE ctermbg=124 cterm=BOLD
+hi Error ctermfg=255 ctermbg=124 cterm=BOLD
+hi ErrorMsg ctermfg=255 ctermbg=124 cterm=BOLD
 "}}}
 "misc {{{
 hi Title ctermfg=NONE ctermbg=NONE cterm=BOLD
@@ -71,16 +71,16 @@ hi Directory ctermfg=NONE ctermbg=NONE cterm=NONE
 hi link SpecialKey Special
 "}}}
 "spell {{{
-hi SpellBad ctermfg=124 ctermbg=NONE cterm=BOLD
+hi SpellBad ctermfg=255 ctermbg=124 cterm=BOLD
 hi! link SpellCap SpellBad
 hi! link SpellLocal SpellBad
 hi! link SpellRare SpellBad
 "}}}
 "diff {{{
-hi DiffText ctermfg=NONE ctermbg=NONE cterm=NONE
-hi DiffChange ctermfg=NONE ctermbg=29 cterm=NONE
-hi DiffDelete ctermfg=NONE ctermbg=125 cterm=NONE
-hi DiffAdd ctermfg=NONE ctermbg=28 cterm=NONE
+hi DiffText ctermfg=255 ctermbg=0 cterm=NONE
+hi DiffChange ctermfg=255 ctermbg=126 cterm=NONE
+hi DiffDelete ctermfg=255 ctermbg=124 cterm=NONE
+hi DiffAdd ctermfg=255 ctermbg=23 cterm=NONE
 "}}}
 "ruby {{{
 hi link rubyInstanceVariable Special
