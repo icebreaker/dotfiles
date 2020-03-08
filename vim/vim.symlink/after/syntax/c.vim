@@ -1,3 +1,5 @@
+" highlight foreach
+syn keyword Function foreach
 " match and highlight types that end with _t
 syn match Type /\<.\{-}_t\>/
 
