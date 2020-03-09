@@ -42,17 +42,17 @@ hi WildMenu ctermbg=NONE ctermfg=NONE cterm=BOLD,REVERSE
 "}}}
 "syntax {{{
 hi Type ctermfg=172 ctermbg=NONE cterm=BOLD
-hi Statement ctermfg=134 ctermbg=NONE cterm=BOLD
-hi Function ctermfg=68 ctermbg=NONE cterm=BOLD
-hi Identifier ctermfg=132 ctermbg=NONE cterm=BOLD
-hi Constant ctermfg=185 ctermbg=NONE cterm=BOLD
-hi PreProc ctermfg=31 ctermbg=NONE cterm=BOLD
-hi Include ctermfg=131 ctermbg=NONE cterm=BOLD
-hi String ctermfg=137 ctermbg=NONE cterm=NONE
-hi Special ctermfg=29 ctermbg=NONE cterm=NONE
+hi Statement ctermfg=172 ctermbg=NONE cterm=BOLD
+hi Function ctermfg=172 ctermbg=NONE cterm=BOLD
+hi Identifier ctermfg=172 ctermbg=NONE cterm=BOLD
+hi Constant ctermfg=172 ctermbg=NONE cterm=BOLD
+hi PreProc ctermfg=172 ctermbg=NONE cterm=BOLD
+hi Include ctermfg=172 ctermbg=NONE cterm=BOLD
+hi String ctermfg=130 ctermbg=NONE cterm=NONE
+hi Special ctermfg=130 ctermbg=NONE cterm=NONE
 hi Number ctermfg=130 ctermbg=NONE cterm=NONE
-hi Todo ctermfg=243 ctermbg=NONE cterm=BOLD
-hi Comment ctermfg=238 ctermbg=NONE cterm=NONE
+hi Todo ctermfg=172 ctermbg=NONE cterm=BOLD
+hi Comment ctermfg=130 ctermbg=NONE cterm=NONE
 "}}}
 "msg {{{
 hi ModeMsg ctermbg=NONE ctermfg=NONE cterm=NONE
