@@ -70,7 +70,7 @@ set undofile
 set undolevels=1000
 set history=1000
 set nofsync
-set clipboard+=unnamed
+set clipboard=exclude:.*
 set cinoptions+=g0
 set foldmethod=marker
 
