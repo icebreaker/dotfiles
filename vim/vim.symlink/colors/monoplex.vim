@@ -51,8 +51,8 @@ hi Include ctermfg=60 ctermbg=NONE cterm=BOLD
 hi String ctermfg=101 ctermbg=NONE cterm=NONE
 hi Special ctermfg=101 ctermbg=NONE cterm=NONE
 hi Number ctermfg=101 ctermbg=NONE cterm=NONE
-hi Todo ctermfg=60 ctermbg=NONE cterm=BOLD
-hi Comment ctermfg=101 ctermbg=NONE cterm=NONE
+hi Todo ctermfg=136 ctermbg=NONE cterm=BOLD
+hi Comment ctermfg=136 ctermbg=NONE cterm=NONE
 "}}}
 "msg {{{
 hi ModeMsg ctermbg=NONE ctermfg=NONE cterm=NONE
