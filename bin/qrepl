@@ -1,10 +1,15 @@
 #!/bin/bash
 
-if [ $# -lt 3 ]; then
-	echo usage: `basename $0` pattern replacement wildcard
+if [ $# -lt 2 ]; then
+	echo usage: `basename $0` pattern replacement [pattern]
 	exit -1
 fi
 
-FILES=$(find . -name "$3" -print)
+PATTERN="$3"
+if [ -z "$PATTERN" ]; then
+	PATTERN="*"
+fi
+
+FILES=$(find . -type f -name "$PATTERN" -print)
 
 perl -pi -e "s/$1/$2/g" $FILES
