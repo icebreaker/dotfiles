@@ -1,3 +1,6 @@
+" compound literals :P
+let c_no_curly_error=1
+
 " Custom make wrapper which can search for a valid Makefile.
 set makeprg=make.sh
 " Custom grep wrapper
