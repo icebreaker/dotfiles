@@ -32,11 +32,11 @@ bind -n M-Right select-pane -R
 bind -n M-Up select-pane -U
 bind -n M-Down select-pane -D
 
-bind -n C-T new-window
+bind -n C-T new-window -c '#{pane_current_path}'
 
 unbind %
-bind \\ split-window -h
-bind - split-window -v
+bind \\ split-window -h -c '#{pane_current_path}'
+bind - split-window -v -c '#{pane_current_path}'
 
 set -g history-limit 5000
 set -s escape-time 0
