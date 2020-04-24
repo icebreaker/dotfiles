@@ -330,24 +330,6 @@
         <command>~/.dotfiles/bin/dot-skype</command>
       </action>
     </keybind>
-   <keybind key="W-n">
-      <action name="Execute">
-        <startupnotify>
-          <enabled>true</enabled>
-          <name>Noty</name>
-        </startupnotify>
-        <command>~/.dotfiles/bin/noty-gui</command>
-      </action>
-    </keybind>
-    <keybind key="W-p">
-      <action name="Execute">
-        <startupnotify>
-          <enabled>true</enabled>
-          <name>Pidgin</name>
-        </startupnotify>
-        <command>pidgin</command>
-      </action>
-    </keybind>
     <keybind key="W-b">
       <action name="Execute">
         <startupnotify>
@@ -732,7 +714,7 @@
     <!-- You can specify more than one menu file in here and they are all loaded,
        just don't make menu ids clash or, well, it'll be kind of pointless -->
     <!-- default menu file (or custom one in $HOME/.config/openbox/) -->
-    <!-- system menu files on Debian systems 
+    <!-- system menu files on Debian systems
     <file>/var/lib/openbox/debian-menu.xml</file>
     <file>debian-menu.xml</file> -->
     <file>menu.xml</file>
@@ -761,7 +743,7 @@
   # order that they appear in this list
 
 
-    # each element can be left out or set to 'default' to specify to not 
+    # each element can be left out or set to 'default' to specify to not
     # change that attribute of the window
 
     <decor>yes</decor>
