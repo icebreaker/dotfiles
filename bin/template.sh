@@ -43,11 +43,14 @@ if [ -n "$1" ]; then
 
 	if [ -n "$EXTENSION" ]; then
 		TEMPLATE=".template.${EXTENSION}"
+		if [ ! -f "$2/$TEMPLATE" ]; then
+			TEMPLATE=".template.$1"
+		fi
 	fi
 
 	if [ -n "$FILEPATH" ]; then
-		IMPORTPATH=$(echo "$FILEPATH" | tr '/' '.')
-		IMPORTPATH="${IMPORTPATH}."
+		PACKAGEPATH=$(echo "$FILEPATH" | tr '/' '.')
+		IMPORTPATH="${PACKAGEPATH}."
 	fi
 
 	if [ -n "$2" ] && [ -f "$2/$TEMPLATE" ]; then
