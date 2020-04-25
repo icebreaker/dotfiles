@@ -1,6 +1,9 @@
 #!/bin/bash
 
-if [ -x "/opt/bin/sakura" ]; then
+ALACRITTY=$(which alacritty 2>/dev/null)
+if [ -n "$ALACRITTY" ]; then
+	alacritty "$@"
+elif [ -x "/opt/bin/sakura" ]; then
 	/opt/bin/sakura "$@"
 else
 	TERMINATOR=$(which terminator 2>/dev/null)
@@ -8,6 +11,6 @@ else
 	if [ -n "$TERMINATOR" ]; then
 		terminator "$@"
 	else
-		xterm "$@"
+		xterm -maximized "$@"
 	fi
 fi
