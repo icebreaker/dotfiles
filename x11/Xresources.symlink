@@ -8,7 +8,7 @@ Xft.hinting: true
 Xft.hintstyle: hintslight
 Xft.lcdfilter: lcddefault
 Xft.dpi: 96
-XTerm*faceName: IBM Plex Mono SemiBold:size=19:antialias=true
+XTerm*faceName: IBM Plex Mono:weight=650:size=20:antialias=true
 XTerm*TrueTintingType: true
 XTerm*ScrollBar: false
 XTerm*RightScrollBar: false
@@ -16,6 +16,7 @@ XTerm*VisualBell: false
 XTerm*LoginShell: true
 XTerm*foreground: rgb:c6/c6/c6
 XTerm*background: rgb:00/00/00
+XTerm*cursorColor: rgb:8e/8e/8e
 XTerm*color0: rgb:00/00/00
 XTerm*color1: rgb:cc/00/00
 XTerm*color2: rgb:4e/9a/06
