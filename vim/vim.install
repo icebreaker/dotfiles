@@ -1,0 +1,2 @@
+mkdir -vp ~/.vimundo
+mkdir -vp ~/.vimswap

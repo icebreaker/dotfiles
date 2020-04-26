@@ -34,7 +34,7 @@ if [ -f $DOT_RC ]; then
 fi
 
 # source every .bsh file
-for config_file in $(find $DOT_HOME -name "*.bsh" -print | grep -v "/undo/");
+for config_file in $(find $DOT_HOME -name "*.bsh" -print);
 do
 	. $config_file
 done

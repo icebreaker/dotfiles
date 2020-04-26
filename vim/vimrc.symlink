@@ -208,9 +208,9 @@ au! BufRead,BufNewFile Trollfile,Buildfile set filetype=lua
 au! BufRead,BufNewFile * set formatoptions=tcq
 
 " Swap Directory
-set directory=~/.vim/swap
+set directory=~/.vimswap
 " Undo Directory
-set undodir=~/.vim/undo
+set undodir=~/.vimundo
 
 " Restore / Jump to last position
 au! BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
