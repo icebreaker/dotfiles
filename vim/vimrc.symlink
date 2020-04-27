@@ -22,8 +22,8 @@ map <F4> :set spell! spelllang=en_us<CR>
 map <F2> :set nonumber!<CR>
 
 " Copy Paste with Ctrl+C and Ctrl+V
-vmap <c-c> :w! ~/.vim/swap/.buffer<CR>
-nmap <c-p> :r ~/.vim/swap/.buffer<CR>
+vmap <c-c> :w! ~/.vimswap/.buffer<CR>
+nmap <c-p> :r ~/.vimswap/.buffer<CR>
 
 " Highlight Last Searched Term
 noremap <space> :set hlsearch!<CR>
