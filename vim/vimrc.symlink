@@ -265,6 +265,10 @@ function! CloseFile()
 		else
 			bd
 		endif
+
+		if bufname('%') == ''
+			silent q!
+		endif
 	endif
 endfunction
 
