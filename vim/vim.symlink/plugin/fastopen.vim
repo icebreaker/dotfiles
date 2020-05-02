@@ -1,5 +1,5 @@
 " Location:     plugin/fastopen.vim
-" Author:       Mihail Szabolcs <http://mihail.co>
+" Author:       Mihail Szabolcs <https://mihail.co>
 " Version:      1.3
 " License:      Same as Vim itself.  See :help license
 

@@ -146,21 +146,6 @@ endif
 hi ColorColumn ctermbg=29 ctermfg=NONE
 call matchadd('ColorColumn', '\%120v', 120)
 
-" Highlight any trailing whitespaces
-hi WEOL ctermbg=124 ctermfg=NONE
-let s:weol = 0
-
-function! ToggleWhitespaceHighlight()
-	let s:weol = !s:weol
-
-	if s:weol
-		match WEOL /\s\+$/
-	else
-		match none
-	endif
-endfunction
-map <F3> :call ToggleWhitespaceHighlight()<CR>
-
 " Word Completion
 function! Tab_Or_Complete()
 	if col('.') > 1 && strpart(getline('.'), col('.')-2, 3) =~ '^\w'
@@ -179,7 +164,7 @@ au! BufRead,BufNewFile Dockerfile,Jenkinsfile set tabstop=2 shiftwidth=2 softtab
 au! BufRead,BufNewFile Rakefile,Gemfile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.ru set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufNewFile *.rb silent! execute '0r ~/.vim/templates/ruby'
+au! BufNewFile *.rb silent! execute '0r ~/.vim/templates/template.rb'
 au! BufRead,BufNewFile *.cr set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 au! BufRead,BufNewFile *.conf set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
 au! BufRead,BufNewFile .irbrc set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
@@ -251,16 +236,36 @@ set cryptmethod=blowfish2
 let coffee_no_reserved_words_error = 1
 
 function! NextFile()
-	execute 'try | n | catch | try | rew | catch | | endtry | endtry'
+	if bufname('%') != ''
+		execute 'try | n | catch | try | rew | catch | | endtry | endtry'
+	endif
 endfunction
 
 function! PrevFile()
-	execute 'try | prev | catch | try | la | catch | | endtry | endtry'
+	if bufname('%') != ''
+		execute 'try | prev | catch | try | la | catch | | endtry | endtry'
+	endif
 endfunction
 
 function! CloseFile()
-	execute 'try | argdel % | catch | endtry'
-	execute 'try | n | catch | try | rew | catch | q | endtry | endtry'
+	if &modified && confirm('File modified. Are you sure?', "&Yes\n&No") == 2
+		return
+	endif
+
+	if bufname('%') == ''
+		if &modified
+			silent q!
+		else
+			q
+		end
+	else
+		silent! argdel %
+		if &modified
+			silent bd!
+		else
+			bd
+		endif
+	endif
 endfunction
 
 noremap <Leader>] :call NextFile()<CR>
@@ -268,7 +273,7 @@ noremap <Leader>[ :call PrevFile()<CR>
 
 noremap <Leader>q :call CloseFile()<CR>
 
-noremap <Leader>w <C-w>w
+noremap <Leader>w :w<CR>
 
 let g:asynctotem_copen = 0
 let g:asynctotem_cclose_delay = 0
@@ -306,10 +311,13 @@ noremap <Leader>g :call asynctotem#run(&makeprg, 'generate')<CR>
 noremap <Leader>f :call Acopen()<CR>
 
 noremap q <nop>
+nnoremap zz ZZ
+nnoremap zq ZQ
 
 command! -nargs=+ -complete=shellcmd Arun call asynctotem#run(<q-args>)
 command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run(&grepprg, <q-args>)
 
-command! Wiki argedit ~/.wiki/README.md
+command! Wiki e ~/.wiki/README.md
 
-let g:VimTodoListsMoveItems = 0
+noremap <Leader>- :call gustav#add()<CR>
+noremap <Leader>= :call gustav#toggle()<CR>
