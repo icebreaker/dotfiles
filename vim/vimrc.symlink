@@ -310,4 +310,6 @@ noremap q <nop>
 command! -nargs=+ -complete=shellcmd Arun call asynctotem#run(<q-args>)
 command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run(&grepprg, <q-args>)
 
+command! Wiki argedit ~/.wiki/README.md
+
 let g:VimTodoListsMoveItems = 0
