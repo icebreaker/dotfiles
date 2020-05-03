@@ -43,7 +43,7 @@ if [ -n "$1" ]; then
 
 	if [ -n "$EXTENSION" ]; then
 		TEMPLATE=".template.${EXTENSION}"
-		if [ ! -f "$2/$TEMPLATE" ]; then
+		if [ -n "$2" ] && [ ! -f "$2/$TEMPLATE" ]; then
 			TEMPLATE=".template.$1"
 		fi
 	fi
@@ -66,3 +66,5 @@ while [ "$DIR" != "/" ]; do
 	fi
 	DIR=$(dirname "$DIR")
 done
+
+exit 0

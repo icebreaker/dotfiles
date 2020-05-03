@@ -1,37 +1,4 @@
-" compound literals :P
-let c_no_curly_error=1
-
-" Custom make wrapper which can search for a valid Makefile.
-set makeprg=make.sh
-" Custom grep wrapper
-set grepprg=grep.sh
-" Custom error formatting
-set errorformat^=%-GIn\ file\ included\ %.%#
-
-" Bind Ctrl+B to make
-map <c-b> <ESC>:make build<CR>
-" Bind Ctrl+R to execute
-map <c-r> <ESC>:make execute<CR>
-" Bind Ctrl+Q to clean
-map <c-k> <ESC>:make clean<CR>
-" Bind Ctrl+G to generate
-map <c-g> <ESC>:make generate<CR>
-" Toggle Spell checking
-map <F4> :set spell! spelllang=en_us<CR>
-" Toggle Line Numbers
-map <F2> :set nonumber!<CR>
-map <F3> :set nopaste!<CR>
-
-" Copy Paste with Ctrl+C and Ctrl+V
-vmap <c-c> :w! ~/.vimswap/.buffer<CR>
-nmap <c-p> :r ~/.vimswap/.buffer<CR>
-
-" Highlight Last Searched Term
-noremap <F5> :set hlsearch!<CR>
-
-" Shortcut for Redo
-noremap r :redo<CR>
-
+" options
 set nospell
 set encoding=utf8
 set fileencoding=utf8
@@ -46,7 +13,6 @@ set number
 set report=0
 set nolazyredraw
 set ttyfast
-set listchars=tab:\|\ ,trail:.,extends:>,precedes:<,eol:$
 set autoindent
 set cindent
 set smartindent
@@ -70,31 +36,69 @@ set noshowcmd
 set ignorecase
 set mouse-=a
 set ruler
-set undofile
-set undolevels=1000
-set history=1000
 set nofsync
 set clipboard=exclude:.*
 set cinoptions+=g0
 set foldmethod=marker
+set cryptmethod=blowfish2
 
-let python_highlight_all=1
+" netrw
+let g:netrw_banner=0
+let g:netrw_fastbrowse=1
 
-syntax on
-syntax sync fromstart
-filetype on
-filetype plugin on
-filetype plugin indent on
-filetype indent on
+" swap and undo
+set history=1000
+set undodir=~/.vimundo
+set undolevels=1000
+set undofile
+set directory=~/.vimswap
 
+" make and grep
+set errorformat^=%-GIn\ file\ included\ %.%#
+set grepprg=grep.sh
+set makeprg=make.sh
+
+nnoremap <C-b> :make build<CR>
+nnoremap <C-r> :make execute<CR>
+nnoremap <C-k> :make clean<CR>
+nnoremap <C-g> :make generate<CR>
+
+" quality of life
+set pastetoggle=<F3>
+nnoremap <F2> :set nonumber!<CR>
+nnoremap <F4> :set spell! spelllang=en_us<CR>
+nnoremap <F5> :set hlsearch!<CR>
+
+vnoremap <C-c> :w! ~/.vimswap/.buffer<CR>
+nnoremap <C-p> :r ~/.vimswap/.buffer<CR>
+
+nnoremap r :redo<CR>
+nnoremap ; :
+inoremap jj <ESC>
+
+nnoremap <Leader>w :w<CR>
+nnoremap <Leader>= <C-a>
+nnoremap <Leader>- <C-x>
+
+nnoremap zz ZZ
+nnoremap zq ZQ
+
+nnoremap q <nop>
+
+augroup qol
+	au!
+	au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exec "normal! g'\"" | endif
+	au BufWritePre * silent exec '%s/\s\+$//e'
+augroup end
+
+" syntax and colorscheme
 set t_AB=^[[48;5;%dm
 set t_AF=^[[38;5;%dm
 set t_Co=256
-set term=gnome-256color
+set term=xterm-256color
 
 if $TMUX =~ 'tmux'
-	set term=screen-256color
-
+	set term=xterm-256color
 	nmap  <Home>
 	imap  <Home>
 	vmap  <Home>
@@ -103,7 +107,19 @@ if $TMUX =~ 'tmux'
 	vmap  <End>
 endif
 
-let g:CSApprox_attr_map = { 'bold' : 'bold', 'italic' : '', 'sp' : ''  }
+syntax on
+syntax sync fromstart
+filetype on
+filetype plugin on
+filetype plugin indent on
+filetype indent on
+
+set synmaxcol=150
+
+let python_highlight_all=1
+let c_no_curly_error=1
+let coffee_no_reserved_words_error=1
+let g:delimitMate_expand_cr=1
 
 if has('gui_running')
 	set guifont=IBM\ Plex\ Mono\ SemiBold\ 19
@@ -111,9 +127,41 @@ if has('gui_running')
 	set guioptions=i
 endif
 
-set completeopt=menu,menuone
-set pumheight=10
+let g:html_font='IBM Plex Mono Medium'
 
+if has('gui_running')
+	colorscheme gummybears
+else
+	set background=dark
+	colorscheme monoplex
+endif
+
+" color column and basic distraction free writing for markdown
+hi ColorColumn ctermbg=124 ctermfg=NONE cterm=BOLD
+function! AddColorColumn() abort
+	if &buftype == 'help'
+		return
+	endif
+
+	if exists('s:colorcolumn')
+		call matchdelete(s:colorcolumn)
+	endif
+
+	if &ft == 'markdown'
+		set tw=80
+		set nonumber
+		let s:colorcolumn = matchadd('ColorColumn', '\%80v', 100)
+	else
+		let s:colorcolumn = matchadd('ColorColumn', '\%120v', 100)
+	endif
+endfunction
+
+augroup colorcol
+	au!
+	au BufRead,BufNewFile * call AddColorColumn()
+augroup end
+
+" status line
 function! GitStatus()
 	let s = fugitive#head()
 
@@ -135,107 +183,24 @@ set statusline+=\ \|
 set statusline+=\ %04v:%04l\ \|\ %04L
 set statusline+=%{'\ '}
 
-let g:html_font='IBM Plex Mono Medium'
+" word and code completion
+set completeopt=menu,menuone
+set pumheight=10
 
-if has('gui_running')
-	colorscheme gummybears
-else
-	set background=dark
-	colorscheme monoplex
-endif
-
-hi ColorColumn ctermbg=29 ctermfg=NONE
-call matchadd('ColorColumn', '\%120v', 120)
-
-" Word Completion
-function! Tab_Or_Complete()
+function! TabOrComplete()
 	if col('.') > 1 && strpart(getline('.'), col('.')-2, 3) =~ '^\w'
 		return "\<C-N>"
 	else
 		return "\<Tab>"
 	endif
 endfunction
-inoremap <Tab> <C-R>=Tab_Or_Complete()<CR>
+inoremap <Tab> <C-R>=TabOrComplete()<CR>
 inoremap <C-@> <C-X><C-U>
 
-" File Types
-au! BufRead,BufNewFile *.json set filetype=json
-au! BufRead,BufNewFile *.as set filetype=actionscript
-au! BufRead,BufNewFile Dockerfile,Jenkinsfile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile Rakefile,Gemfile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.ru set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufNewFile *.rb silent! execute '0r ~/.vim/templates/template.rb'
-au! BufRead,BufNewFile *.cr set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.conf set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
-au! BufRead,BufNewFile .irbrc set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.erb set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.haml,*.hamlc set filetype=haml tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.sass set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.scss set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.yml,*.yaml,Doxterfile set filetype=yaml tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.rake,*.gemspec,*.js,*.jsx,*.feature,*.xml set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.install,*.inc,*.php set filetype=php tabstop=4 shiftwidth=4 softtabstop=4 noexpandtab noeol
-au! BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
-au! BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc set filetype=sh
-au! BufRead,BufNewFile *.py set filetype=python
-au! BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.coffee,*.feature,*.jsx set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *.ninja set tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab noeol
-au! BufRead,BufNewFile *.lua,Trollfile,Buildfile,*.lud set tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab noeol
-au! BufRead,BufNewFile *.hx set filetype=haxe tabstop=2 shiftwidth=2 softtabstop=2 expandtab
-au! BufRead,BufNewFile *.glsl,*.shader,*.shd set filetype=glsl
-au! BufRead,BufNewFile *.CPP set filetype=cpp
-au! BufRead,BufNewFile *.ASM set filetype=asm
-au! BufRead,BufNewFile *.mm,*.m set filetype=objc
-au! BufRead,BufNewFile Gemfile set syntax=off tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile *cms-plugins*/*joomla*/*.php set filetype=php tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-au! BufRead,BufNewFile Trollfile,Buildfile set filetype=lua
-au! BufRead,BufNewFile * set formatoptions=tcq
-
-" Swap Directory
-set directory=~/.vimswap
-" Undo Directory
-set undodir=~/.vimundo
-
-" Restore / Jump to last position
-au! BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-" Strip trailing spaces on write
-au! BufWritePre * :%s/\s\+$//e
-
-nnoremap ; :
-
+" file navigation
 let g:fastopen_git_aware = 1
 let g:fastopen_filter_cmd = "exclude.sh"
-map <c-l> :call fastopen#show('argedit')<cr>
-
-" RuboCop
-let g:vimrubocop_keymap = 0
-nmap <Leader>c :RuboCop<CR>
-
-let g:delimitMate_expand_cr=1
-
-map <Leader>p :!pandoc -f markdown+tex_math_single_backslash -t beamer --pdf-engine=xelatex -o /tmp/vim_pandoc_tmp.pdf '%' && mupdf /tmp/vim_pandoc_tmp.pdf && rm /tmp/vim_pandoc_tmp.pdf <CR>
-
-" Append the src directory to the path
-let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', ' ', '\\ ', 'g')
-execute 'set path+=' . src
-execute 'set path+=/usr/include/SDL2'
-execute 'set path+=/usr/include'
-
-" Append the data directory to the path
-let src = substitute(substitute(expand('%:p:h'), '\/data.*$', '', '') . '/data', ' ', '\\ ', 'g')
-execute 'set path+=' . src
-
-" Exclude commonly undesirable directories from the wild menu
-set wildmenu
-set wildignore+=.svn/*,.git/*,.hg/*,bin/*,build/*,src_data/*,data/assets/*,resources/*,src/vendor/*
-
-nmap <Leader>t :. !template.sh '%:t' '%:p:h'<CR>
-
-set cryptmethod=blowfish2
-
-let coffee_no_reserved_words_error = 1
+nnoremap <C-l> :call fastopen#show('argedit')<cr>
 
 function! NextFile()
 	if bufname('%') != ''
@@ -276,11 +241,24 @@ endfunction
 
 noremap <Leader>] :call NextFile()<CR>
 noremap <Leader>[ :call PrevFile()<CR>
-
 noremap <Leader>q :call CloseFile()<CR>
 
-noremap <Leader>w :w<CR>
+let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', ' ', '\\ ', 'g')
+execute 'set path+=' . src
+execute 'set path+=/usr/include/SDL2'
+execute 'set path+=/usr/include'
 
+let src = substitute(substitute(expand('%:p:h'), '\/data.*$', '', '') . '/data', ' ', '\\ ', 'g')
+execute 'set path+=' . src
+
+set wildignore+=.svn/*,.git/*,.hg/*,bin/*,build/*,src_data/*,data/assets/*,resources/*,src/vendor/*
+set wildmenu
+
+" rubocop
+let g:vimrubocop_keymap = 0
+nnoremap <Leader>c :RuboCop<CR>
+
+" customized async totem for `makeprg`, `grepprg` and the like
 let g:asynctotem_copen = 0
 let g:asynctotem_cclose_delay = 0
 let g:asynctotem_cclose_on_kill = 1
@@ -306,8 +284,8 @@ function! Acclose()
 endfunction
 
 augroup asynctotem
-	autocmd!
-	autocmd BufReadPost quickfix silent exec 'nnoremap q :call Acclose()<CR>'
+	au!
+	au BufReadPost quickfix silent exec 'nnoremap q :call Acclose()<CR>'
 augroup end
 
 noremap <Leader>e :call asynctotem#run(&makeprg, 'build')<CR>
@@ -316,24 +294,68 @@ noremap <Leader>k :call asynctotem#run(&makeprg, 'clean')<CR>
 noremap <Leader>g :call asynctotem#run(&makeprg, 'generate')<CR>
 noremap <Leader>f :call Acopen()<CR>
 
-noremap q <nop>
-nnoremap zz ZZ
-nnoremap zq ZQ
-
 command! -nargs=+ -complete=shellcmd Arun call asynctotem#run(<q-args>)
 command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run(&grepprg, <q-args>)
 
+" wiki
 command! Wiki e ~/.wiki/README.md
 
-function! WikiJump() abort
+function! WikiJump()
 	call search('\.md)$', 'c', getline('.'))
 	normal! gf
 endfunction
 
 augroup wiki
-	autocmd!
-	autocmd BufNewFile,BufRead ~/.wiki/*.md silent exec 'nnoremap <Tab> :call WikiJump()<CR>'
+	au!
+	au BufNewFile,BufRead ~/.wiki/*.md silent exec 'nnoremap <Tab> :call WikiJump()<CR>'
 augroup end
 
+" task/todo
 nnoremap - :call gustav#add()<CR>
 nnoremap <Space> :call gustav#toggle()<CR>
+
+" templating
+augroup templating
+	au!
+	au BufNewFile *.rb silent! exec '0r ~/.vim/templates/template.rb'
+augroup end
+nnoremap <Leader>t :. !template.sh '%:t' '%:p:h'<CR>
+
+" file types
+augroup filetypes
+	au!
+	au BufRead,BufNewFile * set formatoptions=tcq
+	au BufRead,BufNewFile *.glsl,*.shader,*.shd set filetype=glsl
+	au BufRead,BufNewFile *.CPP,*.H set filetype=cpp
+	au BufRead,BufNewFile *.ASM set filetype=asm
+	au BufRead,BufNewFile *.mm,*.m set filetype=objc
+	au BufRead,BufNewFile Trollfile,Buildfile set filetype=lua
+	au BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc set filetype=sh
+	au BufRead,BufNewFile *.as set filetype=actionscript
+	au BufRead,BufNewFile Gemfile set syntax=off tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile Dockerfile,Jenkinsfile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile Rakefile,Gemfile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.ru set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.cr set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.conf set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
+	au BufRead,BufNewFile .irbrc set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.erb set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.haml,*.hamlc set filetype=haml tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.sass set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.scss set filetype=sass tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.yml,*.yaml set filetype=yaml tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile Doxterfile set filetype=yaml tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.rake,*.gemspec,*.js,*.jsx set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.feature,*.xml set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.install,*.inc set filetype=php tabstop=4 shiftwidth=4 softtabstop=4 noexpandtab noeol
+	au BufRead,BufNewFile *.php tabstop=4 shiftwidth=4 softtabstop=4 noexpandtab noeol
+	au BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
+	au BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.coffee,*.feature,*.jsx set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.ninja set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *.lua,Trollfile,Buildfile,*.lud set tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab noeol
+	au BufRead,BufNewFile *.hx set filetype=haxe tabstop=2 shiftwidth=2 softtabstop=2 expandtab
+	au BufRead,BufNewFile *cms-plugins*/*joomla*/*.php set filetype=php
+		\ tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+augroup end
