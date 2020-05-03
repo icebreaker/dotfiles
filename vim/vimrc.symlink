@@ -205,6 +205,7 @@ au! BufWritePre * :%s/\s\+$//e
 
 nnoremap ; :
 
+let g:fastopen_git_aware = 1
 let g:fastopen_filter_cmd = "exclude.sh"
 map <c-l> :call fastopen#show('argedit')<cr>
 
