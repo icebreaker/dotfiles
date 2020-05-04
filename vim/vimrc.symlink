@@ -114,8 +114,6 @@ filetype plugin on
 filetype plugin indent on
 filetype indent on
 
-set synmaxcol=150
-
 let python_highlight_all=1
 let c_no_curly_error=1
 let coffee_no_reserved_words_error=1
@@ -138,27 +136,11 @@ endif
 
 " color column and basic distraction free writing for markdown
 hi ColorColumn ctermbg=124 ctermfg=NONE cterm=BOLD
-function! AddColorColumn() abort
-	if &buftype == 'help'
-		return
-	endif
+call matchadd('ColorColumn', '\%120v', 100)
 
-	if exists('s:colorcolumn')
-		call matchdelete(s:colorcolumn)
-	endif
-
-	if &ft == 'markdown'
-		set tw=80
-		set nonumber
-		let s:colorcolumn = matchadd('ColorColumn', '\%80v', 100)
-	else
-		let s:colorcolumn = matchadd('ColorColumn', '\%120v', 100)
-	endif
-endfunction
-
-augroup colorcol
+augroup dfw
 	au!
-	au BufRead,BufNewFile * call AddColorColumn()
+	au BufRead,BufNewFile *.md set tw=80 nonumber
 augroup end
 
 " status line
@@ -297,22 +279,57 @@ noremap <Leader>f :call Acopen()<CR>
 command! -nargs=+ -complete=shellcmd Arun call asynctotem#run(<q-args>)
 command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run(&grepprg, <q-args>)
 
+" auto make parent directory
+function! AutoMakeParentDirectory()
+    let dir = expand("%:h")
+
+	if isdirectory(dir)
+		return
+	endif
+
+	if confirm("Parent directory '" . dir . "' doesn't exist.", "&Create it\nor &No?") == 2
+		return
+	endif
+
+	try
+		call mkdir(dir, 'p')
+	catch
+		" noop
+	endtry
+endfunction
+command! Mkdirp call AutoMakeParentDirectory()
+
+augroup automakeparentdir
+    au!
+    au BufNewFile * :call AutoMakeParentDirectory()
+augroup end
+
 " wiki
 command! Wiki e ~/.wiki/README.md
 
 function! WikiJump()
-	call search('\.md)$', 'c', getline('.'))
-	normal! gf
+	normal! ^
+
+	let n = search('\.md)$', 'c', getline('.'))
+	if n == 0
+		return
+	endif
+
+	try
+		normal! gf
+	catch
+		silent! exec ':e %:h/<cfile>'
+	endtry
 endfunction
 
 augroup wiki
 	au!
-	au BufNewFile,BufRead ~/.wiki/*.md silent exec 'nnoremap <Tab> :call WikiJump()<CR>'
+	au BufNewFile,BufRead ~/.wiki/*.md silent! exec 'nnoremap <buffer> <Tab> :call WikiJump()<CR>'
 augroup end
 
 " task/todo
-nnoremap - :call gustav#add()<CR>
-nnoremap <Space> :call gustav#toggle()<CR>
+nnoremap <Leader>- :call gustav#add()<CR>
+nnoremap <Leader>= :call gustav#toggle()<CR>
 
 " templating
 augroup templating
@@ -349,7 +366,7 @@ augroup filetypes
 	au BufRead,BufNewFile *.rake,*.gemspec,*.js,*.jsx set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile *.feature,*.xml set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile *.install,*.inc set filetype=php tabstop=4 shiftwidth=4 softtabstop=4 noexpandtab noeol
-	au BufRead,BufNewFile *.php tabstop=4 shiftwidth=4 softtabstop=4 noexpandtab noeol
+	au BufRead,BufNewFile *.php set tabstop=4 shiftwidth=4 softtabstop=4 noexpandtab noeol
 	au BufRead,BufNewFile *.rst set tabstop=3 shiftwidth=3 softtabstop=3 expandtab
 	au BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile *.coffee,*.feature,*.jsx set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
