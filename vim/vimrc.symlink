@@ -318,7 +318,7 @@ function! WikiJump()
 	try
 		normal! gf
 	catch
-		silent! exec ':e %:h/<cfile>'
+		exec ':e %:h/<cfile>'
 	endtry
 endfunction
 
@@ -346,7 +346,6 @@ augroup filetypes
 	au BufRead,BufNewFile *.CPP,*.H set filetype=cpp
 	au BufRead,BufNewFile *.ASM set filetype=asm
 	au BufRead,BufNewFile *.mm,*.m set filetype=objc
-	au BufRead,BufNewFile Trollfile,Buildfile set filetype=lua
 	au BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc set filetype=sh
 	au BufRead,BufNewFile *.as set filetype=actionscript
 	au BufRead,BufNewFile Gemfile set syntax=off tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
@@ -371,7 +370,8 @@ augroup filetypes
 	au BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile *.coffee,*.feature,*.jsx set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile *.ninja set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-	au BufRead,BufNewFile *.lua,Trollfile,Buildfile,*.lud set tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab noeol
+	au BufRead,BufNewFile *.lua,Trollfile,Buildfile,Maksufile,*.lud
+		\ set filetype=lua tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab noeol
 	au BufRead,BufNewFile *.hx set filetype=haxe tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 	au BufRead,BufNewFile *cms-plugins*/*joomla*/*.php set filetype=php
 		\ tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
