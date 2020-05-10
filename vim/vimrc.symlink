@@ -74,7 +74,6 @@ nnoremap <C-p> :r ~/.vimswap/.buffer<CR>
 
 nnoremap r :redo<CR>
 nnoremap ; :
-inoremap jj <ESC>
 
 nnoremap <Leader>w :w<CR>
 nnoremap <Leader>= <C-a>
@@ -281,7 +280,7 @@ command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run(&grepprg, <q-args
 
 " auto make parent directory
 function! AutoMakeParentDirectory()
-    let dir = expand("%:h")
+	let dir = expand('%:h')
 
 	if isdirectory(dir)
 		return
