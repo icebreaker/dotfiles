@@ -17,8 +17,8 @@ hi clear
 syntax reset
 "}}}
 "general {{{
-hi Normal ctermfg=251 ctermbg=0 cterm=NONE
-hi NonText ctermfg=251 ctermbg=0 cterm=NONE
+hi Normal ctermfg=250 ctermbg=0 cterm=NONE
+hi NonText ctermfg=250 ctermbg=0 cterm=NONE
 hi CursorLine ctermfg=NONE ctermbg=234 cterm=NONE
 hi CursorLineNR ctermfg=NONE ctermbg=234 cterm=NONE
 hi Cursor ctermfg=NONE ctermbg=NONE cterm=INVERSE
@@ -33,26 +33,26 @@ hi IncSearch ctermfg=NONE ctermbg=NONE cterm=BOLD,INVERSE
 hi QuickFixLine ctermfg=NONE ctermbg=NONE cterm=NONE
 hi Folded ctermfg=NONE ctermbg=NONE cterm=BOLD,INVERSE
 hi FoldColumn ctermfg=NONE ctermbg=NONE cterm=BOLD,INVERSE
-hi Visual ctermfg=0 ctermbg=251 cterm=NONE
-hi StatusLine ctermfg=251 ctermbg=235 cterm=BOLD
-hi StatusLineNC ctermfg=251 ctermbg=235 cterm=BOLD,INVERSE
-hi StatusLineTerm ctermfg=251 ctermbg=235 cterm=BOLD
-hi StatusLineTermNC ctermfg=251 ctermbg=235 cterm=BOLD,INVERSE
+hi Visual ctermfg=0 ctermbg=250 cterm=NONE
+hi StatusLine ctermfg=250 ctermbg=235 cterm=BOLD
+hi StatusLineNC ctermfg=250 ctermbg=235 cterm=BOLD,INVERSE
+hi StatusLineTerm ctermfg=250 ctermbg=235 cterm=BOLD
+hi StatusLineTermNC ctermfg=250 ctermbg=235 cterm=BOLD,INVERSE
 hi WildMenu ctermbg=NONE ctermfg=NONE cterm=BOLD,REVERSE
 "}}}
 "syntax {{{
-hi Type ctermfg=60 ctermbg=NONE cterm=BOLD
-hi Statement ctermfg=60 ctermbg=NONE cterm=BOLD
-hi Function ctermfg=60 ctermbg=NONE cterm=BOLD
-hi Identifier ctermfg=60 ctermbg=NONE cterm=BOLD
-hi Constant ctermfg=60 ctermbg=NONE cterm=BOLD
-hi PreProc ctermfg=60 ctermbg=NONE cterm=BOLD
-hi Include ctermfg=60 ctermbg=NONE cterm=BOLD
-hi String ctermfg=101 ctermbg=NONE cterm=NONE
-hi Special ctermfg=101 ctermbg=NONE cterm=NONE
-hi Number ctermfg=101 ctermbg=NONE cterm=NONE
-hi Todo ctermfg=136 ctermbg=NONE cterm=BOLD
-hi Comment ctermfg=136 ctermbg=NONE cterm=NONE
+hi Type ctermfg=101 ctermbg=NONE cterm=BOLD
+hi Statement ctermfg=101 ctermbg=NONE cterm=BOLD
+hi Function ctermfg=101 ctermbg=NONE cterm=BOLD
+hi Identifier ctermfg=101 ctermbg=NONE cterm=BOLD
+hi Constant ctermfg=101 ctermbg=NONE cterm=BOLD
+hi PreProc ctermfg=101 ctermbg=NONE cterm=BOLD
+hi Include ctermfg=101 ctermbg=NONE cterm=BOLD
+hi String ctermfg=30 ctermbg=NONE cterm=NONE
+hi Special ctermfg=30 ctermbg=NONE cterm=NONE
+hi Number ctermfg=30 ctermbg=NONE cterm=NONE
+hi Todo ctermfg=102 ctermbg=NONE cterm=BOLD
+hi Comment ctermfg=59 ctermbg=NONE cterm=NONE
 "}}}
 "msg {{{
 hi ModeMsg ctermbg=NONE ctermfg=NONE cterm=NONE
