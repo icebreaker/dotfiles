@@ -53,16 +53,6 @@ set undolevels=1000
 set undofile
 set directory=~/.vimswap
 
-" make and grep
-set errorformat^=%-GIn\ file\ included\ %.%#
-set grepprg=grep.sh
-set makeprg=make.sh
-
-nnoremap <C-b> :make build<CR>
-nnoremap <C-r> :make execute<CR>
-nnoremap <C-k> :make clean<CR>
-nnoremap <C-g> :make generate<CR>
-
 " quality of life
 set pastetoggle=<F3>
 nnoremap <F2> :set nonumber!<CR>
@@ -179,20 +169,58 @@ inoremap <Tab> <C-R>=TabOrComplete()<CR>
 inoremap <C-@> <C-X><C-U>
 
 " file navigation
+let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', ' ', '\\ ', 'g')
+exec 'set path+=' . src
+exec 'set path+=/usr/include/SDL2'
+exec 'set path+=/usr/include'
+
+let src = substitute(substitute(expand('%:p:h'), '\/data.*$', '', '') . '/data', ' ', '\\ ', 'g')
+exec 'set path+=' . src
+
+let wildignore=[
+	\'.svn',
+	\'.git',
+	\'.hg',
+	\'bin',
+	\'build',
+	\'src_data',
+	\'data/gfx',
+	\'data/sfx',
+	\'data/def',
+	\'data/assets',
+	\'data/textures',
+	\'data/sprites',
+	\'data/audio',
+	\'data/sounds',
+	\'data/music',
+	\'data/maps',
+	\'data/levels',
+	\'data/worlds',
+	\'data/scenes',
+	\'resources',
+	\'src/vendor'
+\]
+exec 'set wildignore+=' . join(wildignore, '/*,')
+set wildmenu
+
 let g:fastopen_git_aware = 1
-let g:fastopen_filter_cmd = "exclude.sh"
-nnoremap <C-l> :call fastopen#show('argedit')<cr>
+let g:fastopen_filter_cmd = 'grep -Ev ' . "'" . join(wildignore, '/|') . "/'"
+nnoremap <C-l> :call fastopen#show('argedit')<CR>
 
 function! NextFile()
-	if bufname('%') != ''
-		execute 'try | n | catch | try | rew | catch | | endtry | endtry'
+	if bufname('%') == ''
+		return
 	endif
+
+	silent! exec 'try | n | catch | try | rew | catch | | endtry | endtry'
 endfunction
 
 function! PrevFile()
-	if bufname('%') != ''
-		execute 'try | prev | catch | try | la | catch | | endtry | endtry'
+	if bufname('%') == ''
+		return
 	endif
+
+	silent! exec 'try | prev | catch | try | la | catch | | endtry | endtry'
 endfunction
 
 function! CloseFile()
@@ -200,22 +228,31 @@ function! CloseFile()
 		return
 	endif
 
-	if bufname('%') == ''
+	if bufname('%') == '' || bufname('%') == 'asynctotem_buffer'
 		if &modified
 			silent q!
 		else
 			q
 		end
 	else
-		silent! argdel %
+		let jump_to_next_file = 0
+		try
+			silent argdel %
+			let jump_to_next_file = 1
+		catch
+			" noop
+		endtry
+
 		if &modified
 			silent bd!
 		else
 			bd
 		endif
 
-		if bufname('%') == ''
+		if bufname('%') == '' || bufname('%') == 'asynctotem_buffer'
 			silent q!
+		elseif jump_to_next_file == 1
+			call NextFile()
 		endif
 	endif
 endfunction
@@ -224,59 +261,76 @@ noremap <Leader>] :call NextFile()<CR>
 noremap <Leader>[ :call PrevFile()<CR>
 noremap <Leader>q :call CloseFile()<CR>
 
-let src = substitute(substitute(expand('%:p:h'), '\/src.*$', '', '') . '/src', ' ', '\\ ', 'g')
-execute 'set path+=' . src
-execute 'set path+=/usr/include/SDL2'
-execute 'set path+=/usr/include'
-
-let src = substitute(substitute(expand('%:p:h'), '\/data.*$', '', '') . '/data', ' ', '\\ ', 'g')
-execute 'set path+=' . src
-
-set wildignore+=.svn/*,.git/*,.hg/*,bin/*,build/*,src_data/*,data/assets/*,resources/*,src/vendor/*
-set wildmenu
-
 " rubocop
 let g:vimrubocop_keymap = 0
 nnoremap <Leader>c :RuboCop<CR>
 
-" customized async totem for `makeprg`, `grepprg` and the like
-let g:asynctotem_copen = 0
+" building and project managament
+set errorformat^=%-GIn\ file\ included\ %.%#
+
 let g:asynctotem_cclose_delay = 0
 let g:asynctotem_cclose_on_kill = 1
 let g:asynctotem_cclose_on_no_errors = 1
 
-function! Acopen()
-	if g:asynctotem_copen == 0
-		let g:asynctotem_cclose_on_kill = 0
-		let g:asynctotem_cclose_on_no_errors = 0
-		let g:asynctotem_copen = 1
-		copen
-	else
-		let g:asynctotem_cclose_on_kill = 1
-		let g:asynctotem_cclose_on_no_errors = 1
-		let g:asynctotem_copen = 0
-		cclose
+function! AsyncFindMakeDir(project)
+	if exists('b:async_make_dir')
+		return b:async_make_dir
 	endif
+
+	let makedir = '.;'
+
+	let filedir = fnamemodify('.', ':p:h')
+	if !empty(filedir) && filedir != getcwd()
+		let makedir = filedir . ';' . makedir
+	endif
+
+	if exists('b:git_dir') && !empty(b:git_dir)
+		let gitmakedir = substitute(b:git_dir, '\.git$', '', '')
+		if gitmakedir != getcwd()
+			let makedir = makedir . gitmakedir . ';'
+		endif
+	endif
+
+	let file = findfile(a:project, makedir)
+	if empty(file)
+		let makedir = '-'
+		let b:async_make_dir = makedir
+		return makedir
+	endif
+
+	let makedir = fnamemodify(file, ':p:h')
+	if empty(makedir) || makedir == '.' || makedir == getcwd()
+		let makedir = ''
+	else
+		let makedir = '-C ' . makedir
+	endif
+
+	let b:async_make_dir = makedir
+
+	return makedir
 endfunction
 
-function! Acclose()
-	let g:asynctotem_copen = 1
-	call Acopen()
+function! AsyncMake(action)
+	let makedir = AsyncFindMakeDir('.project')
+
+	if makedir == '-'
+		echohl ErrorMsg
+		echon 'No project found!'
+		echohl None
+		return
+	endif
+
+	call asynctotem#run(&makeprg, makedir, '-f .project', a:action)
 endfunction
 
-augroup asynctotem
-	au!
-	au BufReadPost quickfix silent exec 'nnoremap q :call Acclose()<CR>'
-augroup end
-
-noremap <Leader>e :call asynctotem#run(&makeprg, 'build')<CR>
-noremap <Leader>r :call asynctotem#run(&makeprg, 'execute')<CR>
-noremap <Leader>k :call asynctotem#run(&makeprg, 'clean')<CR>
-noremap <Leader>g :call asynctotem#run(&makeprg, 'generate')<CR>
-noremap <Leader>f :call Acopen()<CR>
+noremap <Leader>e :call AsyncMake('build')<CR>
+noremap <Leader>r :call AsyncMake('execute')<CR>
+noremap <Leader>k :call AsyncMake('clean')<CR>
+noremap <Leader>g :call AsyncMake('generate')<CR>
+noremap <Leader>f :call asynctotem#copen()<CR>
 
 command! -nargs=+ -complete=shellcmd Arun call asynctotem#run(<q-args>)
-command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run(&grepprg, <q-args>)
+command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run('git --no-pager grep -n -I --untracked', <q-args>)
 
 " auto make parent directory
 function! AutoMakeParentDirectory()

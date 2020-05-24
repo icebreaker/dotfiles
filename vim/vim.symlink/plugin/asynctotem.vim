@@ -1,6 +1,6 @@
 " Location:     plugin/asynctotem.vim
 " Author:       Mihail Szabolcs <https://mihail.co>
-" Version:      1.0
+" Version:      1.1
 " License:      Same as Vim itself. See :help license
 
 if v:version < 800 || exists('g:asynctotem_loaded') || &cp
@@ -11,6 +11,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 let g:asynctotem_loaded = 1
+let g:asynctotem_copen = 0
 
 if !exists('g:asynctotem_copen_keymap')
   let g:asynctotem_copen_keymap = 1
@@ -28,13 +29,23 @@ if !exists('g:asynctotem_cclose_on_no_errors')
   let g:asynctotem_cclose_on_no_errors = 0
 endif
 
-function! asynctotem#copen()
-  copen
+if g:asynctotem_copen_keymap == 1
+  augroup asynctotem
+	au!
+	au BufReadPost quickfix silent exec 'nnoremap q :call asynctotem#cclose()<CR>'
+	au BufReadPost quickfix silent exec 'nnoremap <C-c> :call asynctotem#kill()<CR>'
+  augroup end
+endif
 
-  if g:asynctotem_copen_keymap == 1
-    exec 'nnoremap <silent> <buffer> q :cclose<CR>'
-	exec 'nnoremap <silent> <buffer> <C-c> :call asynctotem#kill()<CR>'
+function! asynctotem#copen()
+  if g:asynctotem_copen == 1
+	return
+  else
+	let g:asynctotem_copen = 1
   endif
+
+  copen
+  cbottom
 endfunction
 
 function! asynctotem#on_cclose(_timer)
@@ -42,6 +53,12 @@ function! asynctotem#on_cclose(_timer)
 endfunction
 
 function! asynctotem#cclose()
+  if g:asynctotem_copen == 0
+	return
+  else
+	let g:asynctotem_copen = 0
+  endif
+
   if !exists('g:asynctotem_job_id')
 	if g:asynctotem_cclose_on_kill == 0
 	  return
@@ -106,9 +123,9 @@ function! asynctotem#kill()
   if !exists('g:asynctotem_job_id')
 	return
   end
-  
+
   call job_stop(g:asynctotem_job_id, 'kill')
-  
+
   unlet g:asynctotem_job_id
 endfunction
 
