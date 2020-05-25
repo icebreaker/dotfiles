@@ -197,13 +197,13 @@ let wildignore=[
 	\'data/levels',
 	\'data/worlds',
 	\'data/scenes',
+	\'data/fonts',
 	\'resources',
 	\'src/vendor'
 \]
 exec 'set wildignore+=' . join(wildignore, '/*,')
 set wildmenu
 
-let g:fastopen_git_aware = 1
 let g:fastopen_filter_cmd = 'grep -Ev ' . "'" . join(wildignore, '/|') . "/'"
 nnoremap <C-l> :call fastopen#show('argedit')<CR>
 
@@ -228,33 +228,24 @@ function! CloseFile()
 		return
 	endif
 
-	if bufname('%') == '' || bufname('%') == 'asynctotem_buffer'
+	try
+		silent argdel %
+		if len(argv()) == 0
+			silent q!
+		else
+			call PrevFile()
+		endif
+	catch
 		if &modified
 			silent q!
 		else
 			q
-		end
-	else
-		let jump_to_next_file = 0
-		try
-			silent argdel %
-			let jump_to_next_file = 1
-		catch
-			" noop
-		endtry
-
-		if &modified
-			silent bd!
-		else
-			bd
 		endif
 
-		if bufname('%') == '' || bufname('%') == 'asynctotem_buffer'
+		if bufname('%') == ''
 			silent q!
-		elseif jump_to_next_file == 1
-			call NextFile()
 		endif
-	endif
+	endtry
 endfunction
 
 noremap <Leader>] :call NextFile()<CR>
@@ -273,28 +264,25 @@ let g:asynctotem_cclose_on_kill = 1
 let g:asynctotem_cclose_on_no_errors = 1
 
 function! AsyncFindMakeDir(project)
-	if exists('b:async_make_dir')
-		return b:async_make_dir
+	if exists('g:async_make_dir')
+		return g:async_make_dir
 	endif
 
-	let makedir = '.;'
-
-	let filedir = fnamemodify('.', ':p:h')
-	if !empty(filedir) && filedir != getcwd()
-		let makedir = filedir . ';' . makedir
-	endif
+	let makedir = ''
 
 	if exists('b:git_dir') && !empty(b:git_dir)
-		let gitmakedir = substitute(b:git_dir, '\.git$', '', '')
+		let gitmakedir = substitute(b:git_dir, '/\.git$', '', '')
 		if gitmakedir != getcwd()
-			let makedir = makedir . gitmakedir . ';'
+			let makedir = gitmakedir . ';'
 		endif
 	endif
+
+	let makedir = makedir . '.;'
 
 	let file = findfile(a:project, makedir)
 	if empty(file)
 		let makedir = '-'
-		let b:async_make_dir = makedir
+		let g:async_make_dir = makedir
 		return makedir
 	endif
 
@@ -305,7 +293,7 @@ function! AsyncFindMakeDir(project)
 		let makedir = '-C ' . makedir
 	endif
 
-	let b:async_make_dir = makedir
+	let g:async_make_dir = makedir
 
 	return makedir
 endfunction
