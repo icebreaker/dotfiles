@@ -236,14 +236,14 @@ function! CloseFile()
 			call PrevFile()
 		endif
 	catch
-		if &modified
+		if winnr('$') > 1
 			silent q!
 		else
-			q
-		endif
-
-		if bufname('%') == ''
-			silent q!
+			if bufname('%') == ''
+				silent q!
+			else
+				silent bd!
+			endif
 		endif
 	endtry
 endfunction
