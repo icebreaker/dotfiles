@@ -263,9 +263,9 @@ let g:asynctotem_cclose_delay = 0
 let g:asynctotem_cclose_on_kill = 1
 let g:asynctotem_cclose_on_no_errors = 1
 
-function! AsyncFindMakeDir(project)
-	if exists('g:async_make_dir')
-		return g:async_make_dir
+function! AsyncMakeFindProject(project)
+	if exists('g:async_project')
+		return g:async_project
 	endif
 
 	let makedir = ''
@@ -281,34 +281,36 @@ function! AsyncFindMakeDir(project)
 
 	let file = findfile(a:project, makedir)
 	if empty(file)
-		let makedir = '-'
-		let g:async_make_dir = makedir
-		return makedir
+		let project = '-'
+		let g:async_project = project
+		return project
 	endif
 
 	let makedir = fnamemodify(file, ':p:h')
 	if empty(makedir) || makedir == '.' || makedir == getcwd()
 		let makedir = ''
 	else
-		let makedir = '-C ' . makedir
+		let makedir = '-C ' . makedir . ' '
 	endif
 
-	let g:async_make_dir = makedir
+	let project = makedir . '-f ' . a:project
 
-	return makedir
+	let g:async_project = project
+
+	return project
 endfunction
 
 function! AsyncMake(action)
-	let makedir = AsyncFindMakeDir('.project')
+	let project = AsyncMakeFindProject('.project')
 
-	if makedir == '-'
+	if project == '-'
 		echohl ErrorMsg
 		echon 'No project found!'
 		echohl None
 		return
 	endif
 
-	call asynctotem#run(&makeprg, makedir, '-f .project', a:action)
+	call asynctotem#run(&makeprg, project, a:action)
 endfunction
 
 noremap <Leader>e :call AsyncMake('build')<CR>
@@ -371,13 +373,6 @@ augroup end
 " task/todo
 nnoremap <Leader>- :call gustav#add()<CR>
 nnoremap <Leader>= :call gustav#toggle()<CR>
-
-" templating
-augroup templating
-	au!
-	au BufNewFile *.rb silent! exec '0r ~/.vim/templates/template.rb'
-augroup end
-nnoremap <Leader>t :. !template.sh '%:t' '%:p:h'<CR>
 
 " file types
 augroup filetypes
