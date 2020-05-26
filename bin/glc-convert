@@ -1,9 +1,0 @@
-#!/bin/bash
-
-if [ $# -lt 2 ]; then
-	echo "usage: `basename $0` input.glc output.mp4"
-	exit 65
-fi
-
-glc-play "$1" -a 1 -o /tmp/glc-convert-sound.wav
-glc-play "$1" -o - -y 1 | ffmpeg -i - -i /tmp/glc-convert-sound.wav -acodec libmp3lame -ab 128k -ac 2 -vcodec libx264 -vpre slow -crf 22 -threads 0 "$2"

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-import -window "Default - Wine Desktop" ~/wine-$(date +%s).png
