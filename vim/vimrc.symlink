@@ -314,7 +314,7 @@ function! AsyncMake(action)
 endfunction
 
 function! Asyncopen()
-	copen
+	call asynctotem#copen()
 	cbottom
 endfunction
 
