@@ -45,7 +45,6 @@ function! asynctotem#copen()
   endif
 
   copen
-  cbottom
 endfunction
 
 function! asynctotem#on_cclose(_timer)

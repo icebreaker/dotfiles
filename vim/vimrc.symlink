@@ -313,11 +313,16 @@ function! AsyncMake(action)
 	call asynctotem#run(&makeprg, project, a:action)
 endfunction
 
+function! Asyncopen()
+	copen
+	cbottom
+endfunction
+
 noremap <Leader>e :call AsyncMake('build')<CR>
 noremap <Leader>r :call AsyncMake('execute')<CR>
 noremap <Leader>k :call AsyncMake('clean')<CR>
 noremap <Leader>g :call AsyncMake('generate')<CR>
-noremap <Leader>f :call asynctotem#copen()<CR>
+noremap <Leader>f :call Asyncopen()<CR>
 
 command! -nargs=+ -complete=shellcmd Arun call asynctotem#run(<q-args>)
 command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run('git --no-pager grep -n -I --untracked', <q-args>)
