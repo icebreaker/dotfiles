@@ -310,7 +310,7 @@ function! AsyncMake(action)
 		return
 	endif
 
-	call asynctotem#run(&makeprg, project, a:action)
+	call asynctotem#run(&makeprg, '-i', '-s', project, a:action)
 endfunction
 
 function! Asyncopen()
