@@ -70,7 +70,7 @@ function! asynctotem#cclose()
 endfunction
 
 function! asynctotem#job_start(cmd)
-  cexpr []
+  cgetexpr []
 
   let options = {}
   let options.callback = 'asynctotem#on_callback'
@@ -91,7 +91,14 @@ function! asynctotem#on_close(_channel)
   call asynctotem#copen()
 
   try
+	crewind
+  catch
+	" noop
+  endtry
+
+  try
 	cnext
+	redraw!
   catch
 	cbottom
 	call asynctotem#cclose()
