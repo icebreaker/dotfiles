@@ -91,12 +91,6 @@ function! asynctotem#on_close(_channel)
   call asynctotem#copen()
 
   try
-	crewind
-  catch
-	" noop
-  endtry
-
-  try
 	cnext
 	redraw!
   catch
