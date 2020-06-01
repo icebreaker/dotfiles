@@ -224,6 +224,11 @@ function! PrevFile()
 endfunction
 
 function! CloseFile()
+	if g:asynctotem_copen == 1
+		call asynctotem#cclose()
+		return
+	endif
+
 	if &modified && confirm('File modified. Are you sure?', "&Yes\n&No") != 1
 		return
 	endif
