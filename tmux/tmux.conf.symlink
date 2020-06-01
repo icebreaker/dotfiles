@@ -1,4 +1,4 @@
-set -g default-terminal screen-256color
+set -g default-terminal xterm-256color
 
 set -g status on
 set -g status-style bg=colour235,fg=default,bold
@@ -40,7 +40,9 @@ unbind %
 bind \\ split-window -h -c '#{pane_current_path}'
 bind - split-window -v -c '#{pane_current_path}'
 
-set -g history-limit 5000
+set -g history-limit 8192
 set -s escape-time 0
 
 set -g renumber-windows on
+
+set -g mouse on
