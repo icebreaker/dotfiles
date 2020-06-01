@@ -265,6 +265,8 @@ nnoremap <Leader>c :RuboCop<CR>
 set errorformat^=%-GIn\ file\ included\ %.%#
 
 let g:asynctotem_cclose_delay = 0
+let g:asynctotem_jump_delay = 0
+let g:asynctotem_copen_height = 6
 let g:asynctotem_cclose_on_kill = 1
 let g:asynctotem_cclose_on_no_errors = 1
 
