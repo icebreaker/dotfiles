@@ -270,9 +270,9 @@ let g:asynctotem_copen_height = 6
 let g:asynctotem_cclose_on_kill = 1
 let g:asynctotem_cclose_on_no_errors = 1
 
-function! AsyncMakeFindProject(project)
-	if exists('g:async_project')
-		return g:async_project
+function! AsyncMakeFindProjectDir(project)
+	if exists('g:async_project_dir')
+		return g:async_project_dir
 	endif
 
 	let makedir = ''
@@ -288,23 +288,36 @@ function! AsyncMakeFindProject(project)
 
 	let file = findfile(a:project, makedir)
 	if empty(file)
-		let project = '-'
-		let g:async_project = project
-		return project
+		let g:async_project_dir = '-'
+		return g:async_project_dir
 	endif
 
 	let makedir = fnamemodify(file, ':p:h')
 	if empty(makedir) || makedir == '.' || makedir == getcwd()
 		let makedir = ''
-	else
+	endif
+
+	let g:async_project_dir = makedir
+	return g:async_project_dir
+endfunction
+
+function! AsyncMakeFindProject(project)
+	if exists('g:async_project')
+		return g:async_project
+	endif
+
+	let makedir = AsyncMakeFindProjectDir(a:project)
+	if makedir == '-'
+		let g:async_project = makedir
+		return g:async_project
+	endif
+
+	if !empty(makedir)
 		let makedir = '-C ' . makedir . ' '
 	endif
 
-	let project = makedir . '-f ' . a:project
-
-	let g:async_project = project
-
-	return project
+	let g:async_project = makedir . '-f ' . a:project
+	return g:async_project
 endfunction
 
 function! AsyncMake(action)
@@ -334,8 +347,79 @@ noremap <Leader>f :call Asyncopen()<CR>
 command! -nargs=+ -complete=shellcmd Arun call asynctotem#run(<q-args>)
 command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run('git --no-pager grep -n -I --untracked', <q-args>)
 
-" auto make parent directory
-function! AutoMakeParentDirectory()
+" file templates - based on Damian Conway's plugin
+let s:FILE_TEMPLATE_DIR = expand('~/.vim/templates')
+let s:FILE_TEMPLATE_PREFIX = 'template'
+
+function! AddTemplatesFromDir(templates, templatedir, templateprefix, filename, extension) abort
+	if a:templatedir == '-'
+		return
+	endif
+
+	let prefix = a:templateprefix
+	if !empty(a:templatedir)
+		let prefix = a:templatedir . '/' . prefix
+	endif
+
+	call add(a:templates, prefix . '.' . a:filename . '.' . a:extension)
+	call add(a:templates, prefix . '.' . a:extension)
+endfunction
+
+function! FindAndFillTemplate(file) abort
+	let filepath = fnamemodify(a:file, ':h')
+	let filepath = substitute(filepath, '^data/\|^data$\|^src/|^src$/', '', '')
+	let filename = fnamemodify(a:file, ':t:r')
+	let extension = fnamemodify(a:file, ':e')
+
+	if empty(filepath) || filepath == '.'
+		let packagepath = ''
+		let importpath = ''
+		let includepath = ''
+	else
+		let packagepath = substitute(filepath, '/', '.', 'g')
+		let importpath = packagepath . '.'
+		if importpath == '.'
+			let importpath = ''
+		endif
+		let includepath = filepath . '/'
+	end
+
+	let variables = {
+	\ 'FILENAME'     : filename,
+	\ 'EXTENSION'    : extension,
+	\ 'FILENAME_PRE' : toupper(filename),
+	\ 'EXTENSION_PRE': toupper(extension),
+	\ 'FILEPATH'     : filepath,
+	\ 'PACKAGEPATH'  : packagepath,
+	\ 'IMPORTPATH'   : importpath,
+	\ 'INCLUDEPATH'  : includepath,
+	\ 'YEAR'         : strftime('%Y')
+	\}
+
+	let templates = []
+
+	call AddTemplatesFromDir(templates, s:FILE_TEMPLATE_DIR, s:FILE_TEMPLATE_PREFIX, filename, extension)
+
+	for filename in templates
+		if !filereadable(filename)
+			continue
+		end
+
+		let template = join(readfile(filename), "\n")
+		let template = substitute(template, '%\([A-Z_ ]\+\)%', { m -> get(variables, m[1], m[0]) }, 'g')
+
+		call append(0, split(template, "\n"))
+		break
+	endfor
+endfunction
+
+augroup FileTemplates
+    au!
+    au BufNewFile * :call FindAndFillTemplate(expand('<afile>'))
+augroup END
+
+" auto make parent directory - based on Damian Conway's plugin
+function! AutoMakeParentDirectory() abort
 	let dir = expand('%:h')
 
 	if isdirectory(dir)
@@ -354,7 +438,7 @@ function! AutoMakeParentDirectory()
 endfunction
 command! Mkdirp call AutoMakeParentDirectory()
 
-augroup automakeparentdir
+augroup AutoMakeParentDirectory
     au!
     au BufNewFile * :call AutoMakeParentDirectory()
 augroup end
@@ -377,7 +461,7 @@ function! WikiJump()
 	endtry
 endfunction
 
-augroup wiki
+augroup Wiki
 	au!
 	au BufNewFile,BufRead ~/.wiki/*.md silent! exec 'nnoremap <buffer> <Tab> :call WikiJump()<CR>'
 augroup end
@@ -386,8 +470,8 @@ augroup end
 nnoremap <Leader>- :call gustav#add()<CR>
 nnoremap <Leader>= :call gustav#toggle()<CR>
 
-" file types
-augroup filetypes
+" setup various file types
+augroup SetupFileTypes
 	au!
 	au BufRead,BufNewFile *.glsl,*.shader,*.shd set filetype=glsl
 	au BufRead,BufNewFile *.CPP,*.H set filetype=cpp
