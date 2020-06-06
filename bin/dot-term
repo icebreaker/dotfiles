@@ -1,16 +1,7 @@
 #!/bin/bash
 
-ALACRITTY=$(which alacritty 2>/dev/null)
-if [ -n "$ALACRITTY" ]; then
-	alacritty "$@"
-elif [ -x "/opt/bin/sakura" ]; then
-	/opt/bin/sakura "$@"
+if [ -n "$(which marmota 2>/dev/null)" ]; then
+	marmota "$@"
 else
-	TERMINATOR=$(which terminator 2>/dev/null)
-
-	if [ -n "$TERMINATOR" ]; then
-		terminator "$@"
-	else
-		xterm -maximized "$@"
-	fi
+	xterm -maximized "$@"
 fi
