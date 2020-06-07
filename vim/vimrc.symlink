@@ -444,7 +444,7 @@ augroup AutoMakeParentDirectory
 augroup end
 
 " wiki
-command! Wiki e ~/.wiki/README.md
+command! Xwiki e ~/.wiki/README.md
 
 function! WikiJump()
 	normal! ^
