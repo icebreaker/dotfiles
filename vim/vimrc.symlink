@@ -461,9 +461,14 @@ function! WikiJump()
 	endtry
 endfunction
 
+function! SetupWiki()
+	silent! exec 'nnoremap <buffer> <Tab> :call WikiJump()<CR>'
+	silent! exec 'nnoremap <buffer> q :call CloseFile()<CR>'
+endfunction
+
 augroup Wiki
 	au!
-	au BufNewFile,BufRead ~/.wiki/*.md silent! exec 'nnoremap <buffer> <Tab> :call WikiJump()<CR>'
+	au BufNewFile,BufRead ~/.wiki/*.md :call SetupWiki()
 augroup end
 
 " task/todo
