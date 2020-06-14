@@ -32,3 +32,5 @@
 	cmd = xdg-open
 [core]
 	pager = less -+X
+[pull]
+	rebase = false
