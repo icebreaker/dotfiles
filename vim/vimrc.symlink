@@ -361,8 +361,12 @@ function! AddTemplatesFromDir(templates, templatedir, templateprefix, filename, 
 		let prefix = a:templatedir . '/' . prefix
 	endif
 
-	call add(a:templates, prefix . '.' . a:filename . '.' . a:extension)
-	call add(a:templates, prefix . '.' . a:extension)
+	if !empty(a:filename) && a:filename[0] == '.' && empty(a:extension)
+		call add(a:templates, prefix . a:filename)
+	else
+		call add(a:templates, prefix . '.' . a:filename . '.' . a:extension)
+		call add(a:templates, prefix . '.' . a:extension)
+	endif
 endfunction
 
 function! FindAndFillTemplate(file) abort
