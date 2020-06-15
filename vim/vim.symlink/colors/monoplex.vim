@@ -17,8 +17,8 @@ hi clear
 syntax reset
 "}}}
 "general {{{
-hi Normal ctermfg=250 ctermbg=0 cterm=NONE
-hi NonText ctermfg=250 ctermbg=0 cterm=NONE
+hi Normal ctermfg=248 ctermbg=0 cterm=NONE
+hi NonText ctermfg=248 ctermbg=0 cterm=NONE
 hi CursorLine ctermfg=NONE ctermbg=234 cterm=NONE
 hi CursorLineNR ctermfg=NONE ctermbg=234 cterm=NONE
 hi Cursor ctermfg=NONE ctermbg=NONE cterm=INVERSE
@@ -41,16 +41,16 @@ hi StatusLineTermNC ctermfg=250 ctermbg=235 cterm=BOLD,INVERSE
 hi WildMenu ctermbg=NONE ctermfg=NONE cterm=BOLD,REVERSE
 "}}}
 "syntax {{{
-hi Type ctermfg=101 ctermbg=NONE cterm=BOLD
-hi Statement ctermfg=101 ctermbg=NONE cterm=BOLD
-hi Function ctermfg=101 ctermbg=NONE cterm=BOLD
-hi Identifier ctermfg=101 ctermbg=NONE cterm=BOLD
-hi Constant ctermfg=101 ctermbg=NONE cterm=BOLD
-hi PreProc ctermfg=101 ctermbg=NONE cterm=BOLD
-hi Include ctermfg=101 ctermbg=NONE cterm=BOLD
-hi String ctermfg=30 ctermbg=NONE cterm=NONE
-hi Special ctermfg=30 ctermbg=NONE cterm=NONE
-hi Number ctermfg=30 ctermbg=NONE cterm=NONE
+hi Type ctermfg=130 ctermbg=NONE cterm=BOLD
+hi Statement ctermfg=130 ctermbg=NONE cterm=BOLD
+hi Function ctermfg=130 ctermbg=NONE cterm=BOLD
+hi Identifier ctermfg=130 ctermbg=NONE cterm=BOLD
+hi Constant ctermfg=130 ctermbg=NONE cterm=BOLD
+hi PreProc ctermfg=130 ctermbg=NONE cterm=BOLD
+hi Include ctermfg=130 ctermbg=NONE cterm=BOLD
+hi String ctermfg=142 ctermbg=NONE cterm=NONE
+hi Special ctermfg=142 ctermbg=NONE cterm=NONE
+hi Number ctermfg=142 ctermbg=NONE cterm=NONE
 hi Todo ctermfg=102 ctermbg=NONE cterm=BOLD
 hi Comment ctermfg=59 ctermbg=NONE cterm=NONE
 "}}}
