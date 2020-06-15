@@ -12,7 +12,7 @@ class Powerline:
     RESET = LSQ + ESC + '[0m' + RSQ
     BG0   = '236'
     BG1   = '237'
-    FG    = '251'
+    FG    = '250'
     RED   = '124'
     PINK  = '126'
     GREEN = '23'
