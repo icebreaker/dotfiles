@@ -1,8 +1,7 @@
 --[[ {{{
 	MIT LICENSE
 
-	Copyright (c) 2018-%YEAR%, Mihail Szabolcs
-	Copyright (c) 2018-%YEAR%, Olen Games
+	Copyright (c) %YEAR%, Mihail Szabolcs
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the 'Software'), to deal
@@ -22,16 +21,5 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
 }}} --]]
-local M = class "%IMPORTPATH%%FILENAME%"
-
-M.initialize = function(self)
-	-- noop
-end
-
-M.on_frame = function(self, dt, w, h)
-	-- noop
-end
-
-return M
 
 -- vim: set ts=2 sw=2 sts=2 noet:
