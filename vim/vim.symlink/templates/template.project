@@ -1,0 +1,21 @@
+function project_build()
+{
+	echo 'Nothing to build.'
+}
+
+function project_execute()
+{
+	echo 'Nothing to execute.'
+}
+
+function project_generate()
+{
+	echo 'Nothing to generate.'
+}
+
+function project_clean()
+{
+	echo 'Nothing to clean.'
+}
+
+# vim: set ft=bash:
