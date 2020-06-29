@@ -64,6 +64,14 @@ function! asynctotem#copen()
 endfunction
 
 function! asynctotem#jump()
+	let n = len(filter(getqflist(), 'v:val.valid'))
+	if n == 0
+		call asynctotem#cclose()
+		wincmd p
+		redraw!
+		return
+	endif
+
 	call asynctotem#copen()
 
 	try
