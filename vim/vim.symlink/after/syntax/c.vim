@@ -8,6 +8,8 @@ syn match Type /\<\i\+_t\>/
 syn match PreProc /\zs\<[A-Z_][A-Z0-9_]\+\>/
 
 " highlight some gtk, gdk, glib, pango and vte types
+syn match Type /\<luaL_.\{-}\>/
+syn match Type /\<lua_.\{-}\>/
 syn match Type /\<Gdk.\{-}\>/
 syn match Type /\<Gtk.\{-}\>/
 syn match Type /\<Vte.\{-}\>/
