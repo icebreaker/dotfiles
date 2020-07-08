@@ -9,7 +9,7 @@ set -g status-left "#[fg=default,bg=default] #($DOT_HOME/tmux/powerline/uptime) 
 set -g status-right "#[fg=default,bg=default] #($DOT_HOME/tmux/powerline/date_day) | #($DOT_HOME/tmux/powerline/date_full) | #($DOT_HOME/tmux/powerline/time) #[fg=default,bg=default]"
 
 set -g window-status-format "#[fg=default,bg=default] #I #W "
-set -g window-status-current-format "#[fg=colour235,bg=colour251]#[fg=colour235,bg=colour251] #I #W #[fg=default,bg=default]"
+set -g window-status-current-format "#[fg=colour235,bg=colour251] #I #W #[fg=default,bg=default]"
 set -g window-status-activity-style bold
 
 set -g pane-border-style fg=colour235
