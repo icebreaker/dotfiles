@@ -15,38 +15,10 @@
         </execute>
       </action>
     </item>
-    <item label="Skype">
-      <action name="Execute">
-        <execute>
-          ~/.dotfiles/bin/dot-skype
-        </execute>
-      </action>
-    </item>
-    <item label="Pidgin">
-      <action name="Execute">
-        <execute>
-          pidgin
-        </execute>
-      </action>
-    </item>
     <item label="File Manager">
       <action name="Execute">
         <execute>
           thunar
-        </execute>
-      </action>
-    </item>
-    <item label="Text Editor">
-      <action name="Execute">
-        <execute>
-          gvim
-        </execute>
-      </action>
-    </item>
-    <item label="Media Player">
-      <action name="Execute">
-        <execute>
-          vlc
         </execute>
       </action>
     </item>
@@ -77,7 +49,7 @@
       <item label="Transmission">
         <action name="Execute">
           <execute>
-            transmission
+            transmission-qt
           </execute>
         </action>
       </item>
@@ -182,17 +154,10 @@
       </item>
     </menu>
     <menu id="system" label="System">
-      <item label="Gnome Terminal">
-        <action name="Execute">
-          <execute>
-            gnome-terminal
-          </execute>
-        </action>
-      </item>
       <item label="Xterm">
         <action name="Execute">
           <execute>
-            xterm
+            xterm -maximized
           </execute>
         </action>
       </item>
