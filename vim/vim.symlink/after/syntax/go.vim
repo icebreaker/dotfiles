@@ -12,5 +12,7 @@ syn match Type /\<os\..\{-}\>/
 syn match Type /\<runtime\..\{-}\>/
 syn match Type /\<filepath\..\{-}\>/
 syn match Type /\<math\..\{-}\>/
+syn match Type /\<io\..\{-}\>/
+syn match Type /\<zip\..\{-}\>/
 
 " vim:set sw=2:
