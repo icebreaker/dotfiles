@@ -405,7 +405,6 @@ function! FindAndFillTemplate(file) abort
 
 	let templates = []
 
-	call AddTemplatesFromDir(templates, s:FILE_TEMPLATE_DIR, s:FILE_TEMPLATE_PREFIX, filename, extension)
 	call AddTemplatesFromDir(
 		\ templates,
 		\ AsyncMakeFindProjectDir(),
@@ -413,6 +412,7 @@ function! FindAndFillTemplate(file) abort
 		\ filename,
 		\ extension
 	\)
+	call AddTemplatesFromDir(templates, s:FILE_TEMPLATE_DIR, s:FILE_TEMPLATE_PREFIX, filename, extension)
 
 	for filename in templates
 		if !filereadable(filename)
