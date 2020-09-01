@@ -28,6 +28,11 @@ if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
 fi
 
+# source in original codespaces .bashrc
+if [ -f ~/.codespacesrc ]; then
+	. ~/.codespacesrc
+fi
+
 # source early definitions
 if [ -f $DOT_RC ]; then
 	. $DOT_RC
