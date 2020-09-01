@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if [ "$(whoami)" == "codespaces" ]; then
-	mv ~/.bashrc ~/.codespacesrc
-	~/.dotfiles/bin/dot-install
-else
-	echo "Not on codespaces!"
-fi
