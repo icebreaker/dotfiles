@@ -489,6 +489,11 @@ augroup end
 nnoremap <Leader>- :call gustav#add()<CR>
 nnoremap <Leader>= :call gustav#toggle()<CR>
 
+" clang complete on codespaces
+if $USER == 'codespace'
+	let g:clang_library_path = '/usr/lib/llvm-3.8/lib/libclang.so.1'
+endif
+
 " setup various file types
 augroup SetupFileTypes
 	au!
