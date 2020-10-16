@@ -167,7 +167,7 @@
 //
 // Regular expression used to match links.
 //
-.link_regex = "[A-Za-z]+://[\\-_.!~*a-zA-Z\\d;?:@&=+$,#%/\r\n]+",
+.link_regex = "[A-Za-z]+://[\\-_.!~*a-zA-Z\\d;?:@&=+$,#%/]+",
 //
 // Regular link & hyperlink handler.
 //
