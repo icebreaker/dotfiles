@@ -184,6 +184,7 @@ let wildignore=[
 	\'bin',
 	\'build',
 	\'tmp',
+	\'vendor',
 	\'src_data',
 	\'data/gfx',
 	\'data/sfx',
