@@ -375,7 +375,7 @@ endfunction
 
 function! FindAndFillTemplate(file) abort
 	let filepath = fnamemodify(a:file, ':h')
-	let filepath = substitute(filepath, '^data/\|^data$\|^src/|^src$/', '', '')
+	let filepath = substitute(filepath, '%^data\/\|^data$\|^src\/\|^src$%', '', '')
 	let filename = fnamemodify(a:file, ':t:r')
 	let extension = fnamemodify(a:file, ':e')
 
