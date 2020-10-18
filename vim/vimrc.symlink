@@ -486,6 +486,16 @@ augroup Wiki
 	au BufNewFile,BufRead ~/.wiki/*.md :call SetupWiki()
 augroup end
 
+function! SetupGitGud()
+	silent! exec 'nnoremap <buffer> q :call CloseFile()<CR>'
+endfunction
+
+augroup GitGud
+	au!
+	au BufRead */.git/* :call SetupGitGud()
+	au BufRead /tmp/* :call SetupGitGud()
+augroup end
+
 " task/todo
 nnoremap <Leader>- :call gustav#add()<CR>
 nnoremap <Leader>= :call gustav#toggle()<CR>
