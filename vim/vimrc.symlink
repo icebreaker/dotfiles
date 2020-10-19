@@ -206,7 +206,7 @@ let wildignore=[
 exec 'set wildignore+=' . join(wildignore, '/*,')
 set wildmenu
 
-let g:fastopen_filter_cmd = 'grep -Ev ' . "'" . join(wildignore, '/|') . "/'"
+let g:fastopen_filter_cmd = 'grep -Ev ' . "'" . join(wildignore, '/|') . "/'" . " | sed 's/^\\.\\///'"
 nnoremap <C-l> :call fastopen#show('argedit')<CR>
 
 function! NextFile()
