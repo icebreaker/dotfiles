@@ -29,6 +29,14 @@ else
 	let s:initialized = 1
 endif
 
+function! s:find_git_dir()
+	if exists('b:git_dir')
+		return b:git_dir
+	endif
+
+	return FugitiveGitDir()
+endfunction
+
 function! s:initialize()
 	if exists('s:initialized')
 		return
@@ -46,11 +54,7 @@ function! s:initialize()
 		let s:initialized = 1
 	end
 
-	if !exists('b:git_dir')
-		return
-	endif
-
-	let git_dir = b:git_dir
+	let git_dir = s:find_git_dir()
 	if empty(git_dir)
 		return
 	endif
