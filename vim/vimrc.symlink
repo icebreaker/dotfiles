@@ -350,6 +350,7 @@ noremap <Leader>r :call AsyncMake('execute')<CR>
 noremap <Leader>k :call AsyncMake('clean')<CR>
 noremap <Leader>g :call AsyncMake('generate')<CR>
 noremap <Leader>f :call Asyncopen()<CR>
+noremap <Leader>s :call asynctotem#run('git --no-pager grep -n -I --untracked', expand('<cword>'))<CR>
 
 command! -nargs=+ -complete=shellcmd Arun call asynctotem#run(<q-args>)
 command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run('git --no-pager grep -n -I --untracked', <q-args>)
