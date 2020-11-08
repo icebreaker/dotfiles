@@ -147,7 +147,8 @@
 //
 // See: https://developer.gnome.org/pango/stable/pango-Fonts.html#pango-font-description-from-string
 //
-.font = "IBM Plex Mono weight=650 19",
+// .font = "IBM Plex Mono weight=650 19",
+.font = "JetBrains Mono weight=850 20",
 //
 // Sets font scale.
 //
@@ -252,22 +253,23 @@
 // See: https://developer.gnome.org/gdk3/unstable/gdk3-RGBA-Colors.html#gdk-rgba-parse
 //
 .colors = {
-    // Dark
-    "#000000",	// Black
-    "#C62828",	// Red
-    "#558B2F",	// Green
-    "#F9A825",	// Yellow
-    "#1565C0",	// Blue
-    "#A01E9A",	// Magenta
-    "#00838F",	// Cyan
-    "#F2F2F2",	// White
-    // Bright
-    "#545454",	// Black
-    "#EF5350",	// Red
-    "#8BC34A",	// Green
-    "#FFEB3B",	// Yellow
-    "#64B5F6",	// Blue
-    "#BA68C8",	// Magenta
-    "#26C6DA",	// Cyan
-    "#E0E0E0",	// White
+	// Dark
+	"rgb(0,0,0)",		// Black
+	//"rgb(23,20,33)",	// Black
+	"rgb(192,28,40)",	// Red
+	"rgb(38,162,105)",	// Green
+	"rgb(162,115,76)",	// Yellow
+	"rgb(90,90,128)",	// Blue
+	"rgb(128,71,128)",	// Magenta
+	"rgb(42,161,179)",	// Cyan
+	"rgb(166,166,166)", // White
+	// Bright
+	"rgb(94,92,100)",	// Black
+	"rgb(246,97,81)",	// Red
+	"rgb(51,218,122)",	// Green
+	"rgb(233,173,12)",	// Yellow
+	"rgb(42,123,222)",	// Blue
+	"rgb(192,97,203)",	// Magenta
+	"rgb(51,199,222)",	// Cyan
+	"rgb(224,224,224)"	// White
 }

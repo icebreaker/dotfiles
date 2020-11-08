@@ -8,4 +8,4 @@ else
 	exit 0
 fi
 
-$DMENU -fn 'IBM Plex Mono SemiBold-19' -nb '#000000' -nf '#C7C7C7' -sb '#C7C7C7' -sf '#000000' $@
+$DMENU -fn 'JetBrains Mono ExtraBold-20' -nb '#000000' -nf '#C7C7C7' -sb '#C7C7C7' -sf '#000000' $@
