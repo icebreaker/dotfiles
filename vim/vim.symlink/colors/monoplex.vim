@@ -17,8 +17,8 @@ hi clear
 syntax reset
 "}}}
 "general {{{
-hi Normal ctermfg=248 ctermbg=0 cterm=NONE
-hi NonText ctermfg=248 ctermbg=0 cterm=NONE
+hi Normal ctermfg=7 ctermbg=0 cterm=NONE
+hi NonText ctermfg=7 ctermbg=0 cterm=NONE
 hi CursorLine ctermfg=NONE ctermbg=234 cterm=NONE
 hi CursorLineNR ctermfg=NONE ctermbg=234 cterm=NONE
 hi Cursor ctermfg=NONE ctermbg=NONE cterm=INVERSE
