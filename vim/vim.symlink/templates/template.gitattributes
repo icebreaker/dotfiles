@@ -1,1 +1,8 @@
+Maksufile linguist-vendored
 .project linguist-vendored
+.template.c linguist-vendored
+.template.cc linguist-vendored
+.template.h linguist-vendored
+.template.lua linguist-vendored
+vendor linguist-vendored
+vendor/**/* linguist-vendored
