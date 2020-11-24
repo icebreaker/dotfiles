@@ -1,9 +1,13 @@
-if [ -z "$DOT_REMOTE" ]; then
-	DOT_OPENBOX=$(which openbox-session 2>/dev/null)
+export XCURSOR_THEME=ComixCursors-Red-Huge
+xrdb ~/.Xresources &
+xmodmap ~/.Xmodmap &
 
-	if [ -n "$DOT_OPENBOX" ]; then
-		export XCURSOR_THEME=ComixCursors-Red-Huge
-		xrdb ~/.Xresources &
-		exec dbus-launch openbox-session
-	fi
+DOT_WINDOW_MANAGER=$(which startfluxbox 2>/dev/null)
+if [ -z "$DOT_WINDOW_MANAGER" ]; then
+	DOT_WINDOW_MANAGER=$(which openbox-session 2>/dev/null)
+fi
+
+if [ -n "$DOT_WINDOW_MANAGER" ]; then
+	export DOT_WINDOW_MANAGER=`basename $DOT_WINDOW_MANAGER`
+	exec dbus-launch $DOT_WINDOW_MANAGER
 fi

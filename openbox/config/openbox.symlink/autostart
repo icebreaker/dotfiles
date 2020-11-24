@@ -10,6 +10,11 @@ if [ -f /sys/class/backlight/intel_backlight/brightness ]; then
 	echo 3300 > /sys/class/backlight/intel_backlight/brightness
 fi
 
+if [ "$DOT_WINDOW_MANAGER" == "startfluxbox" ]; then
+	fluxbox &
+	DOT_FLUXBOX_PID=$!
+fi
+
 if [ -x /usr/bin/xbacklight ]; then
 	xbacklight -set 70
 fi
@@ -18,22 +23,7 @@ if [ -x /usr/bin/xset ]; then
 	xset r rate 200 25
 fi
 
-if [ -x /usr/bin/gnome-keyring-daemon ]; then
-	gnome-keyring-daemon &
-fi
-
 nitrogen --restore &
-
-xfce4-power-manager &
-
-thunar --daemon &
-
-tint2 &
-
-NM_APPLET_PID=$(pgrep 'nm-applet' 2> /dev/null)
-if [ -z "$NM_APPLET_PID" ]; then
-	(sleep 5s && nm-applet) &
-fi
 
 if egrep -iq 'touchpad' /proc/bus/input/devices; then
     synclient VertEdgeScroll=1 &
@@ -45,7 +35,23 @@ if [ ! -z "$TOUCHPAD_ID" ]; then
 	xinput --disable $TOUCHPAD_ID
 fi
 
-xscreensaver -no-splash &
+if [ -x /usr/bin/gnome-keyring-daemon ]; then
+	(sleep 5s && gnome-keyring-daemon) &
+fi
+
+if [ "$DOT_WINDOW_MANAGER" == "openbox-session" ]; then
+	(sleep 5s && tint2) &
+fi
+
+(sleep 5s && xfce4-power-manager) &
+(sleep 5s && thunar --daemon) &
+
+NM_APPLET_PID=$(pgrep 'nm-applet' 2> /dev/null)
+if [ -z "$NM_APPLET_PID" ]; then
+	(sleep 5s && nm-applet) &
+fi
+
+(sleep 5s && xscreensaver -no-splash) &
 
 (sleep 5s && volumeicon) &
 
@@ -54,5 +60,9 @@ if [ -x ~/.dropbox-dist/dropboxd ]; then
 fi
 
 if [ -x /usr/bin/blueman-applet ]; then
-	(sleep 5s && blueman-applet) &
+	(sleep 10s && blueman-applet) &
+fi
+
+if [ "$DOT_WINDOW_MANAGER" == "startfluxbox" ]; then
+	wait $DOT_FLUXBOX_PID
 fi
