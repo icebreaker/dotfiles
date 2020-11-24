@@ -1,4 +1,5 @@
 Maksufile linguist-vendored
+Makefile linguist-vendored
 .project linguist-vendored
 .template.c linguist-vendored
 .template.cc linguist-vendored
