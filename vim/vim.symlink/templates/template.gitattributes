@@ -1,5 +1,6 @@
 Maksufile linguist-vendored
 Makefile linguist-vendored
+build.ninja linguist-vendored
 .project linguist-vendored
 .template.c linguist-vendored
 .template.cc linguist-vendored
