@@ -34,3 +34,5 @@
 	pager = less -+X
 [pull]
 	rebase = false
+[init]
+	defaultBranch = master
