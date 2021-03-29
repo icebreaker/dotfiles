@@ -99,6 +99,11 @@ if $TMUX =~ 'tmux'
 	vmap  <End>
 endif
 
+let c_no_curly_error=1
+let python_highlight_all=1
+let coffee_no_reserved_words_error=1
+let g:delimitMate_expand_cr=1
+
 syntax on
 syntax sync fromstart
 filetype on
@@ -106,23 +111,19 @@ filetype plugin on
 filetype plugin indent on
 filetype indent on
 
-let python_highlight_all=1
-let c_no_curly_error=1
-let coffee_no_reserved_words_error=1
-let g:delimitMate_expand_cr=1
-
 if has('gui_running')
-	set guifont=IBM\ Plex\ Mono\ SemiBold\ 19
+	set guifont=JetBrains\ Mono\ weight=850\ 19
 	set guicursor+=a:blinkon0
 	set guioptions=i
 endif
 
-let g:html_font='IBM Plex Mono Medium'
+let g:html_font='JetBrains Mono Medium'
+
+set background=dark
 
 if has('gui_running')
-	colorscheme gummybears
+	colorscheme borland
 else
-	set background=dark
 	colorscheme monoplex
 endif
 
