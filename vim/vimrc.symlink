@@ -205,7 +205,8 @@ let wildignore=[
 	\'data/scenes',
 	\'data/fonts',
 	\'resources',
-	\'src/vendor'
+	\'src/vendor',
+	\'docs'
 \]
 exec 'set wildignore+=' . join(wildignore, '/*,')
 set wildmenu
