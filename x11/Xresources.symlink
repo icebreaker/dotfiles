@@ -1,7 +1,7 @@
 Xcursor.theme_core: true
 Xcursor.theme: "ComixCursors-Red-Huge"
 Xcursor.size: 32
-Xft.autohint: 0
+Xft.autohint: true
 Xft.antialias: true
 Xft.rgba: rgb
 Xft.hinting: true
