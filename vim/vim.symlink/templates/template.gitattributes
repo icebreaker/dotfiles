@@ -6,5 +6,7 @@ build.ninja linguist-vendored
 .template.cc linguist-vendored
 .template.h linguist-vendored
 .template.lua linguist-vendored
+src/vendor linguist-vendored
+src/vendor/**/* linguist-vendored
 vendor linguist-vendored
 vendor/**/* linguist-vendored
