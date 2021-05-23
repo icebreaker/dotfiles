@@ -373,6 +373,10 @@ function! AddTemplatesFromDir(templates, templatedir, templateprefix, filename, 
 
 	if !empty(a:filename) && a:filename[0] == '.' && empty(a:extension)
 		call add(a:templates, prefix . a:filename)
+	elseif a:filename == 'README'
+		call add(a:templates, prefix . '.readme')
+	elseif a:filename == 'LICENSE'
+		call add(a:templates, prefix . '.license')
 	else
 		call add(a:templates, prefix . '.' . a:filename . '.' . a:extension)
 		call add(a:templates, prefix . '.' . a:extension)
