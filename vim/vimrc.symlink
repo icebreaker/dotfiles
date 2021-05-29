@@ -206,6 +206,7 @@ let wildignore=[
 	\'data/fonts',
 	\'resources',
 	\'src/vendor',
+	\'zig-cache',
 	\'docs'
 \]
 exec 'set wildignore+=' . join(wildignore, '/*,')
