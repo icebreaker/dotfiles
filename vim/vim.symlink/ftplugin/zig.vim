@@ -3,6 +3,9 @@ if exists('b:did_ftplugin')
 endif
 let b:did_ftplugin = 1
 
+" match zig built-in fns
+setlocal iskeyword+=@-@
+
 " ensure that we expand spaces to tabs
 setlocal expandtab
 setlocal tabstop=4
