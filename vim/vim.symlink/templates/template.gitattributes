@@ -1,6 +1,9 @@
 Maksufile linguist-vendored
 Makefile linguist-vendored
 build.ninja linguist-vendored
+build.zig linguist-vendored
+premake4.lua linguist-vendored
+premake5.lua linguist-vendored
 .project linguist-vendored
 .template.c linguist-vendored
 .template.cc linguist-vendored
