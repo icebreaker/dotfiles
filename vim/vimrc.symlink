@@ -271,6 +271,7 @@ nnoremap <Leader>c :RuboCop<CR>
 
 " building and project managament
 set errorformat^=%-GIn\ file\ included\ %.%#
+set errorformat^=%*[^:]:\ %f:%l:%*[^:]:%m "
 
 let g:asynctotem_cclose_delay = 0
 let g:asynctotem_jump_delay = 0
