@@ -1,3 +1,4 @@
 #!/bin/bash
 
-scrot $@ '%Y-%m-%d--%s_$wx$h.png' -e 'mv $f ~/screenshots/; viewnior ~/screenshots/$f'
+scrot $@ '%Y-%m-%d--%s_$wx$h.png' \
+	-e 'mv $f ~/screenshots/; viewnior ~/screenshots/$f; xclip -selection clipboard -t image/png -i ~/screenshots/$f'
