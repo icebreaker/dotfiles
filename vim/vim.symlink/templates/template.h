@@ -22,5 +22,8 @@
 	SOFTWARE.
 }}}*/
 #pragma once
+#ifndef %FILENAME_PRE%_H
+#define %FILENAME_PRE%_H
 
+#endif
 /* vim: set ts=4 sw=4 sts=4 noet: */
