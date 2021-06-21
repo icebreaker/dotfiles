@@ -148,7 +148,7 @@
 // See: https://developer.gnome.org/pango/stable/pango-Fonts.html#pango-font-description-from-string
 //
 // .font = "IBM Plex Mono weight=650 19",
-.font = "JetBrains Mono weight=850 20",
+.font = "JetBrains Mono weight=750 19",
 //
 // Sets font scale.
 //
@@ -184,7 +184,8 @@
 //
 // Whether or not "bold" should use bright colors.
 //
-.bold_is_bright = FALSE,
+#define BOLD_IS_BRIGHT TRUE
+.bold_is_bright = BOLD_IS_BRIGHT,
 //
 // Sets Bold highlight color.
 //
@@ -263,6 +264,18 @@
 	"rgb(128,71,128)",	// Magenta
 	"rgb(42,161,179)",	// Cyan
 	"rgb(166,166,166)", // White
+#if BOLD_IS_BRIGHT
+	// Dark
+	"rgb(0,0,0)",		// Black
+	//"rgb(23,20,33)",	// Black
+	"rgb(192,28,40)",	// Red
+	"rgb(38,162,105)",	// Green
+	"rgb(162,115,76)",	// Yellow
+	"rgb(90,90,128)",	// Blue
+	"rgb(128,71,128)",	// Magenta
+	"rgb(42,161,179)",	// Cyan
+	"rgb(166,166,166)", // White
+#else
 	// Bright
 	"rgb(94,92,100)",	// Black
 	"rgb(246,97,81)",	// Red
@@ -272,4 +285,5 @@
 	"rgb(192,97,203)",	// Magenta
 	"rgb(51,199,222)",	// Cyan
 	"rgb(224,224,224)"	// White
+#endif
 }
