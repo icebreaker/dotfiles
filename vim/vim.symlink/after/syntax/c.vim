@@ -25,5 +25,7 @@ syn keyword Type GPid GError
 syn keyword Type gpointer gboolean gint guint gfloat gdouble gchar guchar glong gulong gshort gushort
 
 syn match Function /\<kba_.\{-}\>/
+syn match Function /\<svs_.\{-}\>/
+syn match Function /\<oln_.\{-}\>/
 
 " vim:set sw=2:
