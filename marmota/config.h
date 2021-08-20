@@ -147,8 +147,8 @@
 //
 // See: https://developer.gnome.org/pango/stable/pango-Fonts.html#pango-font-description-from-string
 //
-.font = "IBM Plex Mono weight=650 19",
-//.font = "JetBrains Mono weight=750 18",
+//.font = "IBM Plex Mono weight=650 18",
+.font = "JetBrains Mono ExtraBold 18",
 //
 // Sets font scale.
 //
