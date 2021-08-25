@@ -112,12 +112,12 @@ filetype plugin indent on
 filetype indent on
 
 if has('gui_running')
-	set guifont=JetBrains\ Mono\ weight=850\ 19
+	set guifont=JetBrains\ Mono\ SemiBold\ 19
 	set guicursor+=a:blinkon0
 	set guioptions=i
 endif
 
-let g:html_font='JetBrains Mono Medium'
+let g:html_font='JetBrains Mono SemiBold'
 
 set background=dark
 
@@ -516,6 +516,21 @@ nnoremap <Leader>= :call gustav#toggle()<CR>
 if $USER == 'codespace'
 	let g:clang_library_path = '/usr/lib/llvm-3.8/lib/libclang.so.1'
 endif
+
+" clang format
+function! ClangFormat()
+	let l:lines = 'all'
+	pyf ~/.vim/bin/clang-format.py
+endfunction
+
+function! SetupClangFormat()
+	silent! exec 'nnoremap <buffer> <Leader>o :call ClangFormat()<CR>'
+endfunction
+
+augroup ClangFormatGroup
+	au!
+	au BufRead,BufNewFile *.c,*.cc,*.cpp,*.cxx,*.inl,*.h :call SetupClangFormat()
+augroup end
 
 " setup various file types
 augroup SetupFileTypes
