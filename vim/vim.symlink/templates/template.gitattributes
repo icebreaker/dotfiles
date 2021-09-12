@@ -5,9 +5,12 @@ build.zig linguist-vendored
 premake4.lua linguist-vendored
 premake5.lua linguist-vendored
 .project linguist-vendored
+.dotmake linguist-vendored
+.editorconfig linguist-vendored
 .template.c linguist-vendored
 .template.cc linguist-vendored
 .template.h linguist-vendored
+.template.inl linguist-vendored
 .template.lua linguist-vendored
 src/vendor linguist-vendored
 src/vendor/**/* linguist-vendored

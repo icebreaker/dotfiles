@@ -3,13 +3,13 @@
 function help()
 {
 	if [ -z "$1" ]; then
-		echo "You must specify a project action!"
+		echo "You must specify an action!"
 	else
-		echo "Project action '$1' doesn't exist!"
+		echo "Action '$1' doesn't exist!"
 	fi
 }
 
-PROJECT_FILE=".project"
+DOTMAKE_FILE=".dotmake"
 
 while [[ $# -gt 0 ]]; do
 	ARGUMENT_NAME=$1
@@ -28,7 +28,7 @@ while [[ $# -gt 0 ]]; do
 				cd "$ARGUMENT_VALUE" || exit -1
 			;;
 			-f*)
-				PROJECT_FILE=$ARGUMENT_VALUE
+				DOTMAKE_FILE=$ARGUMENT_VALUE
 			;;
 			*)
 				echo "unknown argument: '$ARGUMENT_NAME'"
@@ -42,23 +42,23 @@ while [[ $# -gt 0 ]]; do
 	fi
 done
 
-PROJECT_ACTION=$1
+DOTMAKE_ACTION=$1
 shift
-PROJECT_ARGUMENTS=$@
+DOTMAKE_ARGUMENTS=$@
 
-if [ -z "$PROJECT_ACTION" ]; then
+if [ -z "$DOTMAKE_ACTION" ]; then
 	help
 	exit -1
 fi
 
-if [ -f "$PROJECT_FILE" ]; then
-	source $PROJECT_FILE
+if [ -f "$DOTMAKE_FILE" ]; then
+	source $DOTMAKE_FILE
 fi
 
-PROJECT_ACTION_FUNCTION_TYPE=$(type -t "project_$PROJECT_ACTION")
-if [ "$PROJECT_ACTION_FUNCTION_TYPE" == "function" ]; then
-	project_$PROJECT_ACTION $PROJECT_ARGUMENTS || exit -1
+DOTMAKE_ACTION_FUNCTION_TYPE=$(type -t "$DOTMAKE_ACTION")
+if [ "$DOTMAKE_ACTION_FUNCTION_TYPE" == "function" ]; then
+	$DOTMAKE_ACTION $DOTMAKE_ARGUMENTS || exit -1
 else
-	help $PROJECT_ACTION
+	help $DOTMAKE_ACTION
 	exit -1
 fi

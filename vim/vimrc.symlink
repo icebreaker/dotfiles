@@ -279,9 +279,9 @@ let g:asynctotem_copen_height = 6
 let g:asynctotem_cclose_on_kill = 1
 let g:asynctotem_cclose_on_no_errors = 1
 
-let s:PROJECT_FILENAME = '.project'
+let s:DOTMAKE_FILENAME = '.dotmake'
 
-function! AsyncMakeFindProjectDir()
+function! AsyncMakeFindDotMakeDir()
 	if exists('g:async_project_dir')
 		return g:async_project_dir
 	endif
@@ -297,7 +297,7 @@ function! AsyncMakeFindProjectDir()
 
 	let makedir = makedir . '.;'
 
-	let file = findfile(s:PROJECT_FILENAME, makedir)
+	let file = findfile(s:DOTMAKE_FILENAME, makedir)
 	if empty(file)
 		let g:async_project_dir = '-'
 		return g:async_project_dir
@@ -312,12 +312,12 @@ function! AsyncMakeFindProjectDir()
 	return g:async_project_dir
 endfunction
 
-function! AsyncMakeFindProject()
+function! AsyncMakeFindDotMake()
 	if exists('g:async_project')
 		return g:async_project
 	endif
 
-	let makedir = AsyncMakeFindProjectDir()
+	let makedir = AsyncMakeFindDotMakeDir()
 	if makedir == '-'
 		let g:async_project = makedir
 		return g:async_project
@@ -327,21 +327,21 @@ function! AsyncMakeFindProject()
 		let makedir = '-C ' . makedir . ' '
 	endif
 
-	let g:async_project = makedir . '-f ' . s:PROJECT_FILENAME
+	let g:async_project = makedir . '-f ' . s:DOTMAKE_FILENAME
 	return g:async_project
 endfunction
 
 function! AsyncMake(action)
-	let project = AsyncMakeFindProject()
+	let project = AsyncMakeFindDotMake()
 
 	if project == '-'
 		echohl ErrorMsg
-		echon 'No project found!'
+		echon 'No ' . $DOTMAKE_FILENAME . ' found!'
 		echohl None
 		return
 	endif
 
-	call asynctotem#run('dot-project', project, a:action)
+	call asynctotem#run('dot-make', project, a:action)
 endfunction
 
 function! Asyncopen()
@@ -420,7 +420,7 @@ function! FindAndFillTemplate(file) abort
 
 	call AddTemplatesFromDir(
 		\ templates,
-		\ AsyncMakeFindProjectDir(),
+		\ AsyncMakeFindDotMakeDir(),
 		\ '.' .. s:FILE_TEMPLATE_PREFIX,
 		\ filename,
 		\ extension
@@ -563,8 +563,6 @@ augroup SetupFileTypes
 	au BufRead,BufNewFile Cakefile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile *.coffee,*.feature,*.jsx set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile *.ninja set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
-	au BufRead,BufNewFile *.lua,Trollfile,Buildfile,Maksufile,Dokshifile,*.lud
-		\ set filetype=lua tabstop=2 shiftwidth=2 softtabstop=2 noexpandtab noeol
 	au BufRead,BufNewFile *.hx set filetype=haxe tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 	au BufRead,BufNewFile *cms-plugins*/*joomla*/*.php set filetype=php
 		\ tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
