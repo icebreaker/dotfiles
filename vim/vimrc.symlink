@@ -336,7 +336,7 @@ function! AsyncMake(action)
 
 	if project == '-'
 		echohl ErrorMsg
-		echon 'No ' . $DOTMAKE_FILENAME . ' found!'
+		echon 'No ' . s:DOTMAKE_FILENAME . ' found!'
 		echohl None
 		return
 	endif
