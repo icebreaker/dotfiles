@@ -26,4 +26,4 @@
 #define %FILENAME_PRE%_INL
 
 #endif
-/* vim: set ts=4 sw=4 sts=4 noet: */
+/* vim: set ft=c ts=4 sw=4 sts=4 noet: */
