@@ -269,10 +269,12 @@ noremap <Leader>q :call CloseFile()<CR>
 let g:vimrubocop_keymap = 0
 nnoremap <Leader>c :RuboCop<CR>
 
-" building and project managament
+" error formats
 set errorformat^=%-GIn\ file\ included\ %.%#
 set errorformat^=%*[^:]:\ %f:%l:%*[^:]:%m "
+set errorformat^=\ %#%f(%l\\\,%c):\ %m
 
+" building and project managament
 let g:asynctotem_cclose_delay = 0
 let g:asynctotem_jump_delay = 0
 let g:asynctotem_copen_height = 6
