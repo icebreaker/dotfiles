@@ -66,8 +66,8 @@ nnoremap r :redo<CR>
 nnoremap ; :
 
 nnoremap <Leader>w :w<CR>
-nnoremap <Leader>= <C-a>
-nnoremap <Leader>- <C-x>
+nnoremap <Leader>a <C-a>
+nnoremap <Leader>x <C-x>
 
 nnoremap zz ZZ
 nnoremap zq ZQ
