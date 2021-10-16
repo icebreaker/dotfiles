@@ -1,4 +1,11 @@
+if [ -x /usr/bin/gnome-keyring-daemon ]; then
+	eval $(/usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets,ssh)
+	export GNOME_KEYRING_CONTROL
+	export SSH_AUTH_SOCK
+fi
+
 export XCURSOR_THEME=ComixCursors-Red-Huge
+
 xrdb ~/.Xresources &
 xmodmap ~/.Xmodmap &
 

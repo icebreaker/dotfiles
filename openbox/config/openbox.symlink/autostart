@@ -35,10 +35,6 @@ if [ ! -z "$TOUCHPAD_ID" ]; then
 	xinput --disable $TOUCHPAD_ID
 fi
 
-if [ -x /usr/bin/gnome-keyring-daemon ]; then
-	(sleep 5s && gnome-keyring-daemon) &
-fi
-
 if [ "$DOT_WINDOW_MANAGER" == "openbox-session" ]; then
 	(sleep 5s && tint2) &
 fi
