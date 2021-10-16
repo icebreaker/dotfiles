@@ -3,4 +3,3 @@ swap/.buffer
 swap/*.swp
 swap/*.swo
 Powerline_*.cache
-syntax/lr3d*.vim
