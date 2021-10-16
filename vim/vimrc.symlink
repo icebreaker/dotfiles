@@ -207,7 +207,8 @@ let wildignore=[
 	\'resources',
 	\'src/vendor',
 	\'zig-cache',
-	\'docs'
+	\'docs',
+	\'media'
 \]
 exec 'set wildignore+=' . join(wildignore, '/*,')
 set wildmenu
@@ -281,6 +282,31 @@ let g:asynctotem_copen_height = 6
 let g:asynctotem_cclose_on_kill = 1
 let g:asynctotem_cclose_on_no_errors = 1
 
+function! AsyncGitDir()
+	if exists('b:git_dir')
+		return b:git_dir
+	endif
+
+	return FugitiveGitDir()
+endfunction
+
+function! AsyncGitGrepCmd()
+	let cmd = 'git --no-pager grep -n -I --untracked'
+
+	let gitdir = AsyncGitDir()
+	if empty(gitdir)
+		return cmd
+	endif
+
+	" FIXME: maybe shellescape this instead?
+	let gitdir = substitute(substitute(gitdir, '/\.git$', '', ''), ' ', '\\ ', 'g')
+	if empty(gitdir) || gitdir == '.' || gitdir == getcwd()
+		return cmd
+	endif
+
+	return 'dot-git-grep ' . gitdir
+endfunction
+
 let s:DOTMAKE_FILENAME = '.dotmake'
 
 function! AsyncMakeFindDotMakeDir()
@@ -290,8 +316,9 @@ function! AsyncMakeFindDotMakeDir()
 
 	let makedir = ''
 
-	if exists('b:git_dir') && !empty(b:git_dir)
-		let gitmakedir = substitute(b:git_dir, '/\.git$', '', '')
+	let gitdir = AsyncGitDir()
+	if !empty(gitdir)
+		let gitmakedir = substitute(gitdir, '/\.git$', '', '')
 		if gitmakedir != getcwd()
 			let makedir = gitmakedir . ';'
 		endif
@@ -299,6 +326,7 @@ function! AsyncMakeFindDotMakeDir()
 
 	let makedir = makedir . '.;'
 
+	" FIXME: maybe escape the makedir?
 	let file = findfile(s:DOTMAKE_FILENAME, makedir)
 	if empty(file)
 		let g:async_project_dir = '-'
@@ -356,10 +384,10 @@ noremap <Leader>r :call AsyncMake('execute')<CR>
 noremap <Leader>k :call AsyncMake('clean')<CR>
 noremap <Leader>g :call AsyncMake('generate')<CR>
 noremap <Leader>f :call Asyncopen()<CR>
-noremap <Leader>s :call asynctotem#run('git --no-pager grep -n -I --untracked', expand('<cword>'))<CR>
+noremap <Leader>s :call asynctotem#run(AsyncGitGrepCmd(), expand('<cword>'))<CR>
 
 command! -nargs=+ -complete=shellcmd Arun call asynctotem#run(<q-args>)
-command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run('git --no-pager grep -n -I --untracked', <q-args>)
+command! -nargs=+ -complete=shellcmd Agrep call asynctotem#run(AsyncGitGrepCmd(), <q-args>)
 
 " file templates - based on Damian Conway's plugin
 let s:FILE_TEMPLATE_DIR = expand('~/.vim/templates')

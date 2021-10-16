@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]; then
+	echo "usage: `basename $0` path pattern"
+	exit -1
+fi
+
+GITCMD="git -C $1 --no-pager grep --full-name -n -I --untracked $2"
+SEDCMD="sed s|^|$1/|"
+
+$GITCMD | $SEDCMD
