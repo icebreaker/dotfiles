@@ -1,6 +1,7 @@
 [Alsa]
 card=default
 channel=Master
+logarithmic_scale=false
 
 [Notification]
 show_notification=true
@@ -11,6 +12,7 @@ stepsize=2
 onclick=gnome-alsamixer
 theme=Default
 use_panel_specific_icons=true
+reverse_scroll_direction=false
 lmb_slider=true
 mmb_mute=true
 use_horizontal_slider=false
