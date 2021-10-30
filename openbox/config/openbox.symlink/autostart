@@ -10,6 +10,15 @@ if [ -f /sys/class/backlight/intel_backlight/brightness ]; then
 	echo 3300 > /sys/class/backlight/intel_backlight/brightness
 fi
 
+if [ -x /usr/bin/gnome-keyring-daemon ]; then
+	GNOME_KEYRING_PID=$(pgrep -f 'gnome-keyring-daemon' 2> /dev/null)
+	if [ -z "$GNOME_KEYRING_PID" ]; then
+		eval $(/usr/bin/gnome-keyring-daemon --start)
+		export GNOME_KEYRING_CONTROL
+		export SSH_AUTH_SOCK
+	fi
+fi
+
 if [ "$DOT_WINDOW_MANAGER" == "startfluxbox" ]; then
 	fluxbox &
 	DOT_FLUXBOX_PID=$!

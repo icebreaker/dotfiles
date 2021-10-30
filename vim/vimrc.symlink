@@ -409,6 +409,8 @@ function! AddTemplatesFromDir(templates, templatedir, templateprefix, filename, 
 		call add(a:templates, prefix . '.readme')
 	elseif a:filename == 'LICENSE'
 		call add(a:templates, prefix . '.license')
+	elseif a:filename == 'Olenbuild'
+		call add(a:templates, prefix . '.olenbuild')
 	else
 		call add(a:templates, prefix . '.' . a:filename . '.' . a:extension)
 		call add(a:templates, prefix . '.' . a:extension)
