@@ -3,3 +3,5 @@ swap/.buffer
 swap/*.swp
 swap/*.swo
 Powerline_*.cache
+ftdetect/olenbuild.vim
+syntax/olenbuild.vim
