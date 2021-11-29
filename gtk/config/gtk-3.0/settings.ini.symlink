@@ -1,8 +1,8 @@
-[Settings] 
+[Settings]
 gtk-theme-name=ReCrono
 gtk-icon-theme-name=AwOken
 gtk-font-name=Droid Sans 10
-gtk-cursor-theme-name=ComixCursors-Red-Huge
+gtk-cursor-theme-name=Bibata-Modern-DarkRed
 gtk-cursor-theme-size=0
 gtk-toolbar-style=GTK_TOOLBAR_ICONS
 gtk-toolbar-icon-size=GTK_ICON_SIZE_LARGE_TOOLBAR

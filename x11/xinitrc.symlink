@@ -1,4 +1,4 @@
-export XCURSOR_THEME=ComixCursors-Red-Huge
+export XCURSOR_THEME=Bibata-Modern-DarkRed
 
 xrdb ~/.Xresources &
 xmodmap ~/.Xmodmap &
