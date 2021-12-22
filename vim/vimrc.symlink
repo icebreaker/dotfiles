@@ -181,39 +181,35 @@ exec 'set path+=/usr/include'
 let src = substitute(substitute(expand('%:p:h'), '\/data.*$', '', '') . '/data', ' ', '\\ ', 'g')
 exec 'set path+=' . src
 
-let wildignore=[
-	\'.svn',
-	\'.git',
-	\'.hg',
-	\'bin',
-	\'build',
-	\'tmp',
-	\'vendor',
-	\'src_data',
-	\'data/gfx',
-	\'data/sfx',
-	\'data/def',
-	\'data/assets',
-	\'data/textures',
-	\'data/sprites',
-	\'data/audio',
-	\'data/sounds',
-	\'data/music',
-	\'data/maps',
-	\'data/levels',
-	\'data/worlds',
-	\'data/scenes',
-	\'data/fonts',
-	\'resources',
-	\'src/vendor',
-	\'zig-cache',
-	\'docs',
-	\'media'
+let s:wildignore=[
+	\'.svn/',
+	\'.git/',
+	\'.hg/',
+	\'bin/',
+	\'build/',
+	\'tmp/',
+	\'vendor/',
+	\'src_data/',
+	\'src/vendor/',
+	\'zig-cache/',
+	\'docs/',
+	\'media/',
+	\'*.jpg',
+	\'*.jpeg',
+	\'*.gif',
+	\'*.png',
+	\'*.ico',
+	\'*.wav',
+	\'*.mp3',
+	\'*.ogg',
+	\'*.ogv',
+	\'*.webm',
+	\'*.flac'
 \]
-exec 'set wildignore+=' . join(wildignore, '/*,')
+exec 'set wildignore+=' . join(s:wildignore, '*,')
 set wildmenu
 
-let g:fastopen_filter_cmd = 'grep -Ev ' . "'" . join(wildignore, '/|') . "/'"
+let g:fastopen_filter_cmd = 'grep -Ev ' . "'^" . join(s:wildignore, '|^') . "'"
 nnoremap <C-l> :call fastopen#show('argedit')<CR>
 
 function! NextFile()
