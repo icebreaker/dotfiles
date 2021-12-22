@@ -1,4 +1,4 @@
-*clang_complete.txt*	For Vim version 7.3.  Last change: 2014 Apr 13
+*clang_complete.txt*	For Vim version 7.3.  Last change: 2016 Sep 24
 
 
 		  clang_complete plugin documentation
@@ -26,7 +26,11 @@ This plugin use clang for accurately completing C and C++ code.
 
 Note: This plugin is incompatible with omnicppcomplete due to the
 unconditionnaly set mapping done by omnicppcomplete. So don't forget to
-suppress it before using this plugin.
+suppress it before using this plugin. Also it's possible to keep
+omnicppcomplete plugin enabled by setting |g:clang_omnicppcomplete_compliance|.
+in this case it will be possible to use omnicppcomplete in parallel with
+clang_complete, though functionality of the latter will be reduced to
+<C-X><C-U> only.
 
 ==============================================================================
 2. Key bindings					*clang_complete-keybindings*
@@ -148,6 +152,15 @@ for details): >
 
 Default: 1 (0 if conceal not available)
 
+       				       	*clang_complete-optional_args_in_snippets*
+       				       	*g:clang_complete_optional_args_in_snippets*
+If equal to 1, it will add optional arguments to the function call snippet.
+Snippet replaceable object will not be only the argument, but the preceding
+comma will be included as well, so you can press backspace to delete the
+optional argument, while the replaceable is selected.
+Example: foo($`T param1`, $`T param2`$`, T optional_param`)
+Default: 0
+
        				       	*clang_complete-clang_trailing_placeholder*
        				       	*g:clang_trailing_placeholder*
 Note: This option is specific to clang_complete snippets engine.
@@ -171,7 +184,7 @@ Default: 0
 
        				      	*clang_complete-user_options*
        				       	*g:clang_user_options*
-Additionnal compilation argument passed to libclang.
+Additional compilation argument passed to libclang.
 
 Example: >
  " compile all sources as c++11 (just for example, use .clang_complete for
@@ -226,11 +239,18 @@ Default: 1
 
        				       	*clang_complete-library_path*
        				       	*g:clang_library_path*
-If libclang is not in your library search path, set this to the absolute path
-where libclang is available. This should either be a directory containing a
-file named libclang.[dll/so/dylib] or the clang shared library file itself.
+If libclang is not in the library search path of your system, you should set
+this variable to the absolute path of either directory containing
+libclang.{dll,so,dylib} (for Windows, Unix variants and OS X respectively) or
+to that file itself.
 Default: ""
 
+Example: >
+ " path to directory where library can be found
+ let g:clang_library_path='/usr/lib/llvm-3.8/lib'
+ " or path directly to the library file
+ let g:clang_library_path='/usr/lib64/libclang.so.3.8'
+<
 					*clang_complete-sort_algo*
 					*g:clang_sort_algo*
 How results are sorted (alpha, priority, none). Currently only works with
@@ -245,18 +265,18 @@ Default: 0
 					*clang_complete-complete_patterns*
 					*g:clang_complete_patterns*
 If clang should complete code patterns, i.e loop constructs etc.
-Defaut: 0
+Default: 0
 
 					*clang_complete-jumpto_declaration_key*
 					*g:clang_jumpto_declaration_key*
 Set the key used to jump to declaration.
-Defaut: "<C-]>"
+Default: "<C-]>"
 Note: You could use the g:ClangGotoDeclaration() to do the same with a mapping.
 
 					*clang_complete-jumpto_declaration_in_preview_key*
 					*g:clang_jumpto_declaration_in_preview_key*
 Set the key used to jump to declaration in a preview window.
-Defaut: "<C-W>]"
+Default: "<C-W>]"
 Note: You could use the g:ClangGotoDeclarationPreview() to do the same with a mapping.
 
 					*clang_complete-jumpto_back_key*
@@ -264,13 +284,20 @@ Note: You could use the g:ClangGotoDeclarationPreview() to do the same with a ma
 Set the key used to jump back.
 Note: Effectively this will be remapped to <C-O>. The default value is chosen
 to be coherent with ctags implementation.
-Defaut: "<C-T>"
+Default: "<C-T>"
 
 					*clang_complete-make_default_keymappings*
 					*g:clang_make_default_keymappings*
 If this option is set, the default keymappings will be set by clang_complete.
 Otherwise none are set and the user will have to provide those keymappings.
 Default: 1
+
+					*clang_complete-omnicppcomplete_compliance*
+					*g:clang_omnicppcomplete_compliance*
+Omnicppcomplete compatibility mode. Keeps omni auto-completion in control of
+omnicppcomplete, disables clang's auto-completion (|g:clang_complete_auto|)
+and enables only <C-X><C-U> as main clang completion function.
+Default: 0
 
 ==============================================================================
 6. Known issues					*clang_complete-issues*
