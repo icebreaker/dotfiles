@@ -181,19 +181,21 @@ exec 'set path+=/usr/include'
 let src = substitute(substitute(expand('%:p:h'), '\/data.*$', '', '') . '/data', ' ', '\\ ', 'g')
 exec 'set path+=' . src
 
-let s:wildignore=[
-	\'.svn/',
-	\'.git/',
-	\'.hg/',
-	\'bin/',
-	\'build/',
-	\'tmp/',
-	\'vendor/',
-	\'src_data/',
-	\'src/vendor/',
-	\'zig-cache/',
-	\'docs/',
-	\'media/',
+let s:ignorepath=[
+	\'.svn/*',
+	\'.git/*',
+	\'.hg/*',
+	\'bin/*',
+	\'build/*',
+	\'tmp/*',
+	\'vendor/*',
+	\'src_data/*',
+	\'src/vendor/*',
+	\'zig-cache/*',
+	\'docs/*',
+	\'media/*',
+\]
+let s:ignoreext=[
 	\'*.jpg',
 	\'*.jpeg',
 	\'*.gif',
@@ -206,10 +208,11 @@ let s:wildignore=[
 	\'*.webm',
 	\'*.flac'
 \]
-exec 'set wildignore+=' . join(s:wildignore, '*,')
+exec 'set wildignore+=' . join(s:ignorepath + s:ignoreext, ',')
 set wildmenu
 
-let g:fastopen_filter_cmd = 'grep -Ev ' . "'^" . join(s:wildignore, '|^') . "'"
+let s:ignorefilter = s:ignorepath + map(copy(s:ignoreext), 'v:val . "\$"')
+let g:fastopen_filter_cmd = 'grep -Ev ' . "'^" . join(s:ignorefilter, '|^') . "'"
 nnoremap <C-l> :call fastopen#show('argedit')<CR>
 
 function! NextFile()
