@@ -21,7 +21,7 @@ syn match Function /\<gtk_.\{-}\>/
 syn match Function /\<gdk_.\{-}\>/
 syn match Function /\<g_.\{-}\>/
 syn match Function /\<pango_.\{-}\>/
-syn keyword Type GPid GError
+syn keyword Type GPid GError GSList
 syn keyword Type gpointer gpointer gboolean gint guint gfloat gdouble gchar guchar glong gulong gshort gushort gsize
 
 syn match Function /\<oln_.\{-}\>/
