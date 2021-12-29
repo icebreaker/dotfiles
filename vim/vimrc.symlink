@@ -207,7 +207,8 @@ let s:ignoreext=[
 	\'*.ogv',
 	\'*.webm',
 	\'*.flac',
-	\'*.qoi'
+	\'*.qoi',
+	\'*.md5sum'
 \]
 exec 'set wildignore+=' . join(s:ignorepath + s:ignoreext, ',')
 set wildmenu
