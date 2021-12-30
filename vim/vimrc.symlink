@@ -59,9 +59,6 @@ nnoremap <F2> :set nonumber!<CR>
 nnoremap <F4> :set spell! spelllang=en_us<CR>
 nnoremap <F5> :set hlsearch!<CR>
 
-vnoremap <C-c> :w! ~/.vimswap/.buffer<CR>
-nnoremap <C-p> :r ~/.vimswap/.buffer<CR>
-
 nnoremap r :redo<CR>
 nnoremap ; :
 
@@ -112,20 +109,21 @@ filetype plugin on
 filetype plugin indent on
 filetype indent on
 
-if has('gui_running')
-	set guifont=JetBrains\ Mono\ SemiBold\ 19
-	set guicursor+=a:blinkon0
-	set guioptions=i
-endif
-
 let g:html_font='JetBrains Mono SemiBold'
-
 set background=dark
 
 if has('gui_running')
-	colorscheme borland
+	set guifont=JetBrains\ Mono\ SemiBold\ 17
+	set guicursor+=a:blinkon0
+	set guioptions=i
+	set clipboard=unnamedplus
+	colorscheme base16-greenscreen
+	vnoremap <C-c> :w! !xclip -i -sel c<CR><CR>
+	nnoremap <C-p> :r !xclip -o -sel -c<CR><CR>
 else
 	colorscheme monoplex
+	vnoremap <C-c> :w! ~/.vimswap/.buffer<CR>
+	nnoremap <C-p> :r ~/.vimswap/.buffer<CR>
 endif
 
 " color column and basic distraction free writing for markdown
