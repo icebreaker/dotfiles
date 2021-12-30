@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ $# -lt 2 ]; then
+	echo "$0 input.mp4 output.mp4 [scale]"
+	exit -1
+fi
+
+if [ "$3" == "scale" ]; then
+	VF="-vf scale=1024:-1"
+fi
+
+ffmpeg -i "$1" -vcodec h264 $VF "$2"
