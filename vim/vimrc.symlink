@@ -132,7 +132,7 @@ call matchadd('ColorColumn', '\%120v', 100)
 
 augroup dfw
 	au!
-	au FileType markdown set nonumber wrap tw=80
+	au FileType markdown set nonumber wrap tw=78
 augroup end
 
 " status line
