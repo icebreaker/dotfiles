@@ -130,9 +130,11 @@ endif
 hi ColorColumn ctermbg=124 ctermfg=NONE cterm=BOLD
 call matchadd('ColorColumn', '\%120v', 100)
 
+vnoremap q gq
+
 augroup dfw
 	au!
-	au FileType markdown set nonumber wrap tw=78
+	au FileType markdown,text set nonumber wrap tw=78
 augroup end
 
 " status line
