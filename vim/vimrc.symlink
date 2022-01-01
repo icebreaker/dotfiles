@@ -117,7 +117,7 @@ if has('gui_running')
 	set guicursor+=a:blinkon0
 	set guioptions=i
 	set clipboard=unnamedplus
-	colorscheme base16-greenscreen
+	colorscheme base16-default
 	vnoremap <C-c> :w! !xclip -i -sel c<CR><CR>
 	nnoremap <C-p> :r !xclip -o -sel -c<CR><CR>
 else
