@@ -554,11 +554,11 @@ endif
 " clang format
 function! ClangFormat()
 	let l:lines = 'all'
-	pyf ~/.vim/bin/clang-format.py
+	py3file ~/.vim/bin/clang-format.py
 endfunction
 
 function! SetupClangFormat()
-	silent! exec 'nnoremap <buffer> <Leader>o :call ClangFormat()<CR>'
+	silent! exec 'nnoremap <buffer> <Leader>v :call ClangFormat()<CR>'
 endfunction
 
 augroup ClangFormatGroup
