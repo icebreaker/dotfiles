@@ -134,7 +134,7 @@ vnoremap q gq
 
 augroup dfw
 	au!
-	au FileType markdown,text set nonumber wrap tw=78
+	au FileType markdown,text set nonumber wrap linebreak nolist tw=79
 augroup end
 
 " status line
