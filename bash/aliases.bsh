@@ -5,6 +5,7 @@ alias qi='sudo pacman -S'
 alias qr='sudo pacman -Rs'
 alias qu='sudo pacman -Syy'
 alias qd='sudo pacman -Syu'
+alias qp='sudo pacman -U'
 
 elif [ "$DOT_OS" == "fedora" ]; then
 
