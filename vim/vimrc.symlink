@@ -113,7 +113,7 @@ let g:html_font='JetBrains Mono SemiBold'
 set background=dark
 
 if has('gui_running')
-	set guifont=JetBrains\ Mono\ SemiBold\ 17
+	set guifont=JetBrains\ Mono\ ExtraBold\ 17
 	set guicursor+=a:blinkon0
 	set guioptions=i
 	set clipboard=unnamedplus
