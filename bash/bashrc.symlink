@@ -12,7 +12,11 @@ else
 fi
 
 # ENV
-export DOT_ENV="generic"
+if [ -d /run/WSL ]; then
+	export DOT_ENV="WSL"
+else
+	export DOT_ENV="generic"
+fi
 
 # atomic location of the dotfiles
 export DOT_HOME=$HOME/.dotfiles
@@ -51,3 +55,6 @@ fi
 
 # add DOT_BIN, Miniconda and Cargo
 export PATH=$HOME/.miniconda2/bin:$HOME/.miniconda3/bin:$HOME/.cargo/bin:$DOT_BIN:$PATH
+
+# Add RVM to PATH
+export PATH="$PATH:$HOME/.rvm/bin"
