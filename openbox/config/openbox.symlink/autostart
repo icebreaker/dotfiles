@@ -12,11 +12,14 @@ fi
 
 if [ -x /usr/bin/gnome-keyring-daemon ]; then
 	GNOME_KEYRING_PID=$(pgrep -f 'gnome-keyring-daemon' 2> /dev/null)
-	if [ -z "$GNOME_KEYRING_PID" ]; then
-		eval $(/usr/bin/gnome-keyring-daemon --start)
-		export GNOME_KEYRING_CONTROL
-		export SSH_AUTH_SOCK
+
+	if [ ! -z "$GNOME_KEYRING_PID" ]; then
+		kill -9 $GNOME_KEYRING_PID
 	fi
+
+	eval $(/usr/bin/gnome-keyring-daemon --start)
+	export GNOME_KEYRING_CONTROL
+	export SSH_AUTH_SOCK
 fi
 
 if [ "$DOT_WINDOW_MANAGER" == "startfluxbox" ]; then
