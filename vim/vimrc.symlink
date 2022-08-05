@@ -41,6 +41,7 @@ set clipboard=exclude:.*
 set cinoptions+=g0
 set foldmethod=marker
 set cryptmethod=blowfish2
+set ttimeoutlen=8
 
 " netrw
 let g:netrw_banner=0
@@ -130,6 +131,17 @@ endif
 hi ColorColumn ctermbg=124 ctermfg=NONE cterm=BOLD
 call matchadd('ColorColumn', '\%120v', 100)
 
+" set background color to transparent when we got a transparent background image
+if $MARMOTA =~ '1'
+	hi Normal ctermbg=NONE
+	hi NonText ctermbg=NONE
+	hi DiffText ctermbg=NONE
+	"hi Pmenu ctermbg=NONE
+	"hi PmenuSel ctermbg=NONE
+	"hi PmenuSBar ctermbg=NONE
+	"hi PmenuThumb ctermbg=NONE
+endif
+
 vnoremap q gq
 
 augroup dfw
@@ -139,7 +151,7 @@ augroup end
 
 " status line
 function! GitStatus()
-	let s = fugitive#head()
+	let s = FugitiveHead()
 
 	if empty(s)
 		return s
@@ -214,9 +226,13 @@ let s:ignoreext=[
 exec 'set wildignore+=' . join(s:ignorepath + s:ignoreext, ',')
 set wildmenu
 
-let s:ignorefilter = s:ignorepath + map(copy(s:ignoreext), 'v:val . "\$"')
-let g:fastopen_filter_cmd = 'grep -Ev ' . "'^" . join(s:ignorefilter, '|^') . "'"
-nnoremap <C-l> :call fastopen#show('argedit')<CR>
+if has('win32')
+	nnoremap <C-l> :argedit<SPACE>
+else
+	let s:ignorefilter = s:ignorepath + map(copy(s:ignoreext), 'v:val . "\$"')
+	let g:fastopen_filter_cmd = 'grep -Ev ' . "'^" . join(s:ignorefilter, '|^') . "'"
+	nnoremap <C-l> :call fastopen#show('argedit')<CR>
+endif
 
 function! NextFile()
 	if bufname('%') == ''
@@ -567,6 +583,17 @@ augroup ClangFormatGroup
 	au!
 	au BufRead,BufNewFile *.c,*.cc,*.cpp,*.cxx,*.inl,*.h :call SetupClangFormat()
 augroup end
+
+" debug; we do not do `packadd termdebug` on purpose here!
+let g:termdebug_wide = 1
+nnoremap <Leader>td :Termdebug<SPACE>
+nnoremap <Leader>te :Eval<SPACE>
+nnoremap <Leader>tr :Run<CR>
+nnoremap <Leader>tc :Continue<CR>
+nnoremap <Leader>ts :Step<CR>
+nnoremap <Leader>to :Over<CR>
+nnoremap <Leader>tb :Break<CR>
+nnoremap <Leader>tq :Clear<CR>
 
 " setup various file types
 augroup SetupFileTypes
