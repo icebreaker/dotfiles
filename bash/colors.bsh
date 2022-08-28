@@ -4,6 +4,8 @@ fi
 
 if [ -x /usr/bin/dircolors ]; then
 	eval "`dircolors -b`"
-	alias ls='ls --color=auto'                                                                                        
+	alias ls='ls --color=auto'
 	alias grep='grep --color=auto'
 fi
+
+export LS_COLORS=$LS_COLORS:'*.bak=1;32:'
