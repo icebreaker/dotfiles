@@ -5,3 +5,6 @@ export HISTCONTROL=ignoredups:ignorespace
 export IGNOREEOF=666
 
 shopt -s histappend
+
+# disable node cli repl history
+export NODE_REPL_HISTORY=""
