@@ -232,6 +232,10 @@ else
 	let s:ignorefilter = s:ignorepath + map(copy(s:ignoreext), 'v:val . "\$"')
 	let g:fastopen_filter_cmd = 'grep -Ev ' . "'^" . join(s:ignorefilter, '|^') . "'"
 	nnoremap <C-l> :call fastopen#show('argedit')<CR>
+
+	"let g:nextopen_filter_pattern = '^' . join(s:ignorefilter, '|^')
+	"let g:nextopen_filter_cmd = 'grep -Ev ' . "'" . g:nextopen_filter . "'"
+	"nnoremap <C-l> :call nextopen#call('argedit')<CR>
 endif
 
 function! NextFile()
@@ -313,6 +317,7 @@ function! AsyncGitGrepCmd()
 
 	let gitdir = AsyncGitDir()
 	if empty(gitdir)
+		let cmd = 'grep -n -r'
 		return cmd
 	endif
 
