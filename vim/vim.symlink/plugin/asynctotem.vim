@@ -1,6 +1,6 @@
 " Location: plugin/asynctotem.vim
 " Author:   Mihail Szabolcs <https://mihail.co>
-" Version:  1.2
+" Version:  1.3
 " License:  Same as Vim itself. See :help license
 
 if v:version < 800 || exists('g:asynctotem_loaded')
@@ -19,6 +19,10 @@ endif
 
 if !exists('g:asynctotem_cclose_delay')
 	let g:asynctotem_cclose_delay = 1000
+endif
+
+if !exists('g:asynctotem_jump')
+	let g:asynctotem_jump = 1
 endif
 
 if !exists('g:asynctotem_jump_delay')
@@ -68,6 +72,11 @@ function! asynctotem#jump()
 	if n == 0
 		call asynctotem#cclose()
 		wincmd p
+		redraw!
+		return
+	endif
+
+	if g:asynctotem_jump == 0
 		redraw!
 		return
 	endif
