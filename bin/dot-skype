@@ -19,7 +19,10 @@ elif [ -f "/usr/libv4l/v4l1compat.so" ]; then
 	export LD_PRELOAD=/usr/libv4l/v4l1compat.so
 fi
 
-if [ -x "/usr/bin/skypeforlinux" ]; then
+if [ -x "/opt/bin/skypeforlinux" ]; then
+	echo "Using new skype for linux"
+	SKYPE_BIN=/opt/bin/skypeforlinux
+elif [ -x "/usr/bin/skypeforlinux" ]; then
 	echo "Using new skype for linux"
 	SKYPE_BIN=skypeforlinux
 elif [ -x "/opt/skype/skype" ]; then
