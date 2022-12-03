@@ -36,4 +36,4 @@ else
 	FLAGS=""
 fi
 
-exec -a "$0" "$BIN" --process-per-site --high-dpi-support=1 --force-device-scale-factor=1 --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=2048 --no-default-browser-check $FLAGS "$@"
+exec -a "$0" "$BIN" --process-per-site --high-dpi-support=1 --force-device-scale-factor=1 --ignore-gpu-blacklist --enable-nacl --audio-buffer-size=2048 --no-default-browser-check --enable-features=VaapiVideoDecoder $FLAGS "$@"
