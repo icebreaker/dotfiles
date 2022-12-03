@@ -56,5 +56,10 @@ fi
 # add DOT_BIN, Miniconda and Cargo
 export PATH=$HOME/.miniconda2/bin:$HOME/.miniconda3/bin:$HOME/.cargo/bin:$DOT_BIN:$PATH
 
-# Add RVM to PATH
+# add RVM to PATH
 export PATH="$PATH:$HOME/.rvm/bin"
+
+# source in Cargo ENV
+if [ -f ~/.cargo/env ]; then
+	. ~/.cargo/env
+fi
