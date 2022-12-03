@@ -11,31 +11,12 @@ if [ -z "$BROWSER" ]; then
 	export BROWSER
 fi
 
-if [ -f "/usr/lib32/libv4l/v4l1compat.so" ]; then
-	export LD_PRELOAD=/usr/lib32/libv4l/v4l1compat.so
-elif [ -f "/usr/lib/libv4l/v4l1compat.so" ]; then
-	export LD_PRELOAD=/usr/lib/libv4l/v4l1compat.so
-elif [ -f "/usr/libv4l/v4l1compat.so" ]; then
-	export LD_PRELOAD=/usr/libv4l/v4l1compat.so
-fi
-
 if [ -x "/opt/bin/skypeforlinux" ]; then
 	echo "Using new skype for linux"
 	SKYPE_BIN=/opt/bin/skypeforlinux
 elif [ -x "/usr/bin/skypeforlinux" ]; then
 	echo "Using new skype for linux"
 	SKYPE_BIN=skypeforlinux
-elif [ -x "/opt/skype/skype" ]; then
-	echo "Using static skype from /opt/skype ..."
-	cd /opt/skype
-	SKYPE_BIN=./skype
-else
-	SKYPE_BIN=skype
 fi
 
-if [ -x "`which apulse 2>/dev/null`"  ]; then
-	echo "Emulating Pulse Audio ..."
-	apulse $SKYPE_BIN "@$"
-else
-	$SKYPE_BIN "@$"
-fi
+$SKYPE_BIN "@$"
