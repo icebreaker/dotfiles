@@ -4,4 +4,6 @@ swap/*.swp
 swap/*.swo
 Powerline_*.cache
 ftdetect/olenbuild.vim
+ftdetect/maksu.vim
 syntax/olenbuild.vim
+syntax/maksu.vim
