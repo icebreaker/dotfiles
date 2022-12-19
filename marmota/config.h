@@ -6,7 +6,7 @@
 .allow_context_menu_fullscreen = TRUE,
 .allow_context_menu_close = TRUE,
 .allow_context_menu_scrollbar = TRUE,
-.allow_context_menu_font_scale = TRUE,
+.allow_context_menu_font_scale = FALSE,
 .allow_fullscreen_toggle_shortcut = TRUE,
 .allow_copy_paste_shortcut = FALSE,
 .allow_hold_escape_shortcut = TRUE,
