@@ -225,6 +225,7 @@ let s:ignoreext=[
 	\'.gitkeep',
 \]
 exec 'set wildignore+=' . join(s:ignorepath + s:ignoreext, ',')
+set wildoptions=pum
 set wildmenu
 
 if has('win32')
