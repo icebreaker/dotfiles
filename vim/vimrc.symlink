@@ -266,6 +266,11 @@ function! CloseFile()
 		return
 	endif
 
+	if winnr() != winnr('$')
+		silent q!
+		return
+	endif
+
 	try
 		silent argdel %
 		if len(argv()) == 0
