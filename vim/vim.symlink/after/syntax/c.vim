@@ -23,6 +23,7 @@ syn match Function /\<g_.\{-}\>/
 syn match Function /\<pango_.\{-}\>/
 syn keyword Type GPid GError GSList
 syn keyword Type gpointer gpointer gboolean gint guint gfloat gdouble gchar guchar glong gulong gshort gushort gsize
+syn keyword Type gint64 guint64
 
 syn match Function /\<oln_.\{-}\>/
 
