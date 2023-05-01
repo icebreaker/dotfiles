@@ -1,0 +1,1 @@
+export PATH=$HOME/.wiki/src/image/build:$PATH
