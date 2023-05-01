@@ -11,12 +11,6 @@ if [ -z "$BROWSER" ]; then
 	export BROWSER
 fi
 
-if [ -x "/opt/bin/skypeforlinux" ]; then
-	echo "Using new skype for linux"
-	SKYPE_BIN=/opt/bin/skypeforlinux
-elif [ -x "/usr/bin/skypeforlinux" ]; then
-	echo "Using new skype for linux"
-	SKYPE_BIN=skypeforlinux
-fi
+SKYPE_BIN=skypeforlinux
 
 $SKYPE_BIN "@$"
