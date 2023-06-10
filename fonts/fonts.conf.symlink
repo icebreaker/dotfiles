@@ -21,4 +21,14 @@
 			<const>lcddefault</const>
 		</edit>
 	</match>
+	<!--
+	<match target="font">
+		<test name="family">
+		<string>JetBrains Mono ExtraBold</string>
+		</test>
+		<edit name="embolden" mode="assign">
+			<bool>true</bool>
+		</edit>
+	</match>
+	-->
 </fontconfig>
