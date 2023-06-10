@@ -235,9 +235,8 @@ else
 	let g:fastopen_filter_cmd = 'grep -Ev ' . "'" . join(s:ignorefilter, '|') . "'"
 	nnoremap <C-l> :call fastopen#show('argedit')<CR>
 
-	"let g:nextopen_filter_pattern = '^' . join(s:ignorefilter, '|^')
-	"let g:nextopen_filter_cmd = 'grep -Ev ' . "'" . g:nextopen_filter . "'"
-	"nnoremap <C-l> :call nextopen#call('argedit')<CR>
+	"let g:nextopen_filter_pattern = join(s:ignorefilter, '|')
+	"nnoremap <C-k> :call NextOpen('argedit')<CR>
 endif
 
 function! NextFile()
@@ -354,7 +353,7 @@ function! AsyncMakeFindDotMakeDir()
 		endif
 	endif
 
-	let makedir = makedir . '.;'
+	let makedir = '.;' . makedir
 
 	" FIXME: maybe escape the makedir?
 	let file = findfile(s:DOTMAKE_FILENAME, makedir)
