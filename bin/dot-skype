@@ -11,6 +11,10 @@ if [ -z "$BROWSER" ]; then
 	export BROWSER
 fi
 
+if [ -x /usr/bin/gnome-keyring-daemon ]; then
+	/usr/bin/gnome-keyring-daemon
+fi
+
 SKYPE_BIN=skypeforlinux
 
 $SKYPE_BIN "@$"
