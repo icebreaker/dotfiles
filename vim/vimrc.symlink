@@ -129,14 +129,10 @@ hi ColorColumn ctermbg=124 ctermfg=NONE cterm=BOLD
 call matchadd('ColorColumn', '\%120v', 100)
 
 " set background color to transparent when we got a transparent background image
-if $MARMOTA =~ '1'
+if $MARMOTA =~ '1' || $MARMOTA_TRANSPARENT_FORCE =~ '1'
 	hi Normal ctermbg=NONE
 	hi NonText ctermbg=NONE
 	hi DiffText ctermbg=NONE
-	"hi Pmenu ctermbg=NONE
-	"hi PmenuSel ctermbg=NONE
-	"hi PmenuSBar ctermbg=NONE
-	"hi PmenuThumb ctermbg=NONE
 endif
 
 vnoremap q gq
