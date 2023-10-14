@@ -209,6 +209,7 @@ let s:ignoreext=[
 	\'*.gif',
 	\'*.png',
 	\'*.ico',
+	\'*.icns',
 	\'*.wav',
 	\'*.mp3',
 	\'*.ogg',
@@ -218,6 +219,7 @@ let s:ignoreext=[
 	\'*.qoi',
 	\'*.md5sum',
 	\'*.ttf',
+	\'*.bmp',
 	\'.gitkeep',
 \]
 exec 'set wildignore+=' . join(s:ignorepath + s:ignoreext, ',')
