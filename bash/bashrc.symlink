@@ -53,6 +53,11 @@ if [ -f ~/.localrc ]; then
     . ~/.localrc
 fi
 
+# add ~/bin if the directory exists
+if [ -d ~/bin ]; then
+	export PATH=$HOME/bin:$PATH
+fi
+
 # add DOT_BIN, Miniconda and Cargo
 export PATH=$HOME/.miniconda2/bin:$HOME/.miniconda3/bin:$HOME/.cargo/bin:$DOT_BIN:$PATH
 
