@@ -37,7 +37,7 @@ bind -n C-Right next-window
 bind -n C-Left previous-window
 
 unbind %
-bind \\ choose-tree
+bind \\ choose-tree -F "#{window_name}: #{s|^$HOME|~|:pane_current_path}"
 bind - split-window -v -c '#{pane_current_path}'
 
 set -g history-limit 8192
