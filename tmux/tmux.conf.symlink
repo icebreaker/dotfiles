@@ -37,7 +37,7 @@ bind -n C-Right next-window
 bind -n C-Left previous-window
 
 unbind %
-bind \\ split-window -h -c '#{pane_current_path}'
+bind \\ choose-tree
 bind - split-window -v -c '#{pane_current_path}'
 
 set -g history-limit 8192
