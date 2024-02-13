@@ -15,6 +15,11 @@ if [ -x /usr/bin/gnome-keyring-daemon ]; then
 	/usr/bin/gnome-keyring-daemon
 fi
 
+CACHE_PATH=$HOME/.config/skypeforlinux/Cache
+if [ -d "$CACHE_PATH" ]; then
+	rm -rf "$CACHE_PATH/*"
+fi
+
 SKYPE_BIN=skypeforlinux
 
 $SKYPE_BIN "@$"
