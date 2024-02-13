@@ -202,6 +202,8 @@ let s:ignorepath=[
 	\'res/fonts/*',
 	\'docs/*',
 	\'media/*',
+	\'support/build/.*/include/*',
+	\'support/build/.*/gen/*',
 \]
 let s:ignoreext=[
 	\'*.jpg',
