@@ -22,4 +22,9 @@ fi
 
 SKYPE_BIN=skypeforlinux
 
+SKYPE_INSIDER_BIN=$HOME/skypeinsider/usr/bin/$SKYPE_BIN
+if [ -x "$SKYPE_INSIDER_BIN" ]; then
+	SKYPE_BIN=$SKYPE_INSIDER_BIN
+fi
+
 $SKYPE_BIN "@$"
