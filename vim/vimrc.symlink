@@ -107,7 +107,7 @@ filetype plugin on
 filetype plugin indent on
 filetype indent on
 
-let g:html_font='JetBrains Mono SemiBold'
+let g:html_font='JetBrains Mono NL ExtraBold'
 set background=dark
 
 if has('gui_running')
@@ -203,7 +203,7 @@ let s:ignorepath=[
 	\'docs/*',
 	\'media/*',
 	\'support/build/.*/include/*',
-	\'support/build/.*/gen/*',
+	\'support/build/.*/gen/*'
 \]
 let s:ignoreext=[
 	\'*.jpg',
@@ -222,7 +222,9 @@ let s:ignoreext=[
 	\'*.md5sum',
 	\'*.ttf',
 	\'*.bmp',
-	\'.gitkeep',
+	\'*.pdf',
+	\'*.PDF',
+	\'.gitkeep'
 \]
 exec 'set wildignore+=' . join(s:ignorepath + s:ignoreext, ',')
 set wildoptions=pum
