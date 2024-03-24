@@ -1,5 +1,5 @@
 Xcursor.theme_core: true
-Xcursor.theme: "Bibata-Modern-DarkRed"
+Xcursor.theme: Bibata-Modern-DarkRed
 Xcursor.size: 32
 Xft.autohint: true
 Xft.antialias: true
@@ -8,7 +8,7 @@ Xft.hinting: true
 Xft.hintstyle: hintslight
 Xft.lcdfilter: lcddefault
 Xft.dpi: 96
-XTerm*faceName: JetBrains Mono:weight=650:size=19:antialias=true
+XTerm*faceName: JetBrains Mono ExtraBold:size=17:antialias=true
 XTerm*TrueTintingType: true
 XTerm*ScrollBar: false
 XTerm*RightScrollBar: false
