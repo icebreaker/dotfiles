@@ -1,0 +1,16 @@
+nnoremap ; :
+nnoremap r :redo<CR>
+
+nnoremap <Leader>w :w<CR>
+
+nnoremap <Leader>e :Build<CR>
+nnoremap <Leader>r :Run<CR>
+nnoremap <Leader>k :Clean<CR>
+nnoremap <Leader>g :Generate<CR>
+
+nnoremap zz ZZ
+nnoremap zq ZQ
+
+nnoremap q <nop>
+
+
