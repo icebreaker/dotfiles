@@ -129,7 +129,7 @@ hi ColorColumn ctermbg=124 ctermfg=NONE cterm=BOLD
 call matchadd('ColorColumn', '\%120v', 100)
 
 " set background color to transparent when we got a transparent background image
-if $MARMOTA =~ '1' || $MARMOTA_TRANSPARENT_FORCE =~ '1'
+if $MARMOTA =~ '1' || $MARMOTA_TRANSPARENT_FORCE =~ '1' || $TMUX =~ 'tmux'
 	hi Normal ctermbg=NONE
 	hi NonText ctermbg=NONE
 	hi DiffText ctermbg=NONE
@@ -578,8 +578,10 @@ nnoremap <Leader>= :call gustav#toggle()<CR>
 " clang complete on codespaces
 if $USER == 'codespace'
 	let g:clang_library_path = '/usr/lib/llvm-3.8/lib/libclang.so.1'
-elseif $DOT_OS == "ubuntu"
+elseif $DOT_OS == 'ubuntu'
 	let g:clang_library_path = '/usr/lib/llvm-12/lib/libclang.so.1'
+elseif $CLANG_COMPLETE_LIBRARY_PATH =~ 'libclang.so'
+	let g:clang_library_path = $CLANG_COMPLETE_LIBRARY_PATH
 endif
 
 " clang format
