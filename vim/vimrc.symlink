@@ -221,9 +221,12 @@ let s:ignoreext=[
 	\'*.qoi',
 	\'*.md5sum',
 	\'*.ttf',
+	\'*.tga',
 	\'*.bmp',
 	\'*.pdf',
 	\'*.PDF',
+	\'*.raw',
+	\'*.hex',
 	\'.gitkeep'
 \]
 exec 'set wildignore+=' . join(s:ignorepath + s:ignoreext, ',')
@@ -304,6 +307,7 @@ nnoremap <Leader>c :RuboCop<CR>
 set errorformat^=%-GIn\ file\ included\ %.%#
 set errorformat^=%*[^:]:\ %f:%l:%*[^:]:%m "
 set errorformat^=\ %#%f(%l\\\,%c):\ %m
+set errorformat^=%f\(%l\)\ :\ %m
 
 " building and project managament
 let g:asynctotem_cclose_delay = 0
