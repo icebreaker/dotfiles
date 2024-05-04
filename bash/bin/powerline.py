@@ -6,9 +6,9 @@ import subprocess
 import sys
 
 class Powerline:
-    ESC   = '\e'
-    LSQ   = '\['
-    RSQ   = '\]'
+    ESC   = r'\e'
+    LSQ   = r'\['
+    RSQ   = r'\]'
     RESET = LSQ + ESC + '[0m' + RSQ
     BG0   = '236'
     BG1   = '237'
@@ -102,7 +102,7 @@ class Powerline:
         if int(error) != 0:
             bg = self.PINK
 
-        self.append(' \$ ', None, bg)
+        self.append(r' \$ ', None, bg)
 
 if __name__ == '__main__':
     p = Powerline()
