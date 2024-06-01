@@ -95,6 +95,7 @@ if $TMUX =~ 'tmux'
 endif
 
 let c_no_curly_error=1
+let c_no_bracket_error=1
 let python_highlight_all=1
 let coffee_no_reserved_words_error=1
 let g:delimitMate_expand_cr=1
