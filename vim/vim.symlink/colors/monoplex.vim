@@ -51,7 +51,7 @@ hi Include ctermfg=130 ctermbg=NONE cterm=BOLD
 hi String ctermfg=142 ctermbg=NONE cterm=NONE
 hi Special ctermfg=142 ctermbg=NONE cterm=NONE
 hi Number ctermfg=142 ctermbg=NONE cterm=NONE
-hi Todo ctermfg=102 ctermbg=NONE cterm=BOLD
+hi Todo ctermfg=142 ctermbg=NONE cterm=BOLD
 hi Comment ctermfg=59 ctermbg=NONE cterm=NONE
 "}}}
 "msg {{{
