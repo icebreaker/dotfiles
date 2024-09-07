@@ -18,6 +18,13 @@ else
 	export DOT_ENV="generic"
 fi
 
+# HOSTNAME
+export DOT_HOSTNAME=$HOSTNAME
+if [ ! -z $SSH_TTY ]; then
+	export DOT_SSH=yes
+	export DOT_SSH_HOSTNAME=$DOT_HOSTNAME
+fi
+
 # atomic location of the dotfiles
 export DOT_HOME=$HOME/.dotfiles
 
