@@ -6,16 +6,17 @@ import subprocess
 import sys
 
 class Powerline:
-    ESC   = r'\e'
-    LSQ   = r'\['
-    RSQ   = r'\]'
-    RESET = LSQ + ESC + '[0m' + RSQ
-    BG0   = '236'
-    BG1   = '237'
-    FG    = '249'
-    RED   = '124'
-    PINK  = '126'
-    GREEN = '23'
+    ESC    = r'\e'
+    LSQ    = r'\['
+    RSQ    = r'\]'
+    RESET  = LSQ + ESC + '[0m' + RSQ
+    BG0    = '236'
+    BG1    = '237'
+    FG     = '249'
+    RED    = '124'
+    PINK   = '126'
+    GREEN  = '23'
+    BLUE   = '17'
 
     def __init__(self):
         self.segments = []
@@ -104,8 +105,17 @@ class Powerline:
 
         self.append(r' \$ ', None, bg)
 
+    def add_ssh_hostname_segment(self):
+        hostname = os.getenv('DOT_SSH_HOSTNAME')
+
+        if hostname == None or len(hostname) == 0:
+            return
+
+        self.append(' ' + hostname + ' ', None, self.BLUE)
+
 if __name__ == '__main__':
     p = Powerline()
+    p.add_ssh_hostname_segment()
     p.add_cwd_segment()
     p.add_git_segment()
     p.add_root_indicator_segment(sys.argv[1] if len(sys.argv) > 1 else 0)
