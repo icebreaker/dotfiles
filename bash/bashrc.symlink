@@ -71,6 +71,10 @@ export PATH=$HOME/.miniconda2/bin:$HOME/.miniconda3/bin:$HOME/.cargo/bin:$DOT_BI
 # add RVM to PATH
 export PATH="$PATH:$HOME/.rvm/bin"
 
+# add Bun to PATH
+export BUN_INSTALL="$HOME/.bun"
+export PATH=$BUN_INSTALL/bin:$PATH
+
 # source in Cargo ENV
 if [ -f ~/.cargo/env ]; then
 	. ~/.cargo/env
