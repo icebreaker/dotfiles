@@ -1,7 +1,14 @@
 #!/usr/bin/env ruby
-require 'irb/completion'
-require 'irb/ext/save-history'
-require 'rubygems'
+
+require "irb/completion"
+
+begin
+  require "irb/ext/save-history"
+rescue LoadError
+  require "irb/ext/eval_history"
+end
+
+require "rubygems"
 
 IRB.conf[:SAVE_HISTORY] = 1000
 IRB.conf[:HISTORY_FILE] = "#{ENV['HOME']}/.irb_history"
