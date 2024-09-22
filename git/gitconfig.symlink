@@ -26,6 +26,7 @@
 	export-gz = "!f() { git archive HEAD | gzip > $1;  }; f"
 	cl = clone
 	co = checkout
+	serve = daemon --reuseaddr --verbose --export-all --base-path=.git --strict-paths .git/
 [web]
 	browser = webrowser
 [browser "webrowser"]
