@@ -32,7 +32,7 @@ bind -n M-Right select-pane -R
 bind -n M-Up select-pane -U
 bind -n M-Down select-pane -D
 
-bind -n C-T new-window -c '#{pane_current_path}'
+bind -n C-t new-window -c '#{pane_current_path}'
 bind -n C-Right next-window
 bind -n C-Left previous-window
 
