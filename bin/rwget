@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ $# -lt 1 ]; then
+	echo "usage: `basename $0` URL"
+	exit -1
+fi
+
+wget -m -e robots=off --no-parent $@
