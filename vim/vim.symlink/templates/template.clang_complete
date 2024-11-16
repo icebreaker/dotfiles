@@ -2,4 +2,5 @@
 -D_DEBUG
 -D_REENTRANT
 -I/usr/include/SDL2
+-I.
 -Isrc
