@@ -22,6 +22,15 @@ if [ -x /usr/bin/gnome-keyring-daemon ]; then
 	export SSH_AUTH_SOCK
 fi
 
+GNOME_POLKIT_PID=$(pgrep -f 'polkit-gnome-authentication-agent' 2> /dev/null)
+if [ -z "$GNOME_POLKIT_PID" ]; then
+	if [ -x /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 ]; then
+		(sleep 2s && /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1) &
+	elif [ -x /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 ]; then
+		(sleep 2s && /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1) &
+	fi
+fi
+
 if [ "$DOT_WINDOW_MANAGER" == "startfluxbox" ]; then
 	fluxbox &
 	DOT_FLUXBOX_PID=$!
@@ -34,6 +43,8 @@ fi
 if [ -x /usr/bin/xset ]; then
 	xset r rate 200 25
 fi
+
+(sleep 5s && thunar --daemon) &
 
 nitrogen --restore &
 
