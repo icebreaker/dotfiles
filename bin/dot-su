@@ -1,9 +1,14 @@
 #!/bin/bash
 
-if [ -x "/usr/bin/xdg-su" ]; then
+if [ -x "/usr/bin/pkexec" ]; then
+	pkexec "$@"
+elif [ -x "/usr/bin/xdg-su" ]; then
 	xdg-su -c "$@"
 elif [ -x "/usr/bin/gksudo" ]; then
 	gksudo "$@"
+elif [ -x "/usr/bin/xterm" ]; then
+	xterm -geom 60x5 -T "dot-su: $@" -e su -c "$@"
 else
 	echo "No GUI sudo found."
+	exit -1
 fi
