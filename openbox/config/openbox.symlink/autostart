@@ -47,7 +47,8 @@ if [ ! -z "$TOUCHPAD_ID" ]; then
 	xinput --disable $TOUCHPAD_ID
 fi
 
-if [ "$DOT_WINDOW_MANAGER" == "openbox-session" ]; then
+OPENBOX_PID=$(pgrep 'openbox' 2> /dev/null)
+if [ ! -z "$OPENBOX_PID" ]; then
 	(sleep 5s && tint2) &
 fi
 
