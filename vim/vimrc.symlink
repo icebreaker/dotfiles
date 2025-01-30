@@ -189,6 +189,7 @@ let src = substitute(substitute(expand('%:p:h'), '\/data.*$', '', '') . '/data',
 exec 'set path+=' . src
 
 let s:ignorepath=[
+	\'.venv/*',
 	\'.svn/*',
 	\'.git/*',
 	\'.hg/*',
@@ -228,7 +229,8 @@ let s:ignoreext=[
 	\'*.PDF',
 	\'*.raw',
 	\'*.hex',
-	\'.gitkeep'
+	\'.gitkeep',
+	\'*.pyc'
 \]
 exec 'set wildignore+=' . join(s:ignorepath + s:ignoreext, ',')
 set wildoptions=pum
@@ -241,8 +243,11 @@ else
 	let g:fastopen_filter_cmd = 'grep -Ev ' . "'" . join(s:ignorefilter, '|') . "'"
 	nnoremap <C-l> :call fastopen#show('argedit')<CR>
 
-	"let g:nextopen_filter_pattern = join(s:ignorefilter, '|')
-	"nnoremap <C-k> :call NextOpen('argedit')<CR>
+	"let g:nextopen_config = {
+		\'open_cmd': 'argedit',
+		\'filter_pattern': join(s:ignorefilter, '|')
+	\}
+	"nnoremap <C-k> :call NextOpen()<CR>
 endif
 
 function! NextFile()
