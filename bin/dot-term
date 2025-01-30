@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -n "$(which marmota 2>/dev/null)" ]; then
+if [ -x /opt/bin/marmota ]; then
 	marmota "$@"
 else
 	xterm -maximized "$@"
