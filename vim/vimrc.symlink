@@ -315,6 +315,29 @@ set errorformat^=%*[^:]:\ %f:%l:%*[^:]:%m "
 set errorformat^=\ %#%f(%l\\\,%c):\ %m
 set errorformat^=%f\(%l\)\ :\ %m
 
+" shamelessly stolen and adapted from https://github.com/mikelue/vim-maven-plugin
+function! SetupMavenErrorFormat()
+	set errorformat=
+		\%-G[INFO]\ %.%#,
+		\%-G[WARNING]\ %.%#,
+		\%-G[debug]\ %.%#
+	set errorformat+=
+		\[FATAL]\ Non-parseable\ POM\ %f:\ %m%\\s%\\+@%.%#line\ %l\\,\ column\ %c%.%#,
+		\[%tRROR]\ Malformed\ POM\ %f:\ %m%\\s%\\+@%.%#line\ %l\\,\ column\ %c%.%#
+	set errorformat+=
+		\[%tRROR]\ %f:[%l\\,%c]\ %m
+	set errorformat+=
+		\%+E%>[ERROR]\ %.%\\+Time\ elapsed:%.%\\+<<<\ FAILURE!,
+		\%+E%>[ERROR]\ %.%\\+Time\ elapsed:%.%\\+<<<\ ERROR!,
+		\%+Z%\\s%#at\ %f(%\\f%\\+:%l),
+		\%+C%.%#
+endfunction
+
+augroup MavenErrorFormat
+	au!
+	au BufNewFile,BufRead *.java :call SetupMavenErrorFormat()
+augroup end
+
 " building and project managament
 let g:asynctotem_cclose_delay = 0
 let g:asynctotem_jump_delay = 0
