@@ -164,7 +164,14 @@
       <item label="Yast 2">
         <action name="Execute">
           <execute>
-            xdg-su -c yast2
+            ~/.dotfiles/bin/dot-su yast2
+          </execute>
+        </action>
+      </item>
+      <item label="GParted">
+        <action name="Execute">
+          <execute>
+            ~/.dotfiles/bin/dot-su gparted
           </execute>
         </action>
       </item>
