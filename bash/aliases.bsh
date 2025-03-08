@@ -25,6 +25,14 @@ alias qu='sudo zypper refresh'
 alias qd='sudo zypper dist-upgrade --no-allow-vendor-change'
 alias qc='rpm -q --changelog'
 
+elif [ "$DOT_OS" == "freebsd" ]; then
+
+alias qs='sudo pkg search'
+alias qi='sudo pkg install'
+alias qr='sudo pkg remove'
+alias qu='sudo pkg update'
+alias qd='sudo pkg upgrade'
+
 else
 
 alias qs='sudo apt-cache search'
