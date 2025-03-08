@@ -20,6 +20,11 @@ else
 	export DOT_ENV="generic"
 fi
 
+# SHELL
+if [ -z $DOT_SHELL ]; then
+	export DOT_SHELL=$SHELL
+fi
+
 # HOSTNAME
 export DOT_HOSTNAME=$HOSTNAME
 if [ ! -z $SSH_TTY ]; then
