@@ -338,6 +338,12 @@ augroup MavenErrorFormat
 	au BufNewFile,BufRead *.java :call SetupMavenErrorFormat()
 augroup end
 
+" try man(2) and man(3) first for C/C++
+augroup AutoSetupManual
+	au!
+	au BufNewFile,BufRead *.c,*.cc,*.cpp,*.cxx,*.h,*.hpp,*.hh :set keywordprg=dot-man
+augroup end
+
 " building and project managament
 let g:asynctotem_cclose_delay = 0
 let g:asynctotem_jump_delay = 0

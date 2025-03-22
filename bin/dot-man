@@ -1,0 +1,11 @@
+#!/bin/sh
+
+man 2 $@
+
+if [ $? == 16 ]; then
+	man 3 $@
+
+	if [ $? == 16 ]; then
+		man $@
+	fi
+fi
