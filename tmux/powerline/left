@@ -1,0 +1,13 @@
+#!/bin/sh
+
+STATUS_LINE=$(w | head -n 1 | grep -PZo "(up .*?)," | cut -d "," -f 1 | sed 's/  / /')
+
+if [ "$DOT_TMUX_CMUS_DISPLAY_CURRENT_SONG" == "yes" ]; then
+	CURRENT_SONG_TITLE=$(cmus-remote -Q | grep '^tag title' | sed 's/^tag title //')
+	if [ -n "$CURRENT_SONG_TITLE" ]; then
+		STATUS_LINE="$STATUS_LINE | $CURRENT_SONG_TITLE"
+	fi
+fi
+
+echo $STATUS_LINE
+exit 0

@@ -1,9 +1,0 @@
-#!/bin/bash
-
-TITLE=$(xdotool search --name "VLC media player" getwindowname | sed 's/ - VLC media player//' | sed 's/WAVE, //')
-
-if [ -n "$TITLE" ]; then
-	echo " | $TITLE"
-fi
-
-exit 0

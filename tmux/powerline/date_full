@@ -1,3 +1,0 @@
-#!/bin/bash
-date +"%F"
-exit 0

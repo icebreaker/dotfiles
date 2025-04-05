@@ -1,3 +1,0 @@
-#!/bin/bash
-echo $(w | head -n 1 | grep -PZo "(up .*?)," | cut -d "," -f 1)
-exit 0

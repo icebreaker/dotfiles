@@ -5,8 +5,8 @@ set -g status-style bg=colour235,fg=default,bold
 set -g status-interval 60
 set -g status-left-length 15
 set -g status-justify "centre"
-set -g status-left "#[fg=default,bg=default] #($DOT_HOME/tmux/powerline/uptime) #[fg=default,bg=default]"
-set -g status-right "#[fg=default,bg=default] #($DOT_HOME/tmux/powerline/date_day) | #($DOT_HOME/tmux/powerline/date_full) | #($DOT_HOME/tmux/powerline/time) #[fg=default,bg=default]"
+set -g status-left "#[fg=default,bg=default] #($DOT_HOME/tmux/powerline/left) #[fg=default,bg=default]"
+set -g status-right "#[fg=default,bg=default] %a | %Y-%m-%d | %H:%M #[fg=default,bg=default]"
 
 set -g window-status-format "#[fg=default,bg=default] #I #W "
 set -g window-status-current-format "#[fg=colour235,bg=colour251] #I #W #[fg=default,bg=default]"
