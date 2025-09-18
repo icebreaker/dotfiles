@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -z $1 ]; then
+	echo "usage: `basename $0` filename"
+	exit -1
+fi
+
+identify -format %k $1 && echo
