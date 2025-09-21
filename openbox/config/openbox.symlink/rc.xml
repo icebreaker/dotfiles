@@ -262,6 +262,11 @@
         <execute>~/.dotfiles/bin/dot-screenshot -b -s</execute>
       </action>
     </keybind>
+    <keybind key="W-p">
+      <action name="Execute">
+        <execute>~/.dotfiles/bin/dot-screenshot -b -s</execute>
+      </action>
+    </keybind>
     <!-- Keybindings for window switching -->
     <keybind key="A-Tab">
       <action name="NextWindow"/>
