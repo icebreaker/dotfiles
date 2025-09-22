@@ -362,13 +362,22 @@
         <command>~/.dotfiles/bin/dot-lock</command>
       </action>
     </keybind>
-    <keybind key="W-c">
+    <keybind key="W-v">
       <action name="Execute">
         <startupnotify>
           <enabled>true</enabled>
           <name>Launch Color Picker</name>
         </startupnotify>
         <command>~/.dotfiles/bin/dot-color</command>
+      </action>
+    </keybind>
+    <keybind key="W-c">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Calculator</name>
+        </startupnotify>
+        <command>galculator</command>
       </action>
     </keybind>
     <keybind key="XF86Calculator">
