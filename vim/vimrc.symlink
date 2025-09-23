@@ -72,6 +72,8 @@ nnoremap zq ZQ
 
 nnoremap q <nop>
 
+nnoremap ) $
+
 augroup qol
 	au!
 	au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exec "normal! g'\"" | endif
