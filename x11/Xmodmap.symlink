@@ -1,1 +1,8 @@
 pointer = 1 2 3 4 5 6 7 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+keycode 108 = Mode_switch Mode_switch Mode_switch Mode_switch
+
+keycode 75 = Home F9 F9 F9 F9
+keycode 76 = End F10 F10 F10 F10
+keycode 95 = Prior F11 F11 F11 F11
+keycode 96 = Next F12 F12 F12 F12
