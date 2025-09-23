@@ -241,15 +241,9 @@ set wildmenu
 if has('win32')
 	nnoremap <C-l> :argedit<SPACE>
 else
-	let s:ignorefilter = map(copy(s:ignorepath), '"^" . v:val') + map(copy(s:ignoreext), '"." . v:val . "\$"')
-	let g:fastopen_filter_cmd = 'grep -Ev ' . "'" . join(s:ignorefilter, '|') . "'"
+	let g:fastopen_ignore_filter = join(map(copy(s:ignorepath), '"^" . v:val') + map(copy(s:ignoreext), '"." . v:val . "\$"'), '|')
+	let g:fastopen_filter_cmd = 'grep -Ev ' . "'" . g:fastopen_ignore_filter . "'"
 	nnoremap <C-l> :call fastopen#show('argedit')<CR>
-
-	"let g:nextopen_config = {
-		\'open_cmd': 'argedit',
-		\'filter_pattern': join(s:ignorefilter, '|')
-	\}
-	"nnoremap <C-k> :call NextOpen()<CR>
 endif
 
 function! NextFile()
