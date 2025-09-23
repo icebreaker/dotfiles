@@ -686,3 +686,8 @@ augroup SetupFileTypes
 	au BufRead,BufNewFile *cms-plugins*/*joomla*/*.php set filetype=php
 		\ tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 augroup end
+
+" source in local rc if it exists
+if filereadable(expand("~/.vimrc.local"))
+  source ~/.vimrc.local
+endif
