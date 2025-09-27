@@ -9,13 +9,13 @@ set -g status-left "#[fg=default,bg=default] #($DOT_HOME/tmux/powerline/left) #[
 set -g status-right "#[fg=default,bg=default] %a | %Y-%m-%d | %H:%M #[fg=default,bg=default]"
 
 set -g window-status-format "#[fg=default,bg=default] #I #W "
-set -g window-status-current-format "#[fg=colour235,bg=colour251] #I #W #[fg=default,bg=default]"
+set -g window-status-current-format "#[fg=colour235,bg=colour250] #I #W #[fg=default,bg=default]"
 set -g window-status-activity-style bold
 
 set -g pane-border-style fg=colour235
 set -g pane-active-border-style fg=colour235
 
-set -g clock-mode-colour colour251
+set -g clock-mode-colour colour250
 set -g message-style fg=default,bg=colour235,bold
 
 set -g display-time 2000
