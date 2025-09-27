@@ -1,5 +1,11 @@
 #!/bin/bash
 
+VERBOSE=0
+if [ "$1" == "--verbose" ]; then
+	VERBOSE=1
+	shift
+fi
+
 if [ -z "$DOT_HOME" ]; then
 	# pre-load .bashrc
 	DOT_HOME=$(cd "$(dirname "$0")" && cd .. && pwd)
@@ -19,6 +25,10 @@ for src in $(find $DOT_HOME -name "*$SYMLINK" -print); do
 		TARGET=$TARGET_DIR/$SRC
 	else # first level dirs
 		TARGET=$HOME/.$SRC
+	fi
+
+	if [ $VERBOSE -eq 1 ]; then
+		echo $TARGET
 	fi
 
 	# take extra care for nested symlinked dirs as targets
