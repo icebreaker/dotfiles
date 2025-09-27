@@ -39,6 +39,7 @@ bind -n C-Left previous-window
 unbind %
 bind \\ choose-tree -F "#{window_name}: #{s|^$HOME|~|:pane_current_path}"
 bind - split-window -v -c '#{pane_current_path}'
+bind | split-window -h -c '#{pane_current_path}'
 
 set -g history-limit 8192
 set -s escape-time 0
