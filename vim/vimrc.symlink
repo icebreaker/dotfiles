@@ -336,10 +336,11 @@ augroup MavenErrorFormat
 	au BufNewFile,BufRead *.java :call SetupMavenErrorFormat()
 augroup end
 
-" try man(2) and man(3) first for C/C++
+" man/doc for C/C++ and Go
 augroup AutoSetupManual
 	au!
 	au BufNewFile,BufRead *.c,*.cc,*.cpp,*.cxx,*.h,*.hpp,*.hh :set keywordprg=dot-man
+	au BufNewFile,BufRead *.go :set keywordprg=dot-go-doc
 augroup end
 
 " building and project managament
