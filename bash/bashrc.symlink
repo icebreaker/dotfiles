@@ -1,3 +1,6 @@
+# Exit early when not running in interactive mode
+[[ $- != *i* ]] && return
+
 # OS
 if [ -f /etc/arch-release ]; then
 	export DOT_OS="arch"
