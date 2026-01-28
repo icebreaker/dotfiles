@@ -1,5 +1,5 @@
 # Exit early when not running in interactive mode
-[[ $- != *i* ]] && return
+# [[ $- != *i* ]] && return
 
 # OS
 if [ -f /etc/arch-release ]; then
