@@ -37,11 +37,17 @@ set ignorecase
 set mouse-=a
 set ruler
 set nofsync
-set clipboard=exclude:.*
 set cinoptions+=g0
 set foldmethod=marker
 set cryptmethod=blowfish2
 set ttimeoutlen=8
+
+" support for vim-full vs. vim-tiny/vim-minimal
+if has("autocmd")
+	set clipboard=exclude:.*
+else
+	set clipboard=
+endif
 
 " netrw
 let g:netrw_banner=0
