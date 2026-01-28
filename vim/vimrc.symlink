@@ -42,8 +42,8 @@ set foldmethod=marker
 set cryptmethod=blowfish2
 set ttimeoutlen=8
 
-" support for vim-full vs. vim-tiny/vim-minimal
-if has("autocmd")
+" only set option if we have +clipboard
+if has("clipboard")
 	set clipboard=exclude:.*
 else
 	set clipboard=
