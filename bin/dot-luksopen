@@ -1,0 +1,30 @@
+#!/bin/sh
+
+LUKS_DEV=/dev/sdc1
+LUKS_NAME=luks
+LUKS_MNT="/mnt/$LUKS_NAME"
+LUKS_DEV_MAPPER="/dev/mapper/$LUKS_NAME"
+
+if [ -n "$1" ]; then
+	LUKS_DEV="$1"
+fi
+
+if [ -n "$2" ] ; then
+	LUKS_NAME="$2"
+	LUKS_MNT="/mnt/$LUKS_NAME"
+	LUKS_DEV_MAPPER="/dev/mapper/$LUKS_NAME"
+fi
+
+if [ ! -b "$LUKS_DEV" ]; then
+	echo "error: $LUKS_DEV is not a valid block device ..."
+	exit -1
+fi
+
+if mountpoint -q "$LUKS_MNT" ; then
+	echo "error: $LUKS_MNT is already mounted ..."
+	exit -1
+fi
+
+sudo cryptsetup luksOpen "$LUKS_DEV" "$LUKS_NAME" && \
+	sudo mkdir -p "$LUKS_MNT" && \
+	sudo mount "$LUKS_DEV_MAPPER" "$LUKS_MNT"
