@@ -49,8 +49,9 @@ fi
 nitrogen --restore &
 
 if egrep -iq 'touchpad' /proc/bus/input/devices; then
-    synclient VertEdgeScroll=1 &
-    synclient TapButton1=1 &
+	synclient VertEdgeScroll=1
+	synclient TapButton1=1
+	synclient VertScrollDelta=-100
 fi
 
 TOUCHPAD_ID=$(xinput --list | grep 'ETPS/2 Elantech Touchpad' | cut -d '=' -f 2 | awk '{ print $1 }')
