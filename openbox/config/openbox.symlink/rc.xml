@@ -331,6 +331,15 @@
         <command>~/.dotfiles/bin/dot-steam</command>
       </action>
     </keybind>
+   <keybind key="XF86Launch3">
+      <action name="Execute">
+        <startupnotify>
+          <enabled>true</enabled>
+          <name>Steam</name>
+        </startupnotify>
+        <command>~/.dotfiles/bin/dot-steam</command>
+      </action>
+    </keybind>
    <keybind key="W-s">
       <action name="Execute">
         <startupnotify>
