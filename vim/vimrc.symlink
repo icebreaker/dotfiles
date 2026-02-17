@@ -665,6 +665,7 @@ augroup SetupFileTypes
 	au BufRead,BufNewFile *.as set filetype=actionscript
 	au BufRead,BufNewFile Gemfile set syntax=off tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile Dockerfile,Jenkinsfile set tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
+	au BufRead,BufNewFile *-Dockerfile set ft=dockerfile tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile Rakefile,Gemfile set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile *.ru set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
 	au BufRead,BufNewFile *.rb set filetype=ruby tabstop=2 shiftwidth=2 softtabstop=2 expandtab noeol
