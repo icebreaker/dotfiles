@@ -8,7 +8,7 @@ fi
 FROM=$2
 PROTO=$3
 
-if [ -z "$FROM" ] || [ "$FROM" == "-" ]; then
+if [ -z "$FROM" ] || [ "$FROM" = "-" ]; then
 	FROM="192.168.1.0/24"
 fi
 
