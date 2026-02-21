@@ -2,7 +2,7 @@
 
 if [ $# -lt 1 ]; then
 	echo "usage: `basename $0` PORT"
-	exit -1
+	exit 1
 fi
 
 FROM=$2
