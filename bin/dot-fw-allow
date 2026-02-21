@@ -6,9 +6,14 @@ if [ $# -lt 1 ]; then
 fi
 
 FROM=$2
+PROTO=$3
 
-if [ -z "$FROM" ]; then
+if [[ -z "$FROM" ]] || [[ "$FROM" == "-" ]]; then
 	FROM="192.168.1.0/24"
 fi
 
-sudo ufw allow from $FROM to any port $1 proto tcp && sudo ufw status numbered
+if [ -z "$PROTO" ]; then
+	PROTO="tcp"
+fi
+
+sudo ufw allow from $FROM to any port $1 proto $PROTO && sudo ufw status numbered
