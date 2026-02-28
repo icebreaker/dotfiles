@@ -1,0 +1,46 @@
+#!/bin/sh
+
+if [ $# -lt 1 ]; then
+	echo "usage: `basename $0` windowname [w h]"
+	exit 1
+fi
+
+NAME=""
+WIDTH="-"
+HEIGHT="-"
+
+if [ $# -gt 0 ]; then
+	NAME=$1
+	shift
+fi
+
+if [ $# -gt 0 ]; then
+	WIDTH=$1
+	shift
+fi
+
+if [ $# -gt 0 ]; then
+	HEIGHT=$1
+	shift
+fi
+
+if [ "$WIDTH" == "-" ]; then
+	WIDTH=1022
+fi
+
+if [ "$HEIGHT" == "-" ]; then
+	if [ "$NAME" == "qemu" ]; then
+		HEIGHT=448
+	else
+		HEIGHT=743
+	fi
+fi
+
+WINDOW_ID=$(xdotool search --name "$NAME" | tail -1)
+
+if [ -z "$WINDOW_ID" ]; then
+	echo "error: could not find window with name: '$NAME' ..."
+	exit 1
+fi
+
+xdotool windowsize $WINDOW_ID $WIDTH $HEIGHT
