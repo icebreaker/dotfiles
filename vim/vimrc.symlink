@@ -659,6 +659,7 @@ augroup SetupFileTypes
 	au!
 	au BufRead,BufNewFile *.glsl,*.shader,*.shd set filetype=glsl
 	au BufRead,BufNewFile *.CPP,*.H,*.HPP set filetype=cpp
+	au BufRead,BufNewFile *.PAS set filetype=pascal
 	au BufRead,BufNewFile *.ASM set filetype=asm
 	au BufRead,BufNewFile *.mm,*.m set filetype=objc
 	au BufRead,BufNewFile *.me,*.symlink,*.bsh,*.localrc set filetype=sh
