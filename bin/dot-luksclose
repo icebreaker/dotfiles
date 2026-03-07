@@ -17,13 +17,14 @@ fi
 
 if [ ! -b "$LUKS_DEV" ]; then
 	echo "error: $LUKS_DEV is not a valid block device ..."
-	exit -1
+	exit 1
 fi
 
 if mountpoint -q "$LUKS_MNT" ; then
-	sudo umount "$LUKS_MNT" && \
+	sudo sync && \
+		sudo umount "$LUKS_MNT" && \
 		sudo cryptsetup luksClose "$LUKS_NAME"
 else
 	echo "error: $LUKS_MNT is not mounted ..."
-	exit -1
+	exit 1
 fi
