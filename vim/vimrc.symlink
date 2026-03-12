@@ -342,11 +342,18 @@ augroup MavenErrorFormat
 	au BufNewFile,BufRead *.java :call SetupMavenErrorFormat()
 augroup end
 
-" man/doc for C/C++ and Go
+" man/doc for C/C++
 augroup AutoSetupManual
 	au!
 	au BufNewFile,BufRead *.c,*.cc,*.cpp,*.cxx,*.h,*.hpp,*.hh :set keywordprg=dot-man
-	au BufNewFile,BufRead *.go :set keywordprg=dot-go-doc
+augroup end
+
+" Go makeprg, keywordprg and errorformat
+augroup GoSetup
+	au!
+	au FileType go setlocal makeprg=go\ build\ -v\ .
+	au FileType go setlocal keywordprg=dot-go-doc
+	au FileType go setlocal errorformat=%f:%l:%c:\ %m,%f:%l:\ %m
 augroup end
 
 " building and project managament
