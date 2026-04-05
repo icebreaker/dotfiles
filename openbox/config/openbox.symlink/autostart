@@ -11,13 +11,7 @@ if [ -f /sys/class/backlight/intel_backlight/brightness ]; then
 fi
 
 if [ -x /usr/bin/gnome-keyring-daemon ]; then
-	GNOME_KEYRING_PID=$(pgrep -f 'gnome-keyring-daemon' 2> /dev/null)
-
-	if [ ! -z "$GNOME_KEYRING_PID" ]; then
-		kill -9 $GNOME_KEYRING_PID
-	fi
-
-	eval $(/usr/bin/gnome-keyring-daemon --start)
+	eval $(/usr/bin/gnome-keyring-daemon --replace --components=gpg,pkcs11,secrets,ssh)
 	export GNOME_KEYRING_CONTROL
 	export SSH_AUTH_SOCK
 fi
@@ -29,11 +23,6 @@ if [ -z "$GNOME_POLKIT_PID" ]; then
 	elif [ -x /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 ]; then
 		(sleep 2s && /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1) &
 	fi
-fi
-
-if [ "$DOT_WINDOW_MANAGER" == "startfluxbox" ]; then
-	fluxbox &
-	DOT_FLUXBOX_PID=$!
 fi
 
 if [ -x /usr/bin/xbacklight ]; then
@@ -82,8 +71,4 @@ fi
 
 if [ -x /usr/bin/blueman-applet ]; then
 	(sleep 10s && blueman-applet) &
-fi
-
-if [ "$DOT_WINDOW_MANAGER" == "startfluxbox" ]; then
-	wait $DOT_FLUXBOX_PID
 fi
