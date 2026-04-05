@@ -34,7 +34,6 @@ set nostartofline
 set shortmess=atsI
 set noshowcmd
 set ignorecase
-set mouse-=a
 set ruler
 set nofsync
 set cinoptions+=g0
@@ -43,7 +42,7 @@ set cryptmethod=blowfish2
 set ttimeoutlen=8
 
 " only set option if we have +clipboard
-if has("clipboard")
+if has('clipboard')
 	set clipboard=exclude:.*
 else
 	set clipboard=
@@ -124,12 +123,15 @@ set background=dark
 if has('gui_running')
 	set guifont=JetBrains\ Mono\ ExtraBold\ 17
 	set guicursor+=a:blinkon0
-	set guioptions=i
+	" set guioptions=i
 	set clipboard=unnamedplus
+	set selection=old
+	set mouse+=a
 	colorscheme base16-default
 	vnoremap <C-c> :w! !xclip -i -sel c<CR><CR>
 	nnoremap <C-p> :r !xclip -o -sel -c<CR><CR>
 else
+	set mouse-=a
 	colorscheme monoplex
 	vnoremap <C-c> :w! ~/.vimswap/.buffer<CR>
 	nnoremap <C-p> :r ~/.vimswap/.buffer<CR>
@@ -246,7 +248,7 @@ exec 'set wildignore+=' . join(s:ignorepath + s:ignoreext, ',')
 set wildoptions=pum
 set wildmenu
 
-if has('win32')
+if has('win32') || empty($DISPLAY) || !empty($DOT_SSH_HOSTNAME)
 	nnoremap <C-l> :argedit<SPACE>
 else
 	let g:fastopen_ignore_filter = join(map(copy(s:ignorepath), '"^" . v:val') + map(copy(s:ignoreext), '"." . v:val . "\$"'), '|')
