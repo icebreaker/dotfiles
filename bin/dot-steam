@@ -1,23 +1,5 @@
-#!/bin/bash
+#!/bin/sh
 
-VERSION=$(zenity  --list  --text "Steam" --column "Version" Linux Windows Twitch)
-
-if [ -z "$WINEPREFIX" ]; then
-	if [ -d "/extra" ]; then
-		WINEPREFIX=/extra/wine
-	else
-		WINEPREFIX=$HOME/.wine
-	fi
-
-	export WINEPREFIX
-fi
-
-if [ "$VERSION" == "Windows" ]; then
-	wine $WINEPREFIX/drive_c/Steam/Steam.exe -no-cef-sandbox "$@"
-elif [ "$VERSION" == "Linux" ]; then
-	steam "$@"
-elif [ "$VERSION" == "Twitch" ]; then
-	WINEPREFIX=$HOME/amazongames
-	export WINEPREFIX
-	wine "$WINEPREFIX/drive_c/users/msz/Application Data/Twitch/Bin/Twitch.exe"
+if kdialog --yesno "Launch Steam?" --title "Steam"; then
+	steam $*
 fi
