@@ -35,7 +35,13 @@ fi
 
 (sleep 5s && thunar --daemon) &
 
-nitrogen --restore &
+if [ -x /usr/bin/nitrogen ]; then
+	nitrogen --restore &
+fi
+
+if [ -x /usr/bin/feh ]; then
+	feh --bg-fill ~/Pictures/wallpapers/wallpaper.png &
+fi
 
 if egrep -iq 'touchpad' /proc/bus/input/devices; then
 	synclient VertEdgeScroll=1
