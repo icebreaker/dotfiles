@@ -16,7 +16,7 @@ set -g pane-border-style fg=colour235
 set -g pane-active-border-style fg=colour235
 
 set -g clock-mode-colour colour250
-set -g message-style fg=default,bg=colour235,bold
+set -g message-style fg=default,bg=colour235,fill=colour235,bold
 
 set -g display-time 2000
 
