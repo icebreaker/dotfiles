@@ -152,8 +152,20 @@ vnoremap q gq
 
 augroup dfw
 	au!
-	au FileType markdown,text set nonumber wrap linebreak nolist tw=79
+	au FileType markdown,text set nonumber wrap linebreak nolist tw=74
 augroup end
+
+if has('gui_running')
+	function! SetupEvimdfw()
+		silent! exec 'set number wrap linebreak nolist tw=74 guicursor=a:block guioptions='
+		silent! exec 'colorscheme borland'
+	endfunction
+
+	augroup evimdfw
+		au!
+		au GUIEnter * if &insertmode | call SetupEvimdfw() | endif
+	augroup end
+endif
 
 " status line
 function! GitStatus()
