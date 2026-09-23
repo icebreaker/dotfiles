@@ -12,11 +12,22 @@ set -g window-status-format "#[fg=default,bg=default] #I #W "
 set -g window-status-current-format "#[fg=colour235,bg=colour250] #I #W #[fg=default,bg=default]"
 set -g window-status-activity-style bold
 
+set -g mode-style fg=colour235,bg=colour250,bold
+
+set -g menu-style fg=default,bg=default
+set -g menu-border-style fg=default,bg=default
+set -g menu-selected-style fg=colour235,bg=colour250,bold
+
+set -g display-panes-colour default
+set -g display-panes-active-colour color130
+
 set -g pane-border-style fg=colour235
 set -g pane-active-border-style fg=colour235
 
-set -g clock-mode-colour colour250
 set -g message-style fg=default,bg=colour235,fill=colour235,bold
+set -g message-command-style fg=default,bg=colour235,fill=colour235,bold
+
+set -g clock-mode-colour default
 
 set -g display-time 2000
 
@@ -37,7 +48,7 @@ bind -n C-Right next-window
 bind -n C-Left previous-window
 
 unbind %
-bind \\ choose-tree -s -F "#{window_name}: #{s|^$HOME|~|:pane_current_path}"
+bind \\ choose-tree -s -N -F "#{window_name}: #{s|^$HOME|~|:pane_current_path}"
 bind - split-window -v -c '#{pane_current_path}'
 bind | split-window -h -c '#{pane_current_path}'
 
