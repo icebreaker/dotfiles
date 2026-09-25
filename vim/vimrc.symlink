@@ -676,6 +676,12 @@ nnoremap <Leader>to :Over<CR>
 nnoremap <Leader>tb :Break<CR>
 nnoremap <Leader>tq :Clear<CR>
 
+" say no to the pesky asterisks inside multiline comments
+augroup DisableMultilineCommentAsterisks
+	au!
+	au FileType * setlocal formatoptions-=ro
+augroup end
+
 " setup various file types
 augroup SetupFileTypes
 	au!
