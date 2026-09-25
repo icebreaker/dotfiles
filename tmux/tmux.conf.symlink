@@ -1,4 +1,4 @@
-set -g default-terminal xterm-256color
+set -g default-terminal tmux-256color
 
 set -g status on
 set -g status-style bg=colour235,fg=default,bold
