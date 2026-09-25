@@ -48,7 +48,7 @@ bind -n C-Right next-window
 bind -n C-Left previous-window
 
 unbind %
-bind \\ choose-tree -s -N -F "#{window_name}: #{s|^$HOME|~|:pane_current_path}"
+bind \\ choose-tree -s -O name -N -F "#{window_name}: #{s|^$HOME|~|:pane_current_path}"
 bind - split-window -v -c '#{pane_current_path}'
 bind | split-window -h -c '#{pane_current_path}'
 
