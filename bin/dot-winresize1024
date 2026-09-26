@@ -1,0 +1,3 @@
+#!/bin/sh
+
+xdotool selectwindow windowsize 1024 768
