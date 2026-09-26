@@ -12,6 +12,7 @@
 .allow_hold_escape_shortcut = TRUE,
 .allow_font_scale_shortcut = TRUE,
 .allow_background_video_seek_shortcut = TRUE,
+.allow_background_image_toggle_shortcut = TRUE,
 .login_shell = TRUE,
 .shell = NULL,
 .word_char_exceptions = NULL,
